@@ -29,7 +29,7 @@ public:
 	sym_wme_pair make_id_wme(Symbol *id, Symbol *attr);
 	
 	template<class T>
-	wme      *make_wme(Symbol *id, const std::string &attr, const T &val);
+	wme         *make_wme(Symbol *id, const std::string &attr, const T &val);
 	
 	template<class T>
 	wme         *make_wme(Symbol *id, Symbol *attr, const T &val);

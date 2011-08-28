@@ -5,6 +5,7 @@
 #include <sys/un.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <sstream>
@@ -18,32 +19,48 @@ using namespace std;
 const char TERMSTRING[] = "\n***\n";
 const int BUFFERSIZE = 10240;
 
-ipcsocket::ipcsocket(string socketfile, bool recvfirst) 
-: recvbuf(), recvfirst(recvfirst)
+ipcsocket::ipcsocket(char role, string socketfile, bool recvfirst, bool blocklisten) 
+: recvbuf(), recvfirst(recvfirst), role(role)
 {
 	socklen_t len;
 	struct sockaddr_un addr;
 	
-	if ((listenfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-		perror("ipcsocket::ipcsocket");
-		exit(1);
-	}
-	
+	bzero((char *) &addr, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strcpy(addr.sun_path, socketfile.c_str());
-	unlink(addr.sun_path);
 	len = strlen(addr.sun_path) + sizeof(addr.sun_family);
-	if (bind(listenfd, (struct sockaddr *) &addr, len) == -1) {
-		perror("ipcsocket::ipcsocket");
-		exit(1);
+	
+	if (role == 's') {
+		if ((listenfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+			perror("ipcsocket::ipcsocket");
+			exit(1);
+		}
+		
+		unlink(addr.sun_path);
+		if (bind(listenfd, (struct sockaddr *) &addr, len) == -1) {
+			perror("ipcsocket::ipcsocket");
+			exit(1);
+		}
+	
+		if (::listen(listenfd, 1) == -1) {
+			perror("ipcsocket::ipcsocket");
+			exit(1);
+		}
+		if (!blocklisten) {
+			fcntl(listenfd, F_SETFL, O_NONBLOCK);
+		}
+		connected = false;
+	} else {
+		if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+			perror("ipcsocket::ipcsocket");
+			exit(1);
+		}
+		
+		while (connect(fd, (struct sockaddr *) &addr, len) == -1) {
+			sleep(1);
+		}
+		connected = true;
 	}
-
-	if (::listen(listenfd, 1) == -1) {
-		perror("ipcsocket::ipcsocket");
-		exit(1);
-	}
-	fcntl(listenfd, F_SETFL, O_NONBLOCK);
-	connected = false;
 }
 
 ipcsocket::~ipcsocket() {
@@ -58,10 +75,13 @@ bool ipcsocket::accept() {
 	struct sockaddr_un remote;
 	list<ipc_listener*>::iterator i;
 	
+	if (role != 's') {
+		return false;
+	}
 	len = sizeof(struct sockaddr_un);
 	if ((fd = ::accept(listenfd, (struct sockaddr *) &remote, &len)) == -1) {
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			perror("ipcsocket::ipcsocket");
+			perror("ipcsocket::accept");
 			exit(1);
 		}
 		return false;

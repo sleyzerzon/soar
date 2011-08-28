@@ -14,7 +14,7 @@ public:
 
 class ipcsocket {
 public:
-	ipcsocket(std::string socketfile, bool recvfirst);
+	ipcsocket(char role, std::string socketfile, bool recvfirst, bool blocklisten=false);
 	~ipcsocket();
 	
 	bool send(const std::string &s);
@@ -39,6 +39,7 @@ private:
 	bool recvfirst;
 	
 	std::list<ipc_listener*> listeners;
+	char role;
 };
 
 #endif

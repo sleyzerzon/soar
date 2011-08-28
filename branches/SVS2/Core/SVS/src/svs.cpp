@@ -16,12 +16,7 @@
 
 using namespace std;
 
-const bool CHECK_MODELS = true;
-
 typedef map<wme*,command*>::iterator cmd_iter;
-
-ofstream trainlog("train.log");
-bool headerwritten = false;
 
 void print_tree(sgnode *n) {
 	if (n->is_group()) {
@@ -205,7 +200,7 @@ void svs_state::clear_scene() {
 }
 
 svs::svs(agent *a)
-: envsock(getnamespace() + "env", true)
+: envsock('s', getnamespace() + "env", true)
 {
 	si = new soar_interface(a);
 	make_common_syms();
@@ -289,14 +284,6 @@ void svs::update_models() {
 		x.extend(next_out.vals);
 		//models.test(x, y);
 		models.learn(x, curr_pvals, dt);
-		
-		if (!headerwritten) {
-			trainlog << "# ";
-			copy(curr_pnames.begin(), curr_pnames.end(), ostream_iterator<string>(trainlog, " "));
-			trainlog << endl;
-			headerwritten = true;
-		}
-		trainlog << prev_pvals << " " << next_out.vals << " ; " << curr_pvals << " ; " << dt << endl;
 	} else {
 		models.set_property_vector(curr_pnames);
 	}

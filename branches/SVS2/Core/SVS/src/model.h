@@ -14,11 +14,12 @@
 class model {
 public:
 	virtual bool predict(const floatvec &x, floatvec &y) = 0;
-	virtual void learn(const floatvec &x, const floatvec &y, float dt) {}
 	virtual void get_slots(std::vector<std::string> &inputs, std::vector<std::string> &outputs) const = 0;
 	virtual std::string get_type() const = 0;
 	virtual int get_input_size() const = 0;
 	virtual int get_output_size() const = 0;
+	
+	virtual void learn(const floatvec &x, const floatvec &y, float dt) {}
 	
 	virtual float test(const floatvec &x, const floatvec &y) {
 		floatvec py(y.size());
@@ -30,7 +31,18 @@ public:
 	}
 };
 
-class multi_model : public model {
+/*
+ This class keeps track of how to combine several distinct models to make
+ a single prediction.  Its main responsibility is to map the values from
+ a single scene vector to the vectors that the individual models expect
+ as input, and then map the values of the output vectors from individual
+ models back into a single output vector for the entire scene. The mapping
+ is specified by the Soar agent at runtime using the assign-model command.
+ 
+ SVS uses a single instance of this class to make all its predictions. I
+ may turn this into a singleton in the future.
+*/
+class multi_model {
 public:
 	typedef std::map<std::string, std::string> slot_prop_map;
 
@@ -60,30 +72,29 @@ public:
 				continue;
 			}
 			floatvec xp = x.slice(i->in_indexes), yp = y.slice(i->out_indexes);
-			i->mdl->learn(xp, yp, dt);
+			float error = i->mdl->test(xp, yp);
+			if (error < 0. || error > 1.0e-8) {
+				i->mdl->learn(xp, yp, dt);
+			}
 		}
-	}
-	
-	std::string get_type() const {
-		return "multi-model";
 	}
 	
 	float test(const floatvec &x, const floatvec &y) {
 		float s = 0.0;
 		std::list<model_config>::iterator i;
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			std::cout << i->name << "(" << i->mdl->get_type() << "): ";
+			std::cerr << i->name << "(" << i->mdl->get_type() << "): ";
 			if (i->error) {
-				std::cout << "NP (assign error)" << std::endl;
+				std::cerr << "NP (assign error)" << std::endl;
 				continue;
 			}
 			floatvec xp = x.slice(i->in_indexes), yp = y.slice(i->out_indexes);
 			float d = i->mdl->test(xp, yp);
 			if (d < 0.) {
-				std::cout << "NP" << std::endl;
+				std::cerr << "NP" << std::endl;
 				s = -1.;
 			} else if (s >= 0.) {
-				std::cout << d << std::endl;
+				std::cerr << d << std::endl;
 				s += d;
 			}
 		}
@@ -93,34 +104,6 @@ public:
 		return -1.;
 	}
 	
-	/*
-	 Yes, these are slow. But they're used very infrequently, if at all.
-	*/
-	int get_input_size() const {
-		std::vector<std::string> in, out;
-		get_slots(in, out);
-		return in.size();
-	}
-	
-	int get_output_size() const {
-		std::vector<std::string> in, out;
-		get_slots(in, out);
-		return out.size();
-	}
-	
-	void get_slots(std::vector<std::string> &inputs, std::vector<std::string> &outputs) const {
-		std::set<std::string> all_in, all_out;
-		std::list<model_config>::const_iterator i;
-		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			std::vector<std::string> in, out;
-			i->mdl->get_slots(in, out);
-			copy(in.begin(), in.end(), std::inserter(all_in, all_in.begin()));
-			copy(out.begin(), out.end(), std::inserter(all_out, all_out.begin()));
-		}
-		copy(all_in.begin(), all_in.end(), back_inserter(inputs));
-		copy(all_out.begin(), all_out.end(), back_inserter(outputs));
-	}
-
 	bool assign_model(const std::string &name, 
 	                  const slot_prop_map &in_slot_props, 
 	                  const slot_prop_map &out_slot_props) 
@@ -131,17 +114,20 @@ public:
 		
 		config.name = name;
 		if (!map_get(model_db, name, config.mdl)) {
+			std::cerr << "ERROR (assign_model): no model " << name << std::endl;
 			return false;
 		}
 		config.mdl->get_slots(in_slots, out_slots);
 		
 		for (i = in_slots.begin(); i != in_slots.end(); ++i) {
 			if (in_slot_props.find(*i) == in_slot_props.end()) {
+				std::cerr << "ERROR (assign_model): input slot " << *i << std::endl;
 				return false;
 			}
 		}
 		for (i = out_slots.begin(); i != out_slots.end(); ++i) {
 			if (out_slot_props.find(*i) == out_slot_props.end()) {
+				std::cout << "ERROR (assign_model): output slot " << std::endl;
 				return false;
 			}
 		}
@@ -149,8 +135,8 @@ public:
 		config.in_slot_props = in_slot_props;
 		config.out_slot_props = out_slot_props;
 		
-		if (!assign_slot_indexes(in_slots, in_slot_props, config.in_indexes) ||
-		    !assign_slot_indexes(out_slots, out_slot_props, config.out_indexes))
+		if (!assign_slot_indexes(in_slots, in_slot_props, config.in_indexes, false) ||
+		    !assign_slot_indexes(out_slots, out_slot_props, config.out_indexes, true))
 		{
 			config.error = true;
 		} else {
@@ -190,12 +176,12 @@ private:
 			int index = -1;
 			i->mdl->get_slots(in_slots, out_slots);
 			i->in_indexes.clear();
-			if (!assign_slot_indexes(in_slots, i->in_slot_props, i->in_indexes)) {
+			if (!assign_slot_indexes(in_slots, i->in_slot_props, i->in_indexes, false)) {
 				i->error = true;
 				continue;
 			}
 			i->out_indexes.clear();
-			if (!assign_slot_indexes(out_slots, i->out_slot_props, i->out_indexes)) {
+			if (!assign_slot_indexes(out_slots, i->out_slot_props, i->out_indexes, true)) {
 				i->error = true;
 				continue;
 			}
@@ -205,7 +191,8 @@ private:
 	
 	bool assign_slot_indexes(const std::vector<std::string> &slots, 
 							 const slot_prop_map &assignments,
-							 std::vector<int> &indexes)
+							 std::vector<int> &indexes,
+							 bool allow_unassigned)
 	{
 		std::vector<std::string> fields;
 		std::string name;
@@ -214,8 +201,12 @@ private:
 
 		for (i = slots.begin(); i != slots.end(); ++i) {
 			if (!map_get(assignments, *i, name)) {
-				std::cout << "SLOT NOT ASSIGNED " << *i << std::endl;
-				return false;
+				if (allow_unassigned) {
+					continue;
+				} else {
+					std::cerr << "SLOT NOT ASSIGNED " << *i << std::endl;
+					return false;
+				}
 			}
 			index = -1;
 			for (int j = 0; j < prop_vec.size(); ++j) {
@@ -225,7 +216,7 @@ private:
 				}
 			}
 			if (index < 0) {
-				std::cout << "PROPERTY NOT FOUND " << name << std::endl;
+				std::cerr << "PROPERTY NOT FOUND " << name << std::endl;
 				return false;
 			}
 			indexes.push_back(index);
@@ -247,8 +238,5 @@ private:
 	std::map<std::string, model*> model_db;
 	std::vector<std::string>      prop_vec;
 };
-
-model *parse_model_struct(soar_interface *si, Symbol *root, std::string &name);
-
 
 #endif

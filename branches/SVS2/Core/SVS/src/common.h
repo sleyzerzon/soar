@@ -340,12 +340,12 @@ public:
 		}
 	}
 	
+	friend std::ostream &operator<<(std::ostream &os, const floatvec &v);
+	
 private:
 	float *mem;
 	int sz;
 };
-
-std::ostream &operator<<(std::ostream &os, const floatvec &v);
 
 class namedvec {
 public:

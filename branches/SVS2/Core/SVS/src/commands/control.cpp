@@ -259,11 +259,9 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 /* this class is a little dirty to avoid as much allocation and copying as possible */
 class traj_eval {
 public:
-	traj_eval(int outsize, model *m, objective *obj, const scene &init)
-	: outsize(outsize), obj(obj), scn(init)
+	traj_eval(int outsize, multi_model *m, objective *obj, const scene &init)
+	: mdl(m), outsize(outsize), obj(obj), scn(init), numcalls(0), totaltime(0.)
 	{
-		mdl = dynamic_cast<multi_model*>(m);
-		assert(mdl);
 		scn.get_properties(initvals);
 	}
 
@@ -287,6 +285,8 @@ public:
 	/* version to be used in Nelder-Mead search */
 	bool eval(const floatvec &v, float &value) {
 		assert(v.size() % outsize == 0);
+		timer tm;
+		tm.start();
 		if (t.size() * outsize != v.size()) {
 			t.resize(v.size() / outsize, floatvec(outsize));
 		}
@@ -299,7 +299,16 @@ public:
 			}
 			offset += outsize;
 		}
-		return eval(t, value);
+		bool ret = eval(t, value);
+		totaltime += tm.stop();
+		numcalls++;
+		return ret;
+	}
+	
+	void print_stats() const {
+		cout << "ncall: " << numcalls << endl;
+		cout << "ttime: " << totaltime << endl;
+		cout << "atime: " << totaltime / numcalls << endl;
 	}
 	
 private:
@@ -309,6 +318,8 @@ private:
 	trajectory     t;         // cached to prevent repeated memory allocation
 	scene          scn;       // copy of initial scene to be modified after prediction
 	floatvec       initvals;  // flattened values of initial scene
+	int            numcalls;
+	double         totaltime;
 };
 
 void constrain(floatvec &v, const floatvec &min, const floatvec &max) {
@@ -446,7 +457,6 @@ public:
 		}
 	}
 
-	/* Don't forget to make this a PID controller later */
 	bool seek(scene *scn, floatvec &bestout) {
 		if (type == "simplex") {
 			return simplex_seek(scn, bestout);
@@ -457,13 +467,8 @@ public:
 	bool naive_seek(scene *scn, floatvec &bestout) {
 		float val, best;
 		bool found = false;
-		model *mdl = svsp->get_model();
 		
-		if (!mdl) {
-			return false;
-		}
-		
-		traj_eval evaluator(out_info.size(), mdl, obj, *scn);
+		traj_eval evaluator(out_info.size(), svsp->get_model(), obj, *scn);
 		traj_incr incr(depth, output_incr(out_info));
 		trajectory t;
 		
@@ -486,16 +491,12 @@ public:
 	}
 	
 	bool simplex_seek(scene *scn, floatvec &bestout) {
-		model *mdl = svsp->get_model();
-		if (!mdl) {
-			return false;
-		}
-		
-		traj_eval evaluator(out_info.size(), mdl, obj, *scn);
+		traj_eval evaluator(out_info.size(), svsp->get_model(), obj, *scn);
 		floatvec best(min.size());
 		if (!nelder_mead_constrained(min, max, best, evaluator)) {
 			return false;
 		}
+		evaluator.print_stats();
 		bestout = best.slice(0, out_info.size());
 		return true;
 	}
@@ -536,10 +537,13 @@ public:
 			return false;
 		}
 		
+		timer t1;
+		t1.start();
 		if (!ctrl->seek(state->get_scene(), out.vals)) {
 			set_status("no valid output found");
 			return false;
 		}
+		cout << "SEEK " << t1.stop() << endl;
 		if (state->get_level() == 0) {
 			state->get_svs()->set_next_output(out);
 		}
@@ -683,7 +687,7 @@ command *_make_random_control_command_(svs_state *state, Symbol *root) {
 class manual_control_command : public command {
 public:
 	manual_control_command(svs_state *state, Symbol *root) : command(state, root), state(state) {
-		sock = new ipcsocket("ctrl", false);
+		sock = new ipcsocket('s', "ctrl", false);
 	}
 	
 	~manual_control_command() {

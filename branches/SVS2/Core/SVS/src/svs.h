@@ -120,14 +120,14 @@ public:
 	                  const std::map<std::string, std::string> &inputs,
 	                  const std::map<std::string, std::string> &outputs)
 	{
-		models.assign_model(name, inputs, outputs);
+		return models.assign_model(name, inputs, outputs);
 	}
 
 	void unassign_model(const std::string &name) {
 		models.unassign_model(name);
 	}
 	
-	model *get_model() {
+	multi_model *get_model() {
 		return &models;
 	}
 	

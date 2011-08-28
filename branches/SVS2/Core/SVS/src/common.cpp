@@ -35,12 +35,7 @@ string getnamespace() {
 }
 
 ostream &operator<<(ostream &os, const floatvec &v) {
-	for(int i = 0; i < v.size(); ++i) {
-		os << v[i];
-		if (i < v.size() - 1) {
-			os << " ";
-		}
-	}
+	copy(v.mem, v.mem + v.sz, ostream_iterator<float>(os, ","));
 	return os;
 }
 

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const float MARGIN = 0.01;
+const float MARGIN = 0.0001;
 
 DT_Bool collision_callback(void *client_data, void *obj1, void *obj2, const DT_CollData *coll_data);
 
@@ -164,6 +164,7 @@ private:
 		node_info &info = input_table[v];
 		info.node = n;
 		add_object(v, info);
+		return true;
 	}
 	
 	void del_node(filter_val *v) {

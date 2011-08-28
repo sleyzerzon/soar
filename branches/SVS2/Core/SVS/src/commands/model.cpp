@@ -9,10 +9,25 @@ model *_make_null_model_(soar_interface *si, Symbol* root);
 model *_make_velocity_model_(soar_interface *si, Symbol *root);
 model *_make_lwr_model_(soar_interface *si, Symbol *root);
 model *_make_splinter_model_(soar_interface *si, Symbol *root);
+model *_make_splinterenv_model_(soar_interface *si, Symbol *root);
+
+struct model_constructor_table_entry {
+	const char *type;
+	model* (*func)(soar_interface*, Symbol*);
+};
+
+static model_constructor_table_entry constructor_table[] = {
+	{ "null",        _make_null_model_},
+	{ "velocity",    _make_velocity_model_},
+	{ "lwr",         _make_lwr_model_},
+	{ "splinter",    _make_splinter_model_},
+	{ "splinterenv", _make_splinterenv_model_},
+};
 
 model *parse_model_struct(soar_interface *si, Symbol *root, string &name) {
 	wme *type_wme, *name_wme;
 	string type;
+	int table_size = sizeof(constructor_table) / sizeof(model_constructor_table_entry);
 	
 	if (!si->find_child_wme(root, "type", type_wme) ||
 		!si->get_val(si->get_wme_val(type_wme), type))
@@ -26,14 +41,10 @@ model *parse_model_struct(soar_interface *si, Symbol *root, string &name) {
 		return NULL;
 	}
 	
-	if (type == "null") {
-		return _make_null_model_(si, root);
-	} else if (type == "velocity") {
-		return _make_velocity_model_(si, root);
-	} else if (type == "lwr") {
-		return _make_lwr_model_(si, root);
-	} else if (type == "splinter") {
-		return _make_splinter_model_(si, root);
+	for (int i = 0; i < table_size; ++i) {
+		if (type == constructor_table[i].type) {
+			return constructor_table[i].func(si, root);
+		}
 	}
 	return NULL;
 }

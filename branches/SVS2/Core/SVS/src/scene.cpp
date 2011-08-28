@@ -43,7 +43,7 @@ scene::scene(string name, string rootname)
 : name(name), rootname(rootname), iscopy(false), dt(1.0)
 {
 	if (!disp) {
-		disp = new ipcsocket(getnamespace() + "disp", false);
+		disp = new ipcsocket('s', getnamespace() + "disp", false);
 	}
 	disp->listen(this);
 	root = new sgnode(rootname);
@@ -214,7 +214,10 @@ int scene::parse_add(vector<string> &f) {
 	if (get_node(f[0])) {
 		return 0;  // already exists
 	}
-	
+	par = get_node(f[1]);
+	if (!par || !par->is_group()) {
+		return 1;
+	}
 	p = 2;
 	if (!parse_verts(f, p, verts)) {
 		return p;
@@ -223,10 +226,6 @@ int scene::parse_add(vector<string> &f) {
 		return p;
 	}
 	
-	par = get_node(f[1]);
-	if (!par || !par->is_group()) {
-		return 1;
-	}
 	if (verts.size() == 0) {
 		n = new sgnode(f[0]);
 	} else {
@@ -564,5 +563,27 @@ void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 		case sgnode::TRANSFORM_CHANGED:
 			disp_update_node(n);
 			break;
+	}
+}
+
+void scene::dump_sgel(ostream &os) {
+	node_map::const_iterator i;
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		const node_info &info = i->second;
+		sgnode *n = info.node;
+		const property_map &m = info.props;
+		os << "a " << i->first << " " << rootname << " ";
+		if (!n->is_group()) {
+			ptlist verts;
+			n->get_local_points(verts);
+			ptlist::const_iterator j;
+			os << "v ";
+			for (j = verts.begin(); j != verts.end(); ++j) {
+				os << *j << " ";
+			}
+		}
+		os << "p " << n->get_trans('p') << " ";
+		os << "r " << n->get_trans('r') << " ";
+		os << "s " << n->get_trans('s') << " ";
 	}
 }

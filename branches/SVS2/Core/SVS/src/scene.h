@@ -38,6 +38,7 @@ public:
 	float get_dt() const;
 	
 	void parse_sgel(const std::string &s);
+	void dump_sgel(std::ostream &os);
 	
 	void ipc_connect(ipcsocket *sock);
 	void ipc_disconnect(ipcsocket *sock);
