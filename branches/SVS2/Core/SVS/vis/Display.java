@@ -34,7 +34,7 @@ class Display {
 					for (Scene s1 : scenes) {
 						s1.draw = false;
 					}
-					s.draw = true;
+					s.selected();
 				}
 			}
 		});
@@ -55,7 +55,6 @@ class Display {
 			s = new Scene(parts[0]);
 			scenes.add(s);
 			tabs.addTab(parts[0], s.getComponent());
-			s.init();
 		}
 		
 		if (parts[1].trim().equals("delete")) {
@@ -109,6 +108,7 @@ class Display {
 	
 	class Scene {
 		String name;
+		boolean dividerSet;
 		volatile boolean draw;
 		volatile boolean running;
 		
@@ -126,7 +126,7 @@ class Display {
 		
 		public Scene(String name) {
 			this.name = name;
-			draw = true;
+			draw = false;
 			
 			objects = new HashMap<String, SceneObj>();
 			texts = new HashMap<String, SceneText>();
@@ -137,9 +137,10 @@ class Display {
 			textbuf = vw.getBuffer("textbuf");
 			
 			logtext = new JTextArea();
-			splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, vc, logtext);
+			splitpane = new FixedSplitPane(vc, logtext);
 			
 			renderer = new RenderThread();
+			renderer.start();
 		}
 		
 		JComponent getComponent() {
@@ -149,9 +150,8 @@ class Display {
 		/*
 		 Have to wait until the splitpane has been added to tabbedpane before setting divider.
 		*/
-		void init() {
-			splitpane.setDividerLocation(0.80);
-			renderer.start();
+		void selected() {
+			draw = true;
 		}
 		
 		void parseLine(String line) {
@@ -337,9 +337,6 @@ class Display {
 			String name = fields[1], s = "";
 			double[] p = new double[3];
 			
-			if (texts.containsKey(name)) {
-				System.err.println(String.format("text %s already exists", name));
-			}
 			if (!parseFloats(fields, 2, p)) {
 				return;
 			}
@@ -404,17 +401,23 @@ class Display {
 			VisChain chain = null;
 			
 			void setPos(double[] p) {
-				pos = p;
+				for (int i = 0; i < 3; i++) {
+					pos[i] = p[i];
+				}
 				chain = null;
 			}
 			
 			void setRot(double[] r) {
-				rot = r;
+				for (int i = 0; i < 3; i++) {
+					rot[i] = r[i];
+				}
 				chain = null;
 			}
 			
 			void setScale(double[] s) {
-				scl = s;
+				for (int i = 0; i < 3; i++) {
+					scl[i] = s[i];
+				}
 				chain = null;
 			}
 			
@@ -497,6 +500,7 @@ class Display {
 				if (chain == null) {
 					chain = new VisChain();
 					chain.add(LinAlg.translate(pos));
+					System.err.println(String.format("ROT %f %f %f", rot[0], rot[1], rot[2]));
 					chain.add(LinAlg.rollPitchYawToMatrix(rot));
 					chain.add(LinAlg.scale(scl[0], scl[1], scl[2]));
 					chain.add(shape);
@@ -520,6 +524,28 @@ class Display {
 					text = new VisText(pos, VisText.ANCHOR.CENTER, str);
 				}
 				return text;
+			}
+		}
+		
+		class FixedSplitPane extends JSplitPane {
+			double loc = 0.8;
+			boolean painted = false;
+			
+			public FixedSplitPane(JComponent top, JComponent bot) {
+				super(JSplitPane.VERTICAL_SPLIT, top, bot);
+			}
+			
+			public void setDividerLocation(double l) {
+				loc = l;
+				super.setDividerLocation(l);
+			}
+			
+			public void paint(Graphics g) {
+				super.paint(g);
+				if (!painted) {
+					super.setDividerLocation(loc);
+				}
+				painted = true;
 			}
 		}
 	}

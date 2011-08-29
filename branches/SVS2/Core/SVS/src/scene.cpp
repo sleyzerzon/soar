@@ -337,26 +337,36 @@ void scene::parse_sgel(const string &s) {
 }
 
 void scene::disp_add_node(sgnode *n) {
-	ptlist pts;
 	if (display && !n->is_group()) {
+		ptlist pts;
 		n->get_local_points(pts);
-		dispfifo << name << " a " << n->get_name() << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << " ";
+		string nn = n->get_name();
+		
+		dispfifo << name << " a " << nn << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << " ";
 		std::copy(pts.begin(), pts.end(), ostream_iterator<vec3>(dispfifo, " "));
 		dispfifo << endl;
+		
+		// name label
+		dispfifo << name << " t " << nn << "_label " << n->get_trans('p') << " " << nn << endl;
 		dispfifo.flush();
 	}
 }
 
 void scene::disp_del_node(sgnode *n) {
 	if (display && !n->is_group()) {
-		dispfifo << name << " d " << n->get_name() << endl;
+		string nn = n->get_name();
+		dispfifo << name << " d " << nn << endl;
+		dispfifo << name << " d " << nn << "_label" << endl;
 		dispfifo.flush();
 	}
 }
 
 void scene::disp_update_transform(sgnode *n) {
 	if (display && !n->is_group()) {
-		dispfifo << name << " c " << n->get_name() << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << endl;
+		string nn = n->get_name();
+		
+		dispfifo << name << " c " << nn << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << endl;
+		dispfifo << name << " t " << nn << "_label " << n->get_trans('p') << " " << nn << endl;
 		dispfifo.flush();
 	}
 }
