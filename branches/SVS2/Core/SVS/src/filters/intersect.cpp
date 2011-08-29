@@ -23,22 +23,22 @@ public:
 	debug_drawer() : fifo("/tmp/dispfifo"), counter(0) { reset(); }
 	
 	void drawLine(const btVector3 &from, const btVector3 &to, const btVector3 &color) {
-		fifo << "a " << counter++ << " c " << color << " " << from << " " << to << endl;
+		fifo << "bullet a " << counter++ << " c " << color << " " << from << " " << to << endl;
 		fifo.flush();
 	}
 	
 	void drawContactPoint(const btVector3 &pt, const btVector3 &norm, btScalar dist, int time, const btVector3 &color) {
-		fifo << "a " << counter++ << " c " << color << " " << pt << endl;
+		fifo << "bullet a " << counter++ << " c " << color << " " << pt << endl;
 		fifo.flush();
 	}
 	
 	void reportErrorWarning(const char *msg) {
-		fifo << "l " << msg << endl;
+		fifo << "bullet l " << msg << endl;
 		fifo.flush();
 	}
 	
 	void draw3dText(const btVector3 &p, const char *text) {
-		fifo << "t " << counter++ << " " << p << " " << text << endl;
+		fifo << "bullet t " << counter++ << " " << p << " " << text << endl;
 		fifo.flush();
 	}
 	/*
@@ -72,7 +72,7 @@ public:
 		quaternion q2(q.w(), q.x(), q.y(), q.z());
 		vec3 pos(o.x(), o.y(), o.z()), rot = q2.to_rpy();
 
-		fifo << "a " << counter++ << " p " << pos << " r " << rot << " c " << color;
+		fifo << "bullet a " << counter++ << " p " << pos << " r " << rot << " c " << color;
 		outputBoxVerts(min, max);
 		fifo << endl;
 		fifo.flush();
@@ -87,7 +87,7 @@ public:
 	}
 	
 	void reset() {
-		fifo << "r" << endl;
+		fifo << "bullet r" << endl;
 		fifo.flush();
 		counter = 0;
 	}

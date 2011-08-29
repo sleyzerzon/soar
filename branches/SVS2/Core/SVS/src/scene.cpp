@@ -2,6 +2,7 @@
 #include <map>
 #include <iterator>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <limits>
 #include <utility>
@@ -13,7 +14,7 @@
 
 using namespace std;
 
-ipcsocket *disp = NULL;
+ofstream dispfifo("/tmp/dispfifo");
 
 /*
  Native properties are currently the position, rotation, and scaling
@@ -39,49 +40,39 @@ bool is_native_prop(const string &name, char &type, int &dim) {
 	return true;
 }
 
-scene::scene(string name, string rootname) 
-: name(name), rootname(rootname), iscopy(false), dt(1.0)
+scene::scene(string name, string rootname, bool display) 
+: name(name), rootname(rootname), dt(1.0), display(display)
 {
-	if (!disp) {
-		disp = new ipcsocket('s', getnamespace() + "disp", false);
-	}
-	disp->listen(this);
 	root = new sgnode(rootname);
 	nodes[rootname].node = root;
 	root->listen(this);
-	disp_new_scene();
 }
 
-scene::scene(const scene &other)
-: name(other.name), rootname(other.rootname), iscopy(true), dt(other.dt)
-{
+scene::~scene() {
+	delete root;
+}
+
+scene *scene::copy() const {
+	scene *copy = new scene(name, rootname, false);  // don't display copies
 	string name;
 	std::list<sgnode*> all_nodes;
-	std::list<sgnode*>::iterator i;
+	std::list<sgnode*>::const_iterator i;
 	
-	root = other.root->copy();
-	root->walk(all_nodes);
+	copy->root = root->copy();
+	copy->root->walk(all_nodes);
 	
 	/*
 	 Make a deep copy of the nodes table, which will result in
 	 a table with pointers to other's nodes, then go through and
 	 change to point to our nodes.
 	*/
-	nodes = other.nodes;
+	copy->nodes = nodes;
 	for(i = all_nodes.begin(); i != all_nodes.end(); ++i) {
-		nodes[(**i).get_name()].node = *i;
-		(**i).listen(this);
+		copy->nodes[(**i).get_name()].node = *i;
+		(**i).listen(copy);
 	}
-}
-
-scene::~scene() {
-	if (!iscopy) {
-		disp_del_scene();
-	}
-	delete root;
-	if (disp) {
-		disp->unlisten(this);
-	}
+	
+	return copy;
 }
 
 sgnode* scene::get_root() {
@@ -345,40 +336,40 @@ void scene::parse_sgel(const string &s) {
 	}
 }
 
-void scene::disp_update_node(sgnode *n) {
-	if (iscopy) {
-		return;
-	}
-	
-	stringstream ss;
+void scene::disp_add_node(sgnode *n) {
 	ptlist pts;
-	ptlist::const_iterator i;
-	if (!n->is_group() && disp) {
-		ss << "updateobject\n" << name << '\n' << n->get_name() << '\n';
-		n->get_world_points(pts);
-		copy(pts.begin(), pts.end(), ostream_iterator<vec3>(ss, "\n"));
-		disp->send(ss.str());
+	if (display && !n->is_group()) {
+		n->get_local_points(pts);
+		dispfifo << name << " a " << n->get_name() << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << " ";
+		std::copy(pts.begin(), pts.end(), ostream_iterator<vec3>(dispfifo, " "));
+		dispfifo << endl;
+		dispfifo.flush();
 	}
 }
 
 void scene::disp_del_node(sgnode *n) {
-	if (iscopy) {
-		return;
-	}
-	
-	stringstream ss;
-	if (!n->is_group() && disp) {
-		ss << "delobject\n" << name << '\n' << n->get_name();
-		disp->send(ss.str());
+	if (display && !n->is_group()) {
+		dispfifo << name << " d " << n->get_name() << endl;
+		dispfifo.flush();
 	}
 }
 
-void scene::disp_new_scene() {
-	if (disp) disp->send("newscene\n" + name);
+void scene::disp_update_transform(sgnode *n) {
+	if (display && !n->is_group()) {
+		dispfifo << name << " c " << n->get_name() << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << endl;
+		dispfifo.flush();
+	}
 }
 
-void scene::disp_del_scene() {
-	if (disp) disp->send("delscene\n" + name);
+void scene::disp_update_vertices(sgnode *n) {
+	ptlist pts;
+	if (display && !n->is_group()) {
+		n->get_local_points(pts);
+		dispfifo << name << " c " << n->get_name() << " v ";
+		std::copy(pts.begin(), pts.end(), ostream_iterator<vec3>(dispfifo, " "));
+		dispfifo << endl;
+		dispfifo.flush();
+	}
 }
 
 void scene::get_property_names(vector<string> &names) const {
@@ -536,16 +527,6 @@ int scene::get_dof() const {
 	return dof;
 }
 
-void scene::ipc_connect(ipcsocket *sock) {
-	node_map::iterator i;
-	disp_new_scene();
-	for (i = nodes.begin(); i != nodes.end(); ++i) {
-		disp_update_node(i->second.node);
-	}
-}
-
-void scene::ipc_disconnect(ipcsocket *sock) {}
-
 void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 	sgnode *child;
 	switch (t) {
@@ -553,15 +534,17 @@ void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 			child = n->get_child(added_child);
 			child->listen(this);
 			nodes[child->get_name()].node = child;
-			disp_update_node(child);
+			disp_add_node(child);
 			break;
 		case sgnode::DELETED:
 			nodes.erase(n->get_name());
 			disp_del_node(n);
 			break;
 		case sgnode::POINTS_CHANGED:
+			disp_update_vertices(n);
+			break;
 		case sgnode::TRANSFORM_CHANGED:
-			disp_update_node(n);
+			disp_update_transform(n);
 			break;
 	}
 }

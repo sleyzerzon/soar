@@ -8,11 +8,12 @@
 #include "common.h"
 #include "ipcsocket.h"
 
-class scene : public ipc_listener, sgnode_listener {
+class scene : public sgnode_listener {
 public:
-	scene(std::string name, std::string rootname);
-	scene(const scene &other);
+	scene(std::string name, std::string rootname, bool display);
 	~scene();
+	
+	scene *copy() const;
 	
 	sgnode *get_root();
 	sgnode *get_node(const std::string &name);
@@ -40,16 +41,13 @@ public:
 	void parse_sgel(const std::string &s);
 	void dump_sgel(std::ostream &os);
 	
-	void ipc_connect(ipcsocket *sock);
-	void ipc_disconnect(ipcsocket *sock);
-	
 	void node_update(sgnode *n, sgnode::change_type t, int added_child);
 	
 private:
-	void disp_update_node(sgnode *n);
+	void disp_add_node(sgnode *n);
 	void disp_del_node(sgnode *n);
-	void disp_new_scene();
-	void disp_del_scene();
+	void disp_update_transform(sgnode *n);
+	void disp_update_vertices(sgnode *n);
 
 	int  parse_add(std::vector<std::string> &f);
 	int  parse_del(std::vector<std::string> &f);
@@ -71,7 +69,7 @@ private:
 	std::string  rootname;
 	sgnode      *root;
 	node_map     nodes;
-	bool         iscopy;
+	bool         display;
 	float        dt;          // time passed since last update (as reported by environment)
 };
 

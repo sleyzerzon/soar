@@ -260,11 +260,16 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 class traj_eval {
 public:
 	traj_eval(int outsize, multi_model *m, objective *obj, const scene &init)
-	: mdl(m), outsize(outsize), obj(obj), scn(init), numcalls(0), totaltime(0.)
+	: mdl(m), outsize(outsize), obj(obj), numcalls(0), totaltime(0.)
 	{
-		scn.get_properties(initvals);
+		scn = init.copy();
+		scn->get_properties(initvals);
 	}
 
+	~traj_eval() {
+		delete scn;
+	}
+	
 	/* version to be used in incremental search */
 	bool eval(const trajectory &traj, float &value) {
 		if (traj.size() > 0) {
@@ -276,9 +281,9 @@ public:
 					return false;
 				}
 			}
-			scn.set_properties(y);
+			scn->set_properties(y);
 		}
-		value = obj->eval(scn);
+		value = obj->eval(*scn);
 		return true;
 	}
 	
@@ -316,7 +321,7 @@ private:
 	objective     *obj;
 	int            outsize;   // dimensionality of output
 	trajectory     t;         // cached to prevent repeated memory allocation
-	scene          scn;       // copy of initial scene to be modified after prediction
+	scene         *scn;       // copy of initial scene to be modified after prediction
 	floatvec       initvals;  // flattened values of initial scene
 	int            numcalls;
 	double         totaltime;

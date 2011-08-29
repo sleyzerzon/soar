@@ -238,8 +238,7 @@ sp {report-int
 -->
 (<s> ^intersect <i>)
 (<i> ^a <a> ^b <b>)
-(write |INTERSECT | <a> | | <b> (crlf))
-(interrupt)}
+(write |INTERSECT | <a> | | <b> (crlf))}
 
 sp {report-no-int-1
 (state <s> ^svs.command.extract
@@ -301,7 +300,7 @@ sp {push-box-to-target
 -->
 (<c> ^seek <sk>)
 (<sk> ^type simplex
-      ^depth 20
+      ^depth 50
       ^outputs <out>
       ^objective <obj>)
 (<out> ^left <left> ^right <right>)

@@ -119,7 +119,7 @@ void svs_state::init() {
 	svs_link = si->make_id_wme(state, cs->svs).first;
 	cmd_link = si->make_id_wme(svs_link, cs->cmd).first;
 	scene_link = si->make_id_wme(svs_link, cs->scene).first;
-	scn = new scene(name, "world");
+	scn = new scene(name, "world", true);
 	root = new sgwme(si, scene_link, (sgwme*) NULL, scn->get_root());
 	if (!parent) {
 		ltm_link = si->make_id_wme(svs_link, cs->ltm).first;
