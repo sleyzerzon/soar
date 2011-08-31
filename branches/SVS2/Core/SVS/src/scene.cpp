@@ -2,19 +2,16 @@
 #include <map>
 #include <iterator>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <limits>
 #include <utility>
 #include "scene.h"
 #include "sgnode.h"
 #include "linalg.h"
-#include "ipcsocket.h"
 #include "common.h"
+#include "drawer.h"
 
 using namespace std;
-
-ofstream dispfifo("/tmp/dispfifo");
 
 /*
  Native properties are currently the position, rotation, and scaling
@@ -41,7 +38,7 @@ bool is_native_prop(const string &name, char &type, int &dim) {
 }
 
 scene::scene(string name, string rootname, bool display) 
-: name(name), rootname(rootname), dt(1.0), display(display)
+: name(name), rootname(rootname), dt(1.0), display(display), draw("/tmp/dispfifo", name)
 {
 	root = new sgnode(rootname);
 	nodes[rootname].node = root;
@@ -117,7 +114,6 @@ bool scene::del_node(const string &name) {
 	if ((i = nodes.find(name)) == nodes.end()) {
 		return false;
 	}
-	disp_del_node(i->second.node);
 	delete i->second.node;
 	/* rest is handled in node_update */
 	return true;
@@ -336,49 +332,28 @@ void scene::parse_sgel(const string &s) {
 	}
 }
 
-void scene::disp_add_node(sgnode *n) {
-	if (display && !n->is_group()) {
-		ptlist pts;
-		n->get_local_points(pts);
-		string nn = n->get_name();
-		
-		dispfifo << name << " a " << nn << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << " ";
-		std::copy(pts.begin(), pts.end(), ostream_iterator<vec3>(dispfifo, " "));
-		dispfifo << endl;
-		
-		// name label
-		dispfifo << name << " t " << nn << "_label " << n->get_trans('p') << " " << nn << endl;
-		dispfifo.flush();
+void scene::draw_all(const string &prefix, float r, float g, float b) {
+	node_map::const_iterator i;
+	draw.set_color(r, g, b);
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		sgnode *n = i->second.node;
+		if (n->is_group()) {
+			continue;
+		}
+		draw.set_transforms(n);
+		draw.set_vertices(n);
+		draw.add(prefix + n->get_name());
 	}
 }
 
-void scene::disp_del_node(sgnode *n) {
-	if (display && !n->is_group()) {
-		string nn = n->get_name();
-		dispfifo << name << " d " << nn << endl;
-		dispfifo << name << " d " << nn << "_label" << endl;
-		dispfifo.flush();
-	}
-}
-
-void scene::disp_update_transform(sgnode *n) {
-	if (display && !n->is_group()) {
-		string nn = n->get_name();
-		
-		dispfifo << name << " c " << nn << " p " << n->get_trans('p') << " r " << n->get_trans('r') << " s " << n->get_trans('s') << endl;
-		dispfifo << name << " t " << nn << "_label " << n->get_trans('p') << " " << nn << endl;
-		dispfifo.flush();
-	}
-}
-
-void scene::disp_update_vertices(sgnode *n) {
-	ptlist pts;
-	if (display && !n->is_group()) {
-		n->get_local_points(pts);
-		dispfifo << name << " c " << n->get_name() << " v ";
-		std::copy(pts.begin(), pts.end(), ostream_iterator<vec3>(dispfifo, " "));
-		dispfifo << endl;
-		dispfifo.flush();
+void scene::undraw_all(const string &prefix) {
+	node_map::const_iterator i;
+	for (i = nodes.begin(); i != nodes.end(); ++i) {
+		sgnode *n = i->second.node;
+		if (n->is_group()) {
+			continue;
+		}
+		draw.del(prefix + n->get_name());
 	}
 }
 
@@ -542,19 +517,30 @@ void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 	switch (t) {
 		case sgnode::CHILD_ADDED:
 			child = n->get_child(added_child);
+			cout << "ADDING NODE " << child->get_name() << endl;
 			child->listen(this);
 			nodes[child->get_name()].node = child;
-			disp_add_node(child);
+			if (display && !child->is_group()) {
+				draw.add(child);
+			}
 			break;
 		case sgnode::DELETED:
 			nodes.erase(n->get_name());
-			disp_del_node(n);
+			if (display && !n->is_group()) {
+				draw.del(n);
+			}
 			break;
 		case sgnode::POINTS_CHANGED:
-			disp_update_vertices(n);
+			if (display && !n->is_group()) {
+				draw.set_vertices(n);
+				draw.change(n->get_name(), drawer::VERTS);
+			}
 			break;
 		case sgnode::TRANSFORM_CHANGED:
-			disp_update_transform(n);
+			if (display && !n->is_group()) {
+				draw.set_transforms(n);
+				draw.change(n->get_name(), drawer::POS | drawer::ROT | drawer::SCALE);
+			}
 			break;
 	}
 }
