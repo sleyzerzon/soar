@@ -3,73 +3,14 @@
  broadphase pruning, so this is not as efficient as it can be.
 */
 #include <iostream>
-#include <fstream>
 #include <map>
-#include <btBulletCollisionCommon.h>
 #include "model.h"
 #include "linalg.h"
 #include "filter.h"
 #include "common.h"
+#include "bullet_support.h"
 
 using namespace std;
-
-ostream &operator<<(ostream &os, const btVector3 &v) {
-	os << v.x() << " " << v.y() << " " << v.z();
-	return os;
-}
-
-class debug_drawer : public btIDebugDraw {
-public:
-	debug_drawer() : fifo("/tmp/dispfifo"), counter(0) { reset(); }
-	
-	void drawLine(const btVector3 &from, const btVector3 &to, const btVector3 &color) {
-		fifo << "bullet n " << counter++ << " c " << color << " v " << from << " " << to << endl;
-		fifo.flush();
-	}
-	
-	void drawContactPoint(const btVector3 &pt, const btVector3 &norm, btScalar dist, int time, const btVector3 &color) {
-		fifo << "bullet n " << counter++ << " c " << color << " v " << pt << endl;
-		fifo.flush();
-	}
-	
-	void reportErrorWarning(const char *msg) {
-		fifo << "bullet l " << msg << endl;
-		fifo.flush();
-	}
-	
-	void draw3dText(const btVector3 &p, const char *text) {
-		fifo << "bullet t " << counter++ << " " << p << " " << text << endl;
-		fifo.flush();
-	}
-	
-	void outputBoxVerts(const btVector3 &min, const btVector3 &max) {
-		float pt[3];
-		for (int i = 0; i < 8; i++) {
-			pt[0] = min.x() + ((max.x() - min.x()) * (i & 1));
-			pt[1] = min.y() + ((max.y() - min.y()) * ((i >> 1) & 1));
-			pt[2] = min.z() + ((max.z() - min.z()) * ((i >> 2) & 1));
-			fifo << " ";
-			copy(pt, pt + 3, ostream_iterator<float>(fifo, " "));
-		}
-	}
-	
-	void setDebugMode(int mode) {
-	}
-	
-	int getDebugMode() const {
-		return DBG_DrawWireframe | DBG_DrawContactPoints | DBG_DrawText | DBG_DrawFeaturesText; // | DBG_DrawAabb | DBG_DrawConstraints | DBG_DrawConstraintLimits;
-	}
-	
-	void reset() {
-		fifo << "bullet r" << endl;
-		fifo.flush();
-		counter = 0;
-	}
-	
-private:
-	ofstream fifo;
-	int counter;
-};
 
 struct node_info {
 	sgnode *node;
@@ -88,55 +29,20 @@ typedef map<filter_val*, node_info> input_table_t;
 typedef pair<filter_val*, filter_val*> fval_pair;
 typedef map<fval_pair, result_info> result_table_t;
 
-btVector3 toBtVec(const vec3 &v) {
-	return btVector3(v.a[0], v.a[1], v.a[2]);
-}
-
 void update_transforms(node_info &info) {
 	vec3 rpy = info.node->get_trans('r');
 	btQuaternion q;
 	q.setEuler(rpy[0], rpy[1], rpy[2]);
-	info.object->getWorldTransform().setOrigin(toBtVec(info.node->get_trans('p')));
+	info.object->getWorldTransform().setOrigin(to_btvec(info.node->get_trans('p')));
 	info.object->getWorldTransform().setRotation(q);
-	info.shape->setLocalScaling(toBtVec(info.node->get_trans('s')));
-}
-
-btCollisionShape *ptlist_to_btshape(const ptlist &pts) {
-	vector<btVector3> pts1;
-	ptlist::const_iterator i;
-	int j;
-	
-	/*
-	for (i = pts.begin(); i != pts.end(); ++i) {
-		pts1.push_back(btVector3(i->a[0], i->a[1], i->a[2]));
-	}
-	btConvexHullShape *s = new btConvexHullShape(reinterpret_cast<const btScalar*>(&pts[0]), pts.size());
-	btConvexHullShape *s = new btConvexHullShape(reinterpret_cast<const btScalar*>(&pts1[0]), pts1.size());
-	*/
-	
-	btConvexHullShape *s = new btConvexHullShape();
-	
-	for (i = pts.begin(); i != pts.end(); ++i) {
-		s->addPoint(toBtVec(*i));
-	}
-	
-	/*
-	vec3 halfextents = pts[0];
-	for (i = pts.begin(); i != pts.end(); ++i) {
-		for (j = 0; j < 3; ++j) {
-			halfextents[j] = halfextents[j] < i->a[j] ? i->a[j] : halfextents[j];
-		}
-	}
-	btCollisionShape *s = new btBoxShape(toBtVec(halfextents));
-	*/
-	
-	s->setMargin(0.0001);
-	return s;
+	info.shape->setLocalScaling(to_btvec(info.node->get_trans('s')));
 }
 
 class intersect_filter : public filter {
 public:
-	intersect_filter(filter_input *input) : filter(input), callback(this) {
+	intersect_filter(filter_input *input) 
+	: filter(input) //drawer("/tmp/dispfifo")
+	{
 		btVector3 worldAabbMin(-1000,-1000,-1000);
 		btVector3 worldAabbMax(1000,1000,1000);
 		
@@ -201,6 +107,7 @@ public:
 			change_node(bv);
 		}
 		
+		/*
 		for (j = results.begin(); j != results.end(); ++j) {
 			btCollisionObject *o1 = input_table[j->first.first].object;
 			btCollisionObject *o2 = input_table[j->first.second].object;
@@ -208,15 +115,13 @@ public:
 			j->second.newval = false;
 			cworld->contactPairTest(o1, o2, callback);
 		}
+		*/
 		
-		/*
 		cworld->performDiscreteCollisionDetection();
 		int num_manifolds = dispatcher->getNumManifolds();
-		cout << "NUM MANIFOLDS: " << num_manifolds << endl;
 		for (int k = 0; k < num_manifolds; ++k) {
 			btPersistentManifold *m = dispatcher->getManifoldByIndexInternal(k);
 			int numcontacts = m->getNumContacts();
-			cout << "NUM CONTACTS: " << numcontacts << endl;
 			if (numcontacts == 0) {
 				continue;
 			}
@@ -226,7 +131,6 @@ public:
 			filter_val *bf = static_cast<filter_val*>(b->getUserPointer());
 			add_collision(af, bf);
 		}
-		*/
 		
 		for (j = results.begin(); j != results.end(); ++j) {
 			result_info &r = j->second;
@@ -256,6 +160,7 @@ public:
 	
 private:
 
+	/*
 	class collision_callback : public btCollisionWorld::ContactResultCallback {
 	public:
 		collision_callback(intersect_filter *f) : f(f) {}
@@ -278,10 +183,11 @@ private:
 	private:
 		intersect_filter *f;
 	};
+	*/
 	
 	void add_object(filter_val *v, node_info &info) {
 		info.node->get_local_points(info.vertices);
-		info.shape = ptlist_to_btshape(info.vertices);
+		info.shape = ptlist_to_hullshape(info.vertices);
 		info.object = new btCollisionObject();
 		info.object->setUserPointer(static_cast<void*>(v));
 		info.object->setCollisionShape(info.shape);
@@ -346,7 +252,7 @@ private:
 				assert(newverts.size() == info.vertices.size());
 				info.vertices = newverts;
 				delete info.shape;
-				info.shape = ptlist_to_btshape(info.vertices);
+				info.shape = ptlist_to_hullshape(info.vertices);
 				info.object->setCollisionShape(info.shape);
 			}
 			update_transforms(info);
@@ -358,8 +264,8 @@ private:
 	btCollisionDispatcher    *dispatcher;
 	btBroadphaseInterface    *broadphase;
 	btCollisionWorld         *cworld;
-	//debug_drawer             drawer;
-	collision_callback       callback;
+	//bullet_debug_drawer      drawer;
+	//collision_callback       callback;
 	
 	input_table_t      input_table;
 	result_table_t     results;

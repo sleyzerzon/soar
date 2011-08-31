@@ -16,6 +16,10 @@ public:
 	vec3(const vec3 &v) { memcpy(a, v.a, sizeof(float) * 3); }
 	vec3(float v[]) { memcpy(a, v, sizeof(float) * 3); }
 	vec3(float x, float y, float z) { a[0] = x; a[1] = y; a[2] = z; }
+
+	void zero() {
+		memset(a, 0, 3 * sizeof(float));
+	}
 	
 	float operator[](int i) const {
 		assert(0 <= i && i < 3);
@@ -56,6 +60,18 @@ public:
 		return result;
 	}
 	
+	vec3 operator-(const vec3 &v) const {
+		vec3 result;
+		for (int i = 0; i < 3; ++i) {
+			result.a[i] = a[i] - v.a[i];
+		}
+		return result;
+	}
+	
+	vec3 operator*(float s) const {
+		return vec3(s * a[0], s * a[1], s * a[2]);
+	}
+	
 	void operator+=(const vec3 &v) {
 		for (int i = 0; i < 3; ++i) {
 			a[i] += v.a[i];
@@ -68,7 +84,7 @@ public:
 		}
 	}
 	
-	float dist(const vec3 &v) const {
+	float dist2(const vec3 &v) const {
 		float w[3], sum = 0.;
 		int i;
 		for (i = 0; i < 3; ++i) {
@@ -77,11 +93,61 @@ public:
 		for (i = 0; i < 3; ++i) {
 			sum += w[i];
 		}
-		return sqrt(sum);
+		return sum;
 	}
 	
-	void zero() {
-		memset(a, 0, 3 * sizeof(float));
+	float dist(const vec3 &v) const {
+		return sqrt(dist2(v));
+	}
+	
+	float dot(const vec3 &v) const {
+		float s = 0.0;
+		for(int i = 0; i < 3; ++i) {
+			s += a[i] * v.a[i];
+		}
+		return s;
+	}
+	
+	float mag2() const {
+		return dot(*this);
+	}
+	
+	float mag() const {
+		return sqrt(mag2());
+	}
+	
+	vec3 unit() const {
+		float m = mag();
+		if (m == 0) {
+			return *this;
+		}
+		return vec3(a[0] / m, a[1] / m, a[2] / m);
+	}
+	
+	vec3 cross(const vec3 &v) {
+		float x = a[1] * v.a[2] - a[2] * v.a[1];
+		float y = a[2] * v.a[0] - a[0] * v.a[2];
+		float z = a[0] * v.a[1] - a[1] * v.a[0];
+		return vec3(x, y, z);
+	}
+	
+	vec3 project(const vec3 &u) const {
+		float m = u.mag2();
+		if (m == 0.) {
+			return vec3();
+		}
+		return u * (dot(u) / m);
+	}
+	
+	/*
+	 Distance between this vector and the line going through a and b.
+	 See http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+	*/
+	float line_dist(const vec3 &a, const vec3 &b) const {
+		vec3 ba = b - a;
+		float d1 = ba.cross(a-*this).mag2();
+		float d2 = ba.mag2();
+		return sqrt(d1 / d2);
 	}
 };
 

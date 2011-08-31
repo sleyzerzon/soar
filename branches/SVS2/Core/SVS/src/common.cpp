@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <limits>
 #include "common.h"
 
 using namespace std;
@@ -64,4 +65,26 @@ vec3 calc_centroid(const ptlist &pts) {
 		c[d] /= pts.size();
 	}
 	return c;
+}
+
+float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u) {
+	ptlist::const_iterator i;
+	vec3 p;
+	float x, min = numeric_limits<float>::max(), max = -numeric_limits<float>::max();
+	for (i = a.begin(); i != a.end(); ++i) {
+		p = i->project(u);
+		x = p[0] / u[0];
+		if (x < min) {
+			min = x;
+		}
+	}
+	for (i = b.begin(); i != b.end(); ++i) {
+		p = i->project(u);
+		float x = p[0] / u[0];
+		if (x > max) {
+			max = x;
+		}
+	}
+	
+	return max - min;
 }

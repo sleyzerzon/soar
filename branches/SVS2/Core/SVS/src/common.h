@@ -446,4 +446,18 @@ std::ostream &operator<<(std::ostream &os, const namedvec &v);
 
 vec3 calc_centroid(const ptlist &pts);
 
+/*
+ Calculate the maximum difference between points in two point clouds in
+ the direction of u.
+ 
+  a         b
+  .<-- d -->.        returns a positive d
+ --------------> u
+ 
+  b         a
+  .<-- d -->.        returns a negative d
+ --------------> u
+*/
+float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u);
+
 #endif

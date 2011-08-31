@@ -517,7 +517,6 @@ void scene::node_update(sgnode *n, sgnode::change_type t, int added_child) {
 	switch (t) {
 		case sgnode::CHILD_ADDED:
 			child = n->get_child(added_child);
-			cout << "ADDING NODE " << child->get_name() << endl;
 			child->listen(this);
 			nodes[child->get_name()].node = child;
 			if (display && !child->is_group()) {
