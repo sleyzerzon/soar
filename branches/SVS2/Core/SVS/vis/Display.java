@@ -159,17 +159,14 @@ class Display {
 			String[] fields2 = line.split("[ \t]+", 2);
 			synchronized (objects) {
 				switch (fields[0].charAt(0)) {
-					case 'a':
-						parseAdd(fields);
-						break;
-					case 'd':
-						parseDel(fields);
-						break;
-					case 'c':
-						parseChange(fields);
+					case 'n':
+						parseNode(fields);
 						break;
 					case 't':
 						parseText(fields);
+						break;
+					case 'd':
+						parseDel(fields);
 						break;
 					case 'l':
 						logtext.append(fields2[1] + "\n");
@@ -191,28 +188,24 @@ class Display {
 		
 		/*
 		 The format is
-		 a <name> [p <px> <py> <pz>] [r <rx> <ry> <rz>] [s <sx> <sy> <sz>] [<v1x> <v1y> <v1z> ... ]
+		 n <name> [p <px> <py> <pz>] [r <rx> <ry> <rz>] [s <sx> <sy> <sz>] [v <v1x> <v1y> <v1z> ...]
 		*/
-		void parseAdd(String fields[]) {
-			
+		void parseNode(String fields[]) {
 			if (fields.length < 2) {
-				System.err.println("invalid add command");
+				System.err.println("invalid node command");
 				return;
 			}
 			
 			String name = fields[1];
-			SceneObj obj = new SceneObj();
-			if (objects.containsKey(name)) {
-				System.err.println(String.format("object %s already exists", name));
-				return;
+			SceneObj obj = objects.get(name);
+			if (obj == null) {
+				obj = new SceneObj();
+				objects.put(name, obj);
 			}
 			
 			double vals[] = new double[3];
 			int i = 2;
-			while (i < fields.length) {
-				if (!fields[i].equals("p") && !fields[i].equals("r") && !fields[i].equals("s") && !fields[i].equals("c")) {
-					break;
-				}
+			while (i < fields.length && fields[i].matches("[prsc]")) {
 				if (!parseFloats(fields, i + 1, vals)) {
 					return;
 				}
@@ -225,74 +218,7 @@ class Display {
 				i += 4;
 			}
 			
-			while (i < fields.length) {
-				
-				if (!parseFloats(fields, i, vals)) {
-					return;
-				}
-				obj.addPoint(vals);
-				i += 3;
-			}
-			
-			objects.put(name, obj);
-		}
-		
-		/*
-		 The format is
-		 d <name>
-		*/
-		void parseDel(String fields[]) {
-			if (fields.length < 2) {
-				System.err.println("invalid del command");
-				return;
-			}
-			String name = fields[1];
-			if (objects.containsKey(name)) {
-				objects.remove(name);
-				return;
-			}
-			if (texts.containsKey(name)) {
-				texts.remove(name);
-				return;
-			}
-			System.err.println(String.format("object %s does not exist", name));
-		}
-		
-		/*
-		 The format is
-		 c <name> [p <px> <py> <pz>] [r <rx> <ry> <rz>] [s <sx> <sy> <sz>] [v <v1x> <v1y> <v1z> ...]
-		*/
-		void parseChange(String fields[]) {
-			if (fields.length < 2) {
-				System.err.println("invalid change command");
-				return;
-			}
-			
-			String name = fields[1];
-			if (!objects.containsKey(name)) {
-				System.err.println(String.format("object %s does not exist", name));
-				return;
-			}
-			SceneObj obj = objects.get(name);
-			
-			double vals[] = new double[3];
-			int i = 2;
-			while (i < fields.length) {
-				if (fields[i].equals("p") && fields[i].equals("r") && fields[i].equals("s")) {
-					break;
-				}
-				if (!parseFloats(fields, i + 1, vals)) {
-					return;
-				}
-				switch (fields[i].charAt(0)) {
-					case 'p': obj.setPos(vals); break;
-					case 'r': obj.setRot(vals); break;
-					case 's': obj.setScale(vals); break;
-				}
-				i += 4;
-			}
-			
-			if (i == fields.length || fields[i] != "v") {
+			if (i >= fields.length || !fields[i].equals("v")) {
 				return;
 			}
 			
@@ -346,6 +272,27 @@ class Display {
 			}
 			
 			texts.put(name, new SceneText(s, p));
+		}
+		
+		/*
+		 The format is
+		 d <name>
+		*/
+		void parseDel(String fields[]) {
+			if (fields.length < 2) {
+				System.err.println("invalid del command");
+				return;
+			}
+			String name = fields[1];
+			if (objects.containsKey(name)) {
+				objects.remove(name);
+				return;
+			}
+			if (texts.containsKey(name)) {
+				texts.remove(name);
+				return;
+			}
+			System.err.println(String.format("object %s does not exist", name));
 		}
 		
 		class RenderThread extends Thread {
@@ -473,13 +420,11 @@ class Display {
 						ArrayList<int[]> visTriangles = new ArrayList<int[]>();
 						
 						for (i = 0; i < verts.length; i++) {
-							System.err.println(String.format("%f %f %f", verts[i].x, verts[i].y, verts[i].z));
 							double[] v = {verts[i].x, verts[i].y, verts[i].z};
 							visVerts.add(v);
 						}
 						for (i = 0; i < faces.length; i++) {
 							assert faces[i].length == 3;
-							System.err.println(String.format("%d %d %d", faces[i][0], faces[i][1], faces[i][2]));
 							visTriangles.add(faces[i]);
 						}
 						
@@ -500,7 +445,6 @@ class Display {
 				if (chain == null) {
 					chain = new VisChain();
 					chain.add(LinAlg.translate(pos));
-					System.err.println(String.format("ROT %f %f %f", rot[0], rot[1], rot[2]));
 					chain.add(LinAlg.rollPitchYawToMatrix(rot));
 					chain.add(LinAlg.scale(scl[0], scl[1], scl[2]));
 					chain.add(shape);
