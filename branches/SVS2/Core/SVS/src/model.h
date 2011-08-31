@@ -59,7 +59,7 @@ public:
 			if (!i->mdl->predict(xp, yp)) {
 				return false;
 			}
-			y.multi_set(i->out_indexes, yp);
+			y.set_indices(i->out_indexes, yp);
 		}
 		return true;
 	}

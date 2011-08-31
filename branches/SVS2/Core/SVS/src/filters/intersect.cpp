@@ -23,12 +23,12 @@ public:
 	debug_drawer() : fifo("/tmp/dispfifo"), counter(0) { reset(); }
 	
 	void drawLine(const btVector3 &from, const btVector3 &to, const btVector3 &color) {
-		fifo << "bullet a " << counter++ << " c " << color << " " << from << " " << to << endl;
+		fifo << "bullet n " << counter++ << " c " << color << " v " << from << " " << to << endl;
 		fifo.flush();
 	}
 	
 	void drawContactPoint(const btVector3 &pt, const btVector3 &norm, btScalar dist, int time, const btVector3 &color) {
-		fifo << "bullet a " << counter++ << " c " << color << " " << pt << endl;
+		fifo << "bullet n " << counter++ << " c " << color << " v " << pt << endl;
 		fifo.flush();
 	}
 	
@@ -41,11 +41,6 @@ public:
 		fifo << "bullet t " << counter++ << " " << p << " " << text << endl;
 		fifo.flush();
 	}
-	/*
-	void drawAabb(const btVector3 &min, const btVector3 &max, const btVector3 &color) {
-		drawBox(min, max, color);
-	}
-	*/
 	
 	void outputBoxVerts(const btVector3 &min, const btVector3 &max) {
 		float pt[3];
@@ -57,27 +52,6 @@ public:
 			copy(pt, pt + 3, ostream_iterator<float>(fifo, " "));
 		}
 	}
-	
-	/*
-	void drawBox(const btVector3 &min, const btVector3 &max, const btVector3 &color) {
-		fifo << "a " << counter++ << " c " << color;
-		outputBoxVerts(min, max);
-		fifo << endl;
-		fifo.flush();
-	}
-	
-	void drawBox(const btVector3 &min, const btVector3 &max, const btTransform &t, const btVector3 &color) {
-		btVector3 o = t.getOrigin();
-		btQuaternion q = t.getRotation();
-		quaternion q2(q.w(), q.x(), q.y(), q.z());
-		vec3 pos(o.x(), o.y(), o.z()), rot = q2.to_rpy();
-
-		fifo << "bullet a " << counter++ << " p " << pos << " r " << rot << " c " << color;
-		outputBoxVerts(min, max);
-		fifo << endl;
-		fifo.flush();
-	}
-	*/
 	
 	void setDebugMode(int mode) {
 	}
@@ -171,7 +145,7 @@ public:
 		broadphase = new btSimpleBroadphase();
 		//broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax);
 		cworld = new btCollisionWorld(dispatcher, broadphase, config);
-		cworld->setDebugDrawer(&drawer);
+		//cworld->setDebugDrawer(&drawer);
 	}
 	
 	~intersect_filter() {
@@ -261,8 +235,8 @@ public:
 				change_result(r.fval);
 			}
 		}
-		drawer.reset();
-		cworld->debugDrawWorld();
+		//drawer.reset();
+		//cworld->debugDrawWorld();
 		return true;
 	}
 	
@@ -384,7 +358,7 @@ private:
 	btCollisionDispatcher    *dispatcher;
 	btBroadphaseInterface    *broadphase;
 	btCollisionWorld         *cworld;
-	debug_drawer             drawer;
+	//debug_drawer             drawer;
 	collision_callback       callback;
 	
 	input_table_t      input_table;

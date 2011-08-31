@@ -6,7 +6,7 @@
 #include "sgnode.h"
 #include "linalg.h"
 #include "common.h"
-#include "ipcsocket.h"
+#include "drawer.h"
 
 class scene : public sgnode_listener {
 public:
@@ -43,19 +43,17 @@ public:
 	
 	void node_update(sgnode *n, sgnode::change_type t, int added_child);
 	
+	void draw_all(const std::string &prefix, float r, float g, float b);
+	void undraw_all(const std::string &prefix);
+	
 private:
-	void disp_add_node(sgnode *n);
-	void disp_del_node(sgnode *n);
-	void disp_update_transform(sgnode *n);
-	void disp_update_vertices(sgnode *n);
-
 	int  parse_add(std::vector<std::string> &f);
 	int  parse_del(std::vector<std::string> &f);
 	int  parse_change(std::vector<std::string> &f);
     int  parse_property(std::vector<std::string> &f);
     int  parse_dt(std::vector<std::string> &f);
     bool parse_transforms(std::vector<std::string> &f, int &start, vec3 &pos, vec3 &rot, vec3 &scale);
-	
+    
 	typedef std::map<std::string, float> property_map;
 	
 	struct node_info {
@@ -70,6 +68,7 @@ private:
 	sgnode      *root;
 	node_map     nodes;
 	bool         display;
+	drawer       draw;
 	float        dt;          // time passed since last update (as reported by environment)
 };
 

@@ -79,6 +79,10 @@ public:
 		}
 		return sqrt(sum);
 	}
+	
+	void zero() {
+		memset(a, 0, 3 * sizeof(float));
+	}
 };
 
 typedef std::vector<vec3> ptlist;

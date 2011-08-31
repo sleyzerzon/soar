@@ -151,7 +151,7 @@ public:
 		}
 	}
 
-	void multi_set(const std::vector<int> &inds, const floatvec &v) {
+	void set_indices(const std::vector<int> &inds, const floatvec &v) {
 		assert(v.size() == inds.size());
 		for (int i = 0; i < inds.size(); ++i) {
 			assert(0 <= inds[i] && inds[i] < sz);
