@@ -18,6 +18,9 @@ const double SCOEF = 0.5;
 const int MAXITERS = 50;
 const double INF = numeric_limits<double>::infinity();
 
+/*
+ Description of a single output dimension.
+*/
 struct output_dim_info {
 	string name;
 	float min;
@@ -31,6 +34,23 @@ bool output_comp(const output_dim_info &a, const output_dim_info &b) {
 
 typedef std::vector<output_dim_info> output_info_vec;
 
+/* Parses a WME structure that describes the output the environment expects.
+   Assumes this format:
+
+	^outputs (
+		^<name1> (
+			^min <val>
+			^max <val>
+			^inc <val>
+		)
+		^<name2> (
+			^min <val>
+			^max <val>
+			^inc <val>
+		)
+		...
+	)
+*/
 bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &out_info) {
 	
 	wme_list dim_wmes;
@@ -62,125 +82,6 @@ bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &o
 	return true;
 }
 
-class output_incr {
-public:
-	output_incr(const output_info_vec &dims) : dims(dims), current(dims.size()) {
-		reset();
-	}
-
-	output_incr(const output_incr &other): current(other.current), dims(other.dims) {}
-	
-
-	
-	void reset() {
-		output_info_vec::const_iterator i;
-		int j;
-		for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
-			current[j] = i->min;
-		}
-	}
-	
-	bool next() {
-		output_info_vec::const_iterator i;
-		int j;
-		
-		for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
-			current[j] += i->inc;
-			if (current[j] <= i->max) {
-				return true;
-			} else {
-				current[j] = i->min;  // roll over and move on to the next value
-			}
-		}
-		return false;
-	}
-	
-	void get_current(floatvec &v) const {
-		v = current;
-	}
-	
-	int size() const {
-		return current.size();
-	}
-	
-private:
-	output_info_vec dims;
-	floatvec current;
-};
-
-typedef vector<floatvec> trajectory;
-
-class traj_incr {
-public:
-	traj_incr() : len(0) {}
-	
-	traj_incr(int len, const output_incr &prototype)
-	: len(len), current(len, prototype)
-	{
-		reset();
-	}
-	
-	void reset() {
-		std::vector<output_incr>::iterator i;
-		for (i = current.begin(); i != current.end(); ++i) {
-			i->reset();
-		}
-	}
-	
-	bool next() {
-		std::vector<output_incr>::iterator i;
-		for (i = current.begin(); i != current.end(); ++i) {
-			if (i->next()) {
-				return true;
-			}
-			i->reset();
-		}
-		return false;
-	}
-	
-	void get_current(trajectory &t) const {
-		std::vector<output_incr>::const_iterator i;
-		trajectory::iterator j;
-		
-		if (len == 0) {
-			t.clear();
-			return;
-		}
-		t.resize(current.size());
-		for (i = current.begin(), j = t.begin(); i != current.end(); ++i, ++j) {
-			i->get_current(*j);
-		}
-	}
-	
-	int dof() {
-		if (len == 0) {
-			return 0;
-		}
-		return len * current.front().size();
-	}
-
-private:
-	int len;
-	std::vector<output_incr> current;
-};
-
-/* Parses a WME structure that describes the output the environment expects.
-   Assumes this format:
-
-	^outputs (
-		^<name1> (
-			^min <val>
-			^max <val>
-			^inc <val>
-		)
-		^<name2> (
-			^min <val>
-			^max <val>
-			^inc <val>
-		)
-		...
-	)
-*/
 
 
 class objective {
@@ -256,11 +157,15 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 	return NULL;
 }
 
-/* this class is a little dirty to avoid as much allocation and copying as possible */
+/*
+ This class binds the model and objective function together and is
+ responsible for simulating a given trajectory and evaluating the
+ objective function on the resulting state.
+*/
 class traj_eval {
 public:
-	traj_eval(int outsize, multi_model *m, objective *obj, const scene &init)
-	: mdl(m), outsize(outsize), obj(obj), numcalls(0), totaltime(0.)
+	traj_eval(int stepsize, multi_model *m, objective *obj, const scene &init)
+	: mdl(m), stepsize(stepsize), obj(obj), numcalls(0), totaltime(0.)
 	{
 		scn = init.copy();
 		scn->get_properties(initvals);
@@ -270,13 +175,14 @@ public:
 		delete scn;
 	}
 	
-	/* version to be used in incremental search */
-	bool eval(const trajectory &traj, float &value) {
+	bool eval(const floatvec &traj, float &value) {
+		timer tm;
+		tm.start();
+		
 		if (traj.size() > 0) {
-			trajectory::const_iterator i;
-			floatvec x(initvals.size() + outsize), y = initvals;
-			for (i = traj.begin(); i != traj.end(); ++i) {
-				x.combine(y, *i);
+			floatvec x(initvals.size() + stepsize), y = initvals;
+			for (int i = 0; i < traj.size(); i += stepsize) {
+				x.combine(y, traj.slice(i, i + stepsize));
 				if (!mdl->predict(x, y)) {
 					return false;
 				}
@@ -284,30 +190,10 @@ public:
 			scn->set_properties(y);
 		}
 		value = obj->eval(*scn);
-		return true;
-	}
-	
-	/* version to be used in Nelder-Mead search */
-	bool eval(const floatvec &v, float &value) {
-		assert(v.size() % outsize == 0);
-		timer tm;
-		tm.start();
-		if (t.size() * outsize != v.size()) {
-			t.resize(v.size() / outsize, floatvec(outsize));
-		}
 		
-		int offset = 0;
-		trajectory::iterator i;
-		for (i = t.begin(); i != t.end(); ++i) {
-			for (int j = 0; j < outsize; ++j) {
-				(*i)[j] = v[offset + j];
-			}
-			offset += outsize;
-		}
-		bool ret = eval(t, value);
 		totaltime += tm.stop();
 		numcalls++;
-		return ret;
+		return true;
 	}
 	
 	void print_stats() const {
@@ -316,11 +202,14 @@ public:
 		cout << "atime: " << totaltime / numcalls << endl;
 	}
 	
+	void draw() {
+		scn->draw_all("predict_", 1., 0., 0.);
+	}
+	
 private:
 	multi_model   *mdl;
 	objective     *obj;
-	int            outsize;   // dimensionality of output
-	trajectory     t;         // cached to prevent repeated memory allocation
+	int            stepsize;  // dimensionality of output
 	scene         *scn;       // copy of initial scene to be modified after prediction
 	floatvec       initvals;  // flattened values of initial scene
 	int            numcalls;
@@ -448,16 +337,18 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 
 class controller {
 public:
-	controller(svs *svsp, objective *obj, const output_info_vec &out_info, int depth, string type)
-	: svsp(svsp), obj(obj), out_info(out_info), step(0), depth(depth), type(type) 
+	controller(svs *svsp, objective *obj, const output_info_vec &stepinfo, int depth, string type)
+	: svsp(svsp), obj(obj), stepinfo(stepinfo), depth(depth), type(type), incr(depth, stepinfo)
 	{
 		int i, j;
-		min.resize(depth * out_info.size());
-		max.resize(depth * out_info.size());
+		
+		stepsize = stepinfo.size();
+		min.resize(depth * stepinfo.size());
+		max.resize(depth * stepinfo.size());
 		for (i = 0; i < depth; ++i) {
-			for (j = 0; j < out_info.size(); ++j) {
-				min[i * out_info.size() + j] = out_info[j].min;
-				max[i * out_info.size() + j] = out_info[j].max;
+			for (j = 0; j < stepsize; ++j) {
+				min[i * stepsize + j] = stepinfo[j].min;
+				max[i * stepsize + j] = stepinfo[j].max;
 			}
 		}
 	}
@@ -473,47 +364,130 @@ public:
 		float val, best;
 		bool found = false;
 		
-		traj_eval evaluator(out_info.size(), svsp->get_model(), obj, *scn);
-		traj_incr incr(depth, output_incr(out_info));
-		trajectory t;
-		
+		traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
+		incr.reset();
 		while (true) {
-			incr.get_current(t);
-			if (!evaluator.eval(t, val)) {
+			if (!evaluator.eval(incr.traj, val)) {
 				return false;
 			}
 			if (!found || val < best) {
 				found = true;
-				bestout = t.front();
+				bestout = incr.traj.slice(0, stepsize);
 				best = val;
 			}
 			if (!incr.next()) {
 				break;
 			}
 		}
-		step++;
 		return found;
 	}
 	
 	bool simplex_seek(scene *scn, floatvec &bestout) {
-		traj_eval evaluator(out_info.size(), svsp->get_model(), obj, *scn);
+		traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
 		floatvec best(min.size());
 		if (!nelder_mead_constrained(min, max, best, evaluator)) {
 			return false;
 		}
 		evaluator.print_stats();
-		bestout = best.slice(0, out_info.size());
+		float bestval;
+		evaluator.eval(best, bestval);
+		//evaluator.draw();
+		bestout = best.slice(0, stepsize);
 		return true;
 	}
 	
 private:
+	/*
+	 Incrementer for a single step within a trajectory
+	*/
+	class step_incr {
+	public:
+		step_incr(const output_info_vec &dims, floatvec *traj, int start) 
+		: dims(dims), traj(traj), start(start)
+		{
+			reset();
+		}
+	
+		void reset() {
+			output_info_vec::const_iterator i;
+			int j;
+			for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
+				(*traj)[start + j] = i->min;
+			}
+		}
+		
+		bool next() {
+			output_info_vec::const_iterator i;
+			int j;
+			
+			for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
+				(*traj)[start + j] += i->inc;
+				if ((*traj)[start + j] <= i->max) {
+					return true;
+				} else {
+					(*traj)[start + j] = i->min;  // roll over and move on to the next value
+				}
+			}
+			return false;
+		}
+		
+	private:
+		output_info_vec dims;
+		int start;
+		floatvec *traj;
+	};
+	
+	/*
+	 Incrementer for a trajectory, used with naive search
+	*/
+	class traj_incr {
+	public:
+		traj_incr() : len(0) {}
+		
+		traj_incr(int len, const output_info_vec &stepinfo)
+		: len(len)
+		{
+			int stepsize = stepinfo.size();
+			traj.resize(len * stepsize);
+			for (int i = 0; i < len; i++) {
+				steps.push_back(step_incr(stepinfo, &traj, i * stepsize));
+			}
+			reset();
+		}
+		
+		void reset() {
+			std::vector<step_incr>::iterator i;
+			for (i = steps.begin(); i != steps.end(); ++i) {
+				i->reset();
+			}
+		}
+		
+		bool next() {
+			std::vector<step_incr>::iterator i;
+			for (i = steps.begin(); i != steps.end(); ++i) {
+				if (i->next()) {
+					return true;
+				}
+				i->reset();
+			}
+			return false;
+		}
+		
+		floatvec traj;
+	
+	private:
+		vector<step_incr> steps;
+		int len;
+	};
+	
 	svs             *svsp;
 	objective       *obj;
-	output_info_vec  out_info;
+	output_info_vec  stepinfo;
 	floatvec         min, max;   // for Nelder-Mead
-	int              step;
 	int              depth;
+	int              stepsize;
 	string           type;
+	traj_incr        incr;
 };
 
 class seek_command : public command {
