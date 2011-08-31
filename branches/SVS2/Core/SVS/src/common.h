@@ -176,6 +176,13 @@ public:
 		memcpy(mem + v1.sz, v2.mem, sizeof(float) * v2.sz);
 	}
 	
+	void randomize(const floatvec &min, const floatvec &max) {
+		assert(sz == min.sz && sz == max.sz);
+		for (int i = 0; i < sz; ++i) {
+			mem[i] = min[i] + (((float) rand()) / RAND_MAX) * (max[i] - min[i]);
+		}
+	}
+	
 	float sum() const {
 		float s = 0.0;
 		for (int i = 0; i < sz; ++i) {
@@ -333,11 +340,48 @@ public:
 		}
 	}
 	
-	void randomize(const floatvec &min, const floatvec &max) {
-		assert(sz == min.sz && sz == max.sz);
-		for (int i = 0; i < sz; ++i) {
-			mem[i] = min[i] + (((float) rand()) / RAND_MAX) * (max[i] - min[i]);
+	bool operator==(const floatvec &v) const {
+		if (sz != v.sz) {
+			return false;
 		}
+		for (int i = 0; i < sz; ++i) {
+			if (mem[i] != v.mem[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	bool operator<(const floatvec &v) const {
+		for (int i = 0; i < sz; ++i) {
+			if (i >= v.sz) {
+				// all common values equal, v is shorter
+				return false;
+			}
+			if (mem[i] < v.mem[i]) {
+				return true;
+			} else if (mem[i] > v.mem[i]) {
+				return false;
+			}
+		}
+		if (v.sz > sz) {
+			// all common values equal, v is longer
+			return true;
+		}
+		// vectors are identical
+		return false;
+	}
+	
+	bool operator<=(const floatvec &v) const {
+		return operator==(v) || operator<(v);
+	}
+	
+	bool operator>(const floatvec &v) const {
+		return !operator<=(v);
+	}
+	
+	bool operator>=(const floatvec &v) const {
+		return !operator<(v);
 	}
 	
 	friend std::ostream &operator<<(std::ostream &os, const floatvec &v);

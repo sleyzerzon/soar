@@ -7,6 +7,7 @@
 #include "svs.h"
 #include "scene.h"
 #include "model.h"
+#include "common.h"
 
 using namespace std;
 
@@ -82,8 +83,6 @@ bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &o
 	return true;
 }
 
-
-
 class objective {
 public:
 	virtual float eval(scene &scn) const = 0;
@@ -92,7 +91,7 @@ public:
 /* Squared Euclidean distance between centroids of two objects */
 class euclidean_obj : public objective {
 public:
-	euclidean_obj(string obj1, string obj2)
+	euclidean_obj(const string &obj1, const string &obj2)
 	: obj1(obj1), obj2(obj2) {}
 	
 	float eval(scene &scn) const {
@@ -100,8 +99,8 @@ public:
 		ptlist p1, p2;
 		::vec3 c1, c2;
 		
-		if ((n1 = scn.get_node(obj1)) == NULL ||
-		    (n2 = scn.get_node(obj2)) == NULL)
+		if (!(n1 = scn.get_node(obj1)) ||
+		    !(n2 = scn.get_node(obj2)))
 		{
 			return INF;
 		}
@@ -118,43 +117,178 @@ private:
 	string obj1, obj2;
 };
 
-/* Parse a WME structure and return the appropriate objective function.
-   Assumes this format:
+/*
+ Returns a positive value as long as c is not behind a w.r.t. b, otherwise
+ returns 0. Minimized when c is behind a.
+*/
+class behind_obj : public objective {
+public:
+	behind_obj(const string &a, const string &b, const string &c)
+	: a(a), b(b), c(c) {}
+	
+	float eval(scene &scn) const {
+		sgnode *na, *nb, *nc;
+		ptlist pa, pb, pc;
+		
+		if (!(na = scn.get_node(a)) ||
+		    !(nb = scn.get_node(b)) ||
+		    !(nc = scn.get_node(c)))
+		{
+			return INF;
+		}
+		
+		na->get_world_points(pa);
+		nb->get_world_points(pb);
+		nc->get_world_points(pc);
+		
+		vec3 ca = calc_centroid(pa);
+		vec3 cb = calc_centroid(pb);
+		vec3 u = (cb - ca).unit();
+		
+		float d = dir_separation(pa, pc, u);
+		if (d < 0.) {
+			return 0.;
+		}
+		return d;
+	}
+	
+private:
+	string a, b, c;
+};
 
-   ^objective (
-       ^name <name>
+/*
+ Returns the shortest distance between the centroid of c and the line
+ going through the centroids of a and b. Minimized when the centroids
+ of all three objects are collinear.
+*/
+class collinear_obj : public objective {
+public:
+	collinear_obj(const string &a, const string &b, const string &c)
+	: a(a), b(b), c(c) {}
+	
+	float eval(scene &scn) const {
+		sgnode *na, *nb, *nc;
+		ptlist pa, pb, pc;
+		
+		if (!(na = scn.get_node(a)) ||
+		    !(nb = scn.get_node(b)) ||
+		    !(nc = scn.get_node(c)))
+		{
+			return INF;
+		}
+		
+		na->get_world_points(pa);
+		nb->get_world_points(pb);
+		nc->get_world_points(pc);
+		
+		vec3 ca = calc_centroid(pa);
+		vec3 cb = calc_centroid(pb);
+		vec3 cc = calc_centroid(pc);
+		
+		float d = cc.line_dist(ca, cb);
+		if (d < 0.001) {
+			return 0.;
+		}
+		return d;
+	}
+	
+private:
+	string a, b, c;
+};
+
+class multi_objective {
+public:
+	multi_objective() {}
+	~multi_objective() {
+		vector<objective*>::iterator i;
+		for (i = objs.begin(); i != objs.end(); ++i) {
+			delete *i;
+		}
+	}
+	
+	void add(objective *o) {
+		objs.push_back(o);
+	}
+	
+	void eval(scene &scn, floatvec &val) const {
+		val.resize(objs.size());
+		for (int i = 0; i < objs.size(); ++i) {
+			val[i] = objs[i]->eval(scn);
+		}
+	}
+private:
+	vector<objective*> objs;
+};
+
+
+/*
+ Parse a WME structure and return the appropriate objective function.
+ Assumes this format:
+
+ (<o1> ^name <name1>
        ^<param1> <val1>
        ^<param2> <val2>
-	   ...
-   )
+       ...
+       ^next <o2>)
+ (<o2> ^name <name2>
+       ...
 */
-objective *parse_obj_struct(soar_interface *si, Symbol *root) {
+multi_objective *parse_obj_struct(soar_interface *si, Symbol *root) {
+	multi_objective *m = new multi_objective();
 	wme_list param_wmes;
-	wme_list::iterator i;
-	map<string, string> params;
-	string name, attr, val;
 	
-	if (!si->is_identifier(root)) {
-		return NULL;
-	}
-	if (!si->get_child_wmes(root, param_wmes)) {
-		return NULL;
-	}
-	for (i = param_wmes.begin(); i != param_wmes.end(); ++i) {
-		if (si->get_val(si->get_wme_attr(*i), attr) &&
-		    si->get_val(si->get_wme_val(*i), val))
-		{
-			params[attr] = val;
+	while (root && si->is_identifier(root) && si->get_child_wmes(root, param_wmes)) {
+		wme_list::iterator i;
+		string name, attr, val;
+		map<string, string> params;
+		
+		for (i = param_wmes.begin(); i != param_wmes.end(); ++i) {
+			if (si->get_val(si->get_wme_attr(*i), attr) &&
+			    si->get_val(si->get_wme_val(*i), val))
+			{
+				params[attr] = val;
+			}
 		}
-	}
-	name = params["name"];
-	if (name == "euclidean") {
-		if (params.find("a") == params.end() || params.find("b") == params.end()) {
-			return NULL;
+		if (!map_get(params, string("name"), name)) {
+			break;
 		}
-		return new euclidean_obj(params["a"], params["b"]);
+		if (name == "euclidean") {
+			string a, b;
+			if (!map_get(params, string("a"), a) ||
+			    !map_get(params, string("b"), b))
+			{
+				break;
+			}
+			m->add(new euclidean_obj(a, b));
+		} else if (name == "behind") {
+			string a, b, c;
+			if (!map_get(params, string("a"), a) ||
+			    !map_get(params, string("b"), b) ||
+			    !map_get(params, string("c"), c))
+			{
+				break;
+			}
+			m->add(new behind_obj(a, b, c));
+		} else if (name == "collinear") {
+			string a, b, c;
+			if (!map_get(params, string("a"), a) ||
+			    !map_get(params, string("b"), b) ||
+			    !map_get(params, string("c"), c))
+			{
+				break;
+			}
+			m->add(new collinear_obj(a, b, c));
+		} else {
+			cerr << "skipping unknown objective " << name << endl;
+		}
+		
+		wme *next_wme;
+		if (!si->find_child_wme(root, "next", next_wme)) {
+			break;
+		}
+		root = si->get_wme_val(next_wme);
 	}
-	return NULL;
+	return m;
 }
 
 /*
@@ -164,7 +298,7 @@ objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 */
 class traj_eval {
 public:
-	traj_eval(int stepsize, multi_model *m, objective *obj, const scene &init)
+	traj_eval(int stepsize, multi_model *m, multi_objective *obj, const scene &init)
 	: mdl(m), stepsize(stepsize), obj(obj), numcalls(0), totaltime(0.)
 	{
 		scn = init.copy();
@@ -175,7 +309,7 @@ public:
 		delete scn;
 	}
 	
-	bool eval(const floatvec &traj, float &value) {
+	bool eval(const floatvec &traj, floatvec &value) {
 		timer tm;
 		tm.start();
 		
@@ -189,7 +323,7 @@ public:
 			}
 			scn->set_properties(y);
 		}
-		value = obj->eval(*scn);
+		obj->eval(*scn, value);
 		
 		totaltime += tm.stop();
 		numcalls++;
@@ -207,13 +341,13 @@ public:
 	}
 	
 private:
-	multi_model   *mdl;
-	objective     *obj;
-	int            stepsize;  // dimensionality of output
-	scene         *scn;       // copy of initial scene to be modified after prediction
-	floatvec       initvals;  // flattened values of initial scene
-	int            numcalls;
-	double         totaltime;
+	multi_model      *mdl;
+	multi_objective  *obj;
+	int               stepsize;  // dimensionality of output
+	scene            *scn;       // copy of initial scene to be modified after prediction
+	floatvec          initvals;  // flattened values of initial scene
+	int               numcalls;
+	double            totaltime;
 };
 
 void constrain(floatvec &v, const floatvec &min, const floatvec &max) {
@@ -226,7 +360,7 @@ void constrain(floatvec &v, const floatvec &min, const floatvec &max) {
 	}
 }
 
-void argmin(const floatvec &v, int &worst, int &nextworst, int &best) {
+void argmin(const vector<floatvec> &v, int &worst, int &nextworst, int &best) {
 	worst = 0; nextworst = 0; best = 0;
 	for (int i = 1; i < v.size(); ++i) {
 		if (v[i] > v[worst]) {
@@ -242,8 +376,8 @@ void argmin(const floatvec &v, int &worst, int &nextworst, int &best) {
 
 bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec &best, traj_eval &ev) {
 	int ndim = min.size(), i, wi, ni, bi;
-	floatvec eval(ndim+1);
-	float reval, eeval, ceval;
+	vector<floatvec> eval(ndim+1);
+	floatvec reval, eeval, ceval;
 	
 	floatvec range = max - min;
 	vector<floatvec> simplex;
@@ -337,7 +471,7 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 
 class controller {
 public:
-	controller(svs *svsp, objective *obj, const output_info_vec &stepinfo, int depth, string type)
+	controller(svs *svsp, multi_objective *obj, const output_info_vec &stepinfo, int depth, string type)
 	: svsp(svsp), obj(obj), stepinfo(stepinfo), depth(depth), type(type), incr(depth, stepinfo)
 	{
 		int i, j;
@@ -361,7 +495,7 @@ public:
 	}
 	
 	bool naive_seek(scene *scn, floatvec &bestout) {
-		float val, best;
+		floatvec val, best;
 		bool found = false;
 		
 		traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
@@ -389,7 +523,7 @@ public:
 			return false;
 		}
 		evaluator.print_stats();
-		float bestval;
+		floatvec bestval;
 		evaluator.eval(best, bestval);
 		//evaluator.draw();
 		bestout = best.slice(0, stepsize);
@@ -481,7 +615,7 @@ private:
 	};
 	
 	svs             *svsp;
-	objective       *obj;
+	multi_objective *obj;
 	output_info_vec  stepinfo;
 	floatvec         min, max;   // for Nelder-Mead
 	int              depth;
@@ -595,14 +729,14 @@ private:
 		stepwme = si->make_wme(get_root(), "step", step);
 	}
 
-	soar_interface *si;
-	svs_state      *state;
-	controller     *ctrl;
-	objective      *obj;
-	wme            *stepwme;
-	int             step;
-	bool            broken;
-	namedvec        out;
+	soar_interface  *si;
+	svs_state       *state;
+	controller      *ctrl;
+	multi_objective *obj;
+	wme             *stepwme;
+	int              step;
+	bool             broken;
+	namedvec         out;
 };
 
 command *_make_seek_command_(svs_state *state, Symbol *root) {

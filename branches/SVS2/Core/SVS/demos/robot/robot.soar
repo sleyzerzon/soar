@@ -276,13 +276,23 @@ sp {move-to-box
 (<sk> ^type simplex
       ^depth 20
       ^outputs <out>
-      ^objective <obj>)
+      ^objective <obj1>)
 (<out> ^left <left> ^right <right>)
 (<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
 (<right> ^min -1.0 ^max 1.0 ^inc 1.0)
-(<obj> ^name euclidean
-       ^a splinter
-       ^b box1)
+(<obj1> ^name behind
+        ^a box1
+        ^b target1
+        ^c splinter
+        ^next <obj2>)
+(<obj2> ^name collinear
+        ^a box1
+        ^b target1
+        ^c splinter
+        ^next <obj3>)
+(<obj3> ^name euclidean
+        ^a splinter
+        ^b box1)
 }
 
 sp {push-box-to-target
@@ -319,3 +329,18 @@ sp {manual
 (<out> ^left <left> ^right <right>)
 (<left>  ^min -1.0 ^max 1.0 ^inc 1.0)
 (<right> ^min -1.0 ^max 1.0 ^inc 1.0)}
+
+sp {extract-between
+(state <s> ^superstate nil
+           ^svs
+	( ^command <cmd>
+	  ^spatial-scene
+		( ^child.id splinter
+		  ^child.id box1
+		  ^child.id target1 )))
+-->
+(<cmd> ^extract <e>)
+(<e> ^type between ^a <a> ^b <b> ^c <c>)
+(<a> ^type node ^name splinter)
+(<b> ^type node ^name box1)
+(<c> ^type node ^name target1)}
