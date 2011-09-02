@@ -36,7 +36,7 @@ string getnamespace() {
 }
 
 ostream &operator<<(ostream &os, const floatvec &v) {
-	copy(v.mem, v.mem + v.sz, ostream_iterator<float>(os, ","));
+	copy(v.mem, v.mem + v.sz, ostream_iterator<float>(os, " "));
 	return os;
 }
 
@@ -68,6 +68,7 @@ vec3 calc_centroid(const ptlist &pts) {
 }
 
 float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u) {
+	int counter = 0;
 	ptlist::const_iterator i;
 	vec3 p;
 	float x, min = numeric_limits<float>::max(), max = -numeric_limits<float>::max();
@@ -80,7 +81,7 @@ float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u) {
 	}
 	for (i = b.begin(); i != b.end(); ++i) {
 		p = i->project(u);
-		float x = p[0] / u[0];
+		x = p[0] / u[0];
 		if (x > max) {
 			max = x;
 		}

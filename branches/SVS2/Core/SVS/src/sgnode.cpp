@@ -200,9 +200,7 @@ void sgnode::update_transform() {
 		return;
 	}
 	
-	ltransform = transform3(transform_tags::TRANSLATION, pos) * 
-	             transform3(transform_tags::ROTATION, rot) * 
-	             transform3(transform_tags::SCALING, scale);
+	ltransform = transform3('p', pos) * transform3('r', rot) * transform3('s', scale);
 	if (parent) {
 		parent->update_transform();
 		wtransform = parent->wtransform * ltransform;

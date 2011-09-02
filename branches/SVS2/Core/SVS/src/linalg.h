@@ -249,19 +249,13 @@ public:
 	}
 };
 
-namespace transform_tags {
+class transform3 {
+public:
 	class Translation {};
 	class Rotation {};
 	class Scaling {};
 	class Identity {};
 	
-	extern const Translation TRANSLATION;
-	extern const Rotation    ROTATION;
-	extern const Scaling     SCALING;
-};
-
-class transform3 {
-public:
 	transform3() {
 		memset(m, 0, 12 * sizeof(float));
 		for (int i = 0; i < 3; ++i) {
@@ -273,33 +267,44 @@ public:
 		memcpy(m, t.m, 12 * sizeof(float));
 	}
 	
-	transform3(transform_tags::Translation t, vec3 v) {
-		int i;
+	transform3(char type, vec3 v) {
 		memset(m, 0, 12 * sizeof(float));
-		for (i = 0; i < 3; ++i) {
-			m[i][i] = 1.;
-		}
-		for (i = 0; i < 3; ++i) {
-			m[i][3] = v[i];
-		}
-	}
-	
-	/* Application order - roll, pitch, yaw
-	   http://mathworld.wolfram.com/EulerAngles.html */
-	transform3(transform_tags::Rotation t, vec3 v)
-	{
-		float sinr = sin(v[0]), sinp = sin(v[1]), siny = sin(v[2]),
-		       cosr = cos(v[0]), cosp = cos(v[1]), cosy = cos(v[2]);
-		
-		m[0][0]=cosy*cosp; m[0][1]=-siny*cosr+cosy*sinp*sinr; m[0][2]=-siny*-sinr+cosy*sinp*cosr; m[0][3]=0.0;
-		m[1][0]=siny*cosp; m[1][1]=cosy*cosr+siny*sinp*sinr;  m[1][2]=cosy*-sinr+siny*sinp*cosr;  m[1][3]=0;
-		m[2][0]=-sinp;     m[2][1]=cosp*sinr;                 m[2][2]=cosp*cosr;                  m[2][3]=0;
-	}
-	
-	transform3(transform_tags::Scaling t, vec3 v) {
-		memset(m, 0, 12 * sizeof(float));
-		for (int i = 0; i < 3; ++i) {
-			m[i][i] = v[i];
+		switch(type) {
+			case 'p':
+				for (int i = 0; i < 3; ++i) {
+					m[i][i] = 1.;
+				}
+				for (int i = 0; i < 3; ++i) {
+					m[i][3] = v[i];
+				}
+				break;
+			case 'r':
+				/*
+				 Application order - roll, pitch, yaw
+				 http://mathworld.wolfram.com/EulerAngles.html
+				*/
+				{
+					float sinr = sin(v[0]), sinp = sin(v[1]), siny = sin(v[2]),
+					      cosr = cos(v[0]), cosp = cos(v[1]), cosy = cos(v[2]);
+					
+					m[0][0] = cosy*cosp;
+					m[0][1] = -siny*cosr+cosy*sinp*sinr;
+					m[0][2] = -siny*-sinr+cosy*sinp*cosr;
+					m[1][0] = siny*cosp;
+					m[1][1] = cosy*cosr+siny*sinp*sinr;
+					m[1][2] = cosy*-sinr+siny*sinp*cosr;
+					m[2][0] = -sinp;
+					m[2][1] = cosp*sinr;
+					m[2][2] = cosp*cosr;
+				}
+				break;
+			case 's':
+				for (int i = 0; i < 3; ++i) {
+					m[i][i] = v[i];
+				}
+				break;
+			default:
+				assert(false);
 		}
 	}
 	

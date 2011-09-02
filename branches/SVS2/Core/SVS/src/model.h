@@ -138,11 +138,9 @@ public:
 		if (!assign_slot_indexes(in_slots, in_slot_props, config.in_indexes, false) ||
 		    !assign_slot_indexes(out_slots, out_slot_props, config.out_indexes, true))
 		{
-			config.error = true;
-		} else {
-			config.error = false;
+			return false;
 		}
-		
+		config.error = false;
 		active_models.push_back(config);
 		return true;
 	}

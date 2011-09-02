@@ -24,7 +24,8 @@ else
 	#python splintersim.py &
 	#envid=$!
 	#socat system:./splintersim unix-connect:env,retry=100 &
-	splintersim3 | python splintersim3_disp.py &
+	#splintersim3 | python splintersim3_disp.py &
+	splintersim3 >/dev/null &
 	envid=`ps | awk '$4 ~ "splintersim3" {print $1}'`
 fi
 

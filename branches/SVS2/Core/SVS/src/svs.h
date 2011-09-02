@@ -84,7 +84,6 @@ private:
 	scene          *scn;
 	sgwme          *root;
 	soar_interface *si;
-	ipcsocket      *ipc;
 	common_syms    *cs;
 	
 	Symbol *state;

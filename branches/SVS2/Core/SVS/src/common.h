@@ -70,7 +70,7 @@ public:
 		zero();
 	}
 	
-	floatvec(int sz, float *data) : sz(sz) {
+	floatvec(float *data, int sz) : sz(sz) {
 		mem = (float *) malloc(sz * sizeof(float));
 		memcpy(mem, data, sizeof(float) * sz);
 	}

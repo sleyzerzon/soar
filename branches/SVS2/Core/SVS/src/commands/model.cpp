@@ -52,7 +52,7 @@ model *parse_model_struct(soar_interface *si, Symbol *root, string &name) {
 class create_model_command : public command {
 public:
 	create_model_command(svs_state *state, Symbol *root)
-	 : command(state, root), root(root), svsp(state->get_svs())
+	 : command(state, root), root(root), svsp(state->get_svs()), broken(false)
 	{
 		si = state->get_svs()->get_soar_interface();
 	}
@@ -64,17 +64,19 @@ public:
 	bool update() {
 		string name;
 		
-		if (!changed()) {
+		if (!changed() && !broken) {
 			return true;
 		}
 		
 		model *m = parse_model_struct(si, root, name);
 		if (m == NULL) {
 			set_status("invalid syntax");
+			broken = true;
 			return false;
 		}
 		svsp->add_model(name, m);
 		set_status("success");
+		broken = false;
 		return true;
 	}
 	
@@ -85,19 +87,19 @@ private:
 	soar_interface *si;
 	Symbol         *root;
 	svs            *svsp;
+	bool            broken;
 };
 
 
 class assign_model_command : public command {
 public:
 	assign_model_command(svs_state *state, Symbol *root)
-	: command(state, root), root(root), svsp(state->get_svs())
+	: command(state, root), root(root), svsp(state->get_svs()), broken(false)
 	{
 		si = state->get_svs()->get_soar_interface();
 	}
 	
 	~assign_model_command() {
-		cout << "DESTRUCTOR " << name << endl;
 		svsp->unassign_model(name);
 	}
 	
@@ -119,7 +121,7 @@ public:
 		map<string, string> inputs;
 		map<string, string> outputs;
 		
-		if (!changed()) {
+		if (!changed() && !broken) {
 			return true;
 		}
 		
@@ -127,6 +129,7 @@ public:
 		    !si->get_val(si->get_wme_val(w), name))
 		{
 			set_status("need model name");
+			broken = true;
 			return false;
 		}
 		
@@ -160,10 +163,12 @@ public:
 		
 		if (!svsp->assign_model(name, inputs, outputs)) {
 			set_status("failed to assign model");
+			broken = true;
 			return false;
 		}
 		
 		set_status("success");
+		broken = false;
 		return true;
 	}
 
@@ -172,6 +177,7 @@ private:
 	Symbol         *root;
 	svs            *svsp;
 	string          name;
+	bool            broken;
 };
 
 command *_make_create_model_command_(svs_state *state, Symbol *root) {

@@ -194,8 +194,8 @@ class splinterenv {
 public:
 	splinterenv() : first(true) {
 		space = cpSpaceNew();
-		splntr = new splinter(space, "splinter", 0.0, 3.0, 0.0);
-		add_block("box1", 2.0, 2.0, 0.0, 2.0, 1.0, 1.0);
+		splntr = new splinter(space, "splinter", 0.0, 4.0, 0.0);
+		add_block("box1", 4.0, 3.0, 0.0, 2.0, 1.0, 1.0);
 	}
 	
 	~splinterenv() {

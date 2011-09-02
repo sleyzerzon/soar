@@ -4,6 +4,8 @@ sp {move-to-box
               ^svs <svs>)
    (<svs> ^command <c>
           ^spatial-scene <scn>)
+   (<c> ^assign-model <am>)
+   (<am> ^name manual ^status success)
    (<scn> ^child.id splinter
           ^child.id target1)
    -{(<s> ^intersect <i>)

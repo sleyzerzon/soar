@@ -8,6 +8,7 @@
 #include "scene.h"
 #include "model.h"
 #include "common.h"
+#include "bullet_support.h"
 
 using namespace std;
 
@@ -53,7 +54,6 @@ typedef std::vector<output_dim_info> output_info_vec;
 	)
 */
 bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &out_info) {
-	
 	wme_list dim_wmes;
 	wme_list::iterator i;
 	Symbol *dim_id;
@@ -81,6 +81,23 @@ bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &o
 	}
 	sort(out_info.begin(), out_info.end(), output_comp);
 	return true;
+}
+
+void draw_prediction(scene *scn, multi_model *mdl, const floatvec &traj, int stepsize) {
+	scene *copy = scn->copy();
+	floatvec x, y, u;
+	copy->get_properties(y);
+	x.resize(y.size() + stepsize);
+	for (int offset = 0; offset < traj.size(); offset += stepsize) {
+		u = traj.slice(offset, offset + stepsize);
+		x.combine(y, u);
+		if (!mdl->predict(x, y)) {
+			cout << "MODEL ERROR" << endl;
+			return;
+		}
+	}
+	copy->set_properties(y);
+	copy->draw_all("predict_", 1., 0., 0.);
 }
 
 class objective {
@@ -181,6 +198,12 @@ public:
 		nb->get_world_points(pb);
 		nc->get_world_points(pc);
 		
+		copy(pa.begin(), pa.end(), back_inserter(pc));
+		float d = hull_distance(pb, pc);
+		if (d < 0) {
+			d = 0.;
+		}
+		/*
 		vec3 ca = calc_centroid(pa);
 		vec3 cb = calc_centroid(pb);
 		vec3 cc = calc_centroid(pc);
@@ -189,7 +212,46 @@ public:
 		if (d < 0.001) {
 			return 0.;
 		}
+		*/
 		return d;
+	}
+	
+private:
+	string a, b, c;
+};
+
+class align_facing_objective : public objective {
+public:
+	align_facing_objective(const string &a, const string &b, const string &c)
+	: a(a), b(b), c(c) {}
+	
+	float eval(scene &scn) const {
+		sgnode *na, *nb, *nc;
+		ptlist pb, pc;
+		
+		if (!(na = scn.get_node(a)) ||
+		    !(nb = scn.get_node(b)) ||
+		    !(nc = scn.get_node(c)))
+		{
+			return INF;
+		}
+		
+		transform3 rot('r', na->get_trans('r'));
+		vec3 facing = rot(vec3(1, 0, 0));
+		
+		nb->get_world_points(pb);
+		nc->get_world_points(pc);
+		
+		vec3 desired = (calc_centroid(pc) - calc_centroid(pb)).unit();
+		
+		/*
+		 Return the negative cosine between the two
+		 directions. This will be minimized at -1 if the angle
+		 is 0, and maximized at 1 when the angle is 180.
+		*/
+		float negcos = -(facing.dot(desired));
+		//cout << "NEG COS ANGLE " << negcos << endl;
+		return negcos;
 	}
 	
 private:
@@ -278,6 +340,15 @@ multi_objective *parse_obj_struct(soar_interface *si, Symbol *root) {
 				break;
 			}
 			m->add(new collinear_obj(a, b, c));
+		} else if (name == "align_facing") {
+			string a, b, c;
+			if (!map_get(params, string("a"), a) ||
+			    !map_get(params, string("b"), b) ||
+			    !map_get(params, string("c"), c))
+			{
+				break;
+			}
+			m->add(new align_facing_objective(a, b, c));
 		} else {
 			cerr << "skipping unknown objective " << name << endl;
 		}
@@ -330,15 +401,16 @@ public:
 		return true;
 	}
 	
+	void eval_curr(floatvec &value) {
+		obj->eval(*scn, value);
+	}
+	
 	void print_stats() const {
 		cout << "ncall: " << numcalls << endl;
 		cout << "ttime: " << totaltime << endl;
 		cout << "atime: " << totaltime / numcalls << endl;
 	}
 	
-	void draw() {
-		scn->draw_all("predict_", 1., 0., 0.);
-	}
 	
 private:
 	multi_model      *mdl;
@@ -469,6 +541,139 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 	return true;
 }
 
+class tree_search {
+public:
+	tree_search(scene *scn, multi_model *mdl, multi_objective *obj, const output_info_vec &stepinfo, int maxnodes)
+	: nodes(node_compare()), stepinfo(stepinfo), maxnodes(maxnodes)
+	{
+		ci.scn = scn->copy();
+		ci.obj = obj;
+		ci.mdl = mdl;
+		floatvec initstate;
+		scn->get_properties(initstate);
+		nodes.push(new node(initstate, &ci));
+	}
+	
+	~tree_search() {
+		while (!nodes.empty()) {
+			node *n = nodes.top();
+			nodes.pop();
+			delete n;
+		}
+	}
+	
+	void expand() {
+		/*
+		 Since the underlying container for the queue is a vector,
+		 we know that &nodes.top() points to the first position
+		 of an internal array of nodes.
+		*/
+		node * const *front = &nodes.top();
+		const node *n = front[rand() % nodes.size()];
+		node *newnode = new node(*n);
+		
+		floatvec output(stepinfo.size());
+		for (int i = 0; i < stepinfo.size(); ++i) {
+			float range = stepinfo[i].max - stepinfo[i].min;
+			output[i] = stepinfo[i].min + (range * rand()) / RAND_MAX;
+		}
+		
+		if (!newnode->add_step(output)) {
+			cout << "TREE SEARCH ERROR" << endl;
+			delete newnode;
+			return;
+		}
+		nodes.push(newnode);
+		if (nodes.size() > maxnodes) {
+			node *old = nodes.top();
+			nodes.pop();
+			delete old;
+		}
+	}
+	
+	void search(int iterations, floatvec &besttraj, floatvec &bestval) {
+		for (int i = 0; i < iterations; ++i) {
+			expand();
+		}
+		node *bestnode = nodes.top();
+		besttraj = bestnode->traj;
+		bestval = bestnode->value;
+		cout << "BEST TRAJ LENGTH " << bestnode->offset / stepinfo.size() << endl;
+		cout << "OTHER VALUES" << endl;
+		while (nodes.size() > 0) {
+			node *n = nodes.top();
+			cout << nodes.size() << " " << n->value << endl;
+			nodes.pop();
+			delete n;
+		}
+	}
+	
+private:
+	struct common_info {
+		multi_objective *obj;
+		multi_model *mdl;
+		scene *scn;
+	};
+	
+	class node {
+	public:
+		int offset;
+		floatvec traj;
+		floatvec value;
+		floatvec state;
+		common_info *ci;
+		
+		node(const floatvec &state, common_info *ci)
+		: offset(0), state(state), ci(ci)
+		{
+			ci->scn->set_properties(state);
+			ci->obj->eval(*ci->scn, value);
+		}
+		
+		node(const node &n) 
+		: offset(n.offset), traj(n.traj), value(n.value), state(n.state), ci(n.ci)
+		{}
+		
+		bool add_step(const floatvec &s) {
+			if (offset == traj.size()) {
+				if (traj.size() == 0) {
+					traj.resize(s.size());
+				} else {
+					traj.resize(traj.size() * 2);
+				}
+			}
+			for (int i = 0; i < s.size(); ++i) {
+				traj[offset + i] = s[i];
+			}
+			offset += s.size();
+			floatvec x(state.size() + s.size());
+			x.combine(state, s);
+			if (!ci->mdl->predict(x, state)) {
+				return false;
+			}
+			ci->scn->set_properties(state);
+			ci->obj->eval(*ci->scn, value);
+			return true;
+		}
+	};
+	
+	struct node_compare {
+		bool operator()(const node *lhs, const node *rhs) const {
+			/*
+			 Since the priority queue keeps the largest items,
+			 we have to reverse the comparison.
+			*/
+			return lhs->value > rhs->value;
+		}
+	};
+	
+	priority_queue<node*, vector<node*>, node_compare> nodes;
+	common_info ci;
+	output_info_vec stepinfo;
+	int maxnodes;
+
+};
+
 class controller {
 public:
 	controller(svs *svsp, multi_objective *obj, const output_info_vec &stepinfo, int depth, string type)
@@ -487,47 +692,54 @@ public:
 		}
 	}
 
-	bool seek(scene *scn, floatvec &bestout) {
-		if (type == "simplex") {
-			return simplex_seek(scn, bestout);
+	int seek(scene *scn, floatvec &bestout) {
+		floatvec besttraj, currval, bestval;
+		bool result;
+		if (type == "tree") {
+			tree_search t(scn, svsp->get_model(), obj, stepinfo, 100);
+			t.search(2, besttraj, bestval);
+		} else {
+			traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
+			if (type == "simplex") {
+				result = nelder_mead_constrained(min, max, besttraj, evaluator);
+			} else {
+				result = naive_seek(evaluator, besttraj);
+			}
+			evaluator.print_stats();
+			if (!result) {
+				return 0;
+			}
 		}
-		return naive_seek(scn, bestout);
+		obj->eval(*scn, currval);
+		if (besttraj.size() < stepsize || currval <= bestval) {
+			return 1;
+		}
+		bestout = besttraj.slice(0, stepsize);
+		draw_prediction(scn, svsp->get_model(), besttraj, stepsize);
+		cout << "BEST VAL " << bestval << endl;
+		cout << "BEST OUT " << bestout << endl;
+		return 2;
 	}
 	
-	bool naive_seek(scene *scn, floatvec &bestout) {
-		floatvec val, best;
+	bool naive_seek(traj_eval &evaluator, floatvec &besttraj) {
+		floatvec val, bestval;
 		bool found = false;
 		
-		traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
 		incr.reset();
 		while (true) {
 			if (!evaluator.eval(incr.traj, val)) {
 				return false;
 			}
-			if (!found || val < best) {
+			if (!found || val < bestval) {
 				found = true;
-				bestout = incr.traj.slice(0, stepsize);
-				best = val;
+				besttraj = incr.traj;
+				bestval = val;
 			}
 			if (!incr.next()) {
 				break;
 			}
 		}
 		return found;
-	}
-	
-	bool simplex_seek(scene *scn, floatvec &bestout) {
-		traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
-		floatvec best(min.size());
-		if (!nelder_mead_constrained(min, max, best, evaluator)) {
-			return false;
-		}
-		evaluator.print_stats();
-		floatvec bestval;
-		evaluator.eval(best, bestval);
-		//evaluator.draw();
-		bestout = best.slice(0, stepsize);
-		return true;
 	}
 	
 private:
@@ -652,19 +864,26 @@ public:
 		
 		timer t1;
 		t1.start();
-		if (!ctrl->seek(state->get_scene(), out.vals)) {
-			set_status("no valid output found");
-			return false;
+		int result = ctrl->seek(state->get_scene(), out.vals);
+		switch (result) {
+			case 0:
+				set_status("no valid output found");
+				break;
+			case 1:
+				set_status("local minimum");
+				break;
+			case 2:
+				if (state->get_level() == 0) {
+					state->get_svs()->set_next_output(out);
+				}
+				// need to update scene with model otherwise
+		
+				set_status("success");
+				step++;
+				//update_step();
+				break;
 		}
 		cout << "SEEK " << t1.stop() << endl;
-		if (state->get_level() == 0) {
-			state->get_svs()->set_next_output(out);
-		}
-		// need to update scene with model otherwise
-		
-		set_status("success");
-		step++;
-		//update_step();
 		return true;
 	}
 	
