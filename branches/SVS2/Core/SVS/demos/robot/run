@@ -30,9 +30,9 @@ fi
 
 if test "$debug" == "1"
 then
-	gdb --args $soar robot.soar
+	gdb --args $soar agent/robot.soar
 else
-	$soar robot.soar
+	$soar agent/robot.soar
 fi
 
 if test "$java" == "1"

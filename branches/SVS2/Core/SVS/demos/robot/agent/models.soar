@@ -1,0 +1,144 @@
+sp {create-manual-model
+   (state <s> ^superstate nil
+              ^svs.command <c>)
+-->
+   (<c> ^create-model <cm>)
+   (<cm> ^name manual
+         ^type splinterenv
+         ^test t)}
+
+sp {assign-manual-model
+   (state <s> ^superstate nil
+              ^svs.command <c>)
+   (<c> ^create-model <cm>)
+   (<cm> ^name manual ^status success)
+-->
+   (<c> ^assign-model <am>)
+   (<am> ^name manual ^inputs <in> ^outputs <out>)
+   (<in> ^box1:px        box1:px
+         ^box1:py        box1:py
+         ^box1:vx        box1:vx
+         ^box1:vy        box1:vy
+         ^box1:fx        box1:fx
+         ^box1:fy        box1:fy
+         ^box1:rz        box1:rz
+         ^box1:av        box1:av
+         ^box1:t         box1:t
+   
+         ^splinter:px    splinter:px
+         ^splinter:py    splinter:py
+         ^splinter:vx    splinter:vx
+         ^splinter:vy    splinter:vy
+         ^splinter:fx    splinter:fx
+         ^splinter:fy    splinter:fy
+         ^splinter:rz    splinter:rz
+         ^splinter:av    splinter:av
+         ^splinter:t     splinter:t
+         ^splinter:lrps  splinter:lrps
+         ^splinter:rrps  splinter:rrps
+   
+         ^lvolts         left
+         ^rvolts         right)
+   
+   (<out> ^box1:px        box1:px
+          ^box1:py        box1:py
+          ^box1:vx        box1:vx
+          ^box1:vy        box1:vy
+          ^box1:fx        box1:fx
+          ^box1:fy        box1:fy
+          ^box1:rz        box1:rz
+          ^box1:av        box1:av
+          ^box1:t         box1:t
+    
+          ^splinter:px    splinter:px
+          ^splinter:py    splinter:py
+          ^splinter:vx    splinter:vx
+          ^splinter:vy    splinter:vy
+          ^splinter:fx    splinter:fx
+          ^splinter:fy    splinter:fy
+          ^splinter:rz    splinter:rz
+          ^splinter:av    splinter:av
+          ^splinter:t     splinter:t
+          ^splinter:lrps  splinter:lrps
+          ^splinter:rrps  splinter:rrps)}
+
+#sp {make-free-move-model
+#   (state <s> ^superstate nil ^svs <svs>)
+#   (<svs> ^spatial-scene.child.id splinter ^command <c>)
+#-->
+#   (<c> ^create-model <cm>)
+#   (<cm> ^name free-move ^type splinter)}
+#   
+## for now, assume that colliding with the box doesn't affect the robot's movement
+#sp {assign-free-move-model
+#   (state <s> ^superstate nil ^svs.command <c>)
+#   (<c> ^create-model <cm>)
+#   (<cm> ^name free-move ^status success)
+#-->
+#   (<c> ^assign-model <am>)
+#   (<am> ^name free-move ^inputs <in> ^outputs <out>)
+#   (<in> ^px splinter:px
+#         ^py splinter:py
+#         ^rz splinter:rz
+#         ^vx splinter:vel_0
+#         ^vy splinter:vel_1
+#         ^rtz splinter:rotation_rate_2
+#         ^lrps splinter:left_rads_per_sec
+#         ^rrps splinter:right_rads_per_sec
+#         ^lvolts left
+#         ^rvolts right)
+#   (<out> ^px splinter:px
+#          ^py splinter:py
+#          ^rz splinter:rz
+#          ^vx splinter:vel_0
+#          ^vy splinter:vel_1
+#          ^rtz splinter:rotation_rate_2
+#          ^lrps splinter:left_rads_per_sec
+#          ^rrps splinter:right_rads_per_sec)}
+
+
+#sp {make-collision-model
+#   (state <s> ^superstate nil ^svs.command <c>)
+#-->
+#   (<c> ^create-model <cm>)
+#   (<cm> ^name collision
+#         ^type lwr
+#         ^log |collision.arff|
+#         ^test t
+#         ^inputs <in> ^outputs <out>)
+#   (<in> ^spx  <spx>
+#         ^spy  <spy>
+#         ^srz  <srz>
+#         ^bpx  <bpx>
+#         ^bpy  <bpy>
+#         ^brz  <brz>
+#         ^vx   <vx>
+#         ^vy   <vy>
+#         ^lvolts <lvolts>
+#         ^rvolts <rvolts>)
+#   (<out> ^bpx <obpx>
+#          ^bpy <obpy>
+#          ^brz <obrz>)}
+#
+#sp {assign-collision-model
+#   (state <s> ^superstate nil 
+#              ^svs.command <c>
+#              ^intersect ( ^a splinter ^b box1))
+#-->
+#   (<c> ^assign-model <am>)
+#   (<am> ^name collision ^inputs <in> ^outputs <out>)
+#   (<in> ^spx splinter:px
+#         ^spy splinter:py
+#         ^srz splinter:rz
+#         ^bpx box1:px
+#         ^bpy box1:py
+#         ^brz box1:rz
+#         ^vx splinter:vel_0
+#         ^vy splinter:vel_1
+#         ^lvolts left
+#         ^rvolts right)
+#   (<out> ^bpx box1:px
+#          ^bpy box1:py
+#          ^brz box1:rz)}
+
+   
