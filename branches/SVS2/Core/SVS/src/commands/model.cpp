@@ -52,7 +52,7 @@ model *parse_model_struct(soar_interface *si, Symbol *root, string &name) {
 class create_model_command : public command {
 public:
 	create_model_command(svs_state *state, Symbol *root)
-	 : command(state, root), root(root), svsp(state->get_svs()), broken(false)
+	 : command(state, root), root(root), mmdl(state->get_model()), broken(false)
 	{
 		si = state->get_svs()->get_soar_interface();
 	}
@@ -74,7 +74,7 @@ public:
 			broken = true;
 			return false;
 		}
-		svsp->add_model(name, m);
+		mmdl->add_model(name, m);
 		set_status("success");
 		broken = false;
 		return true;
@@ -86,7 +86,7 @@ public:
 private:
 	soar_interface *si;
 	Symbol         *root;
-	svs            *svsp;
+	multi_model    *mmdl;
 	bool            broken;
 };
 
@@ -94,13 +94,13 @@ private:
 class assign_model_command : public command {
 public:
 	assign_model_command(svs_state *state, Symbol *root)
-	: command(state, root), root(root), svsp(state->get_svs()), broken(false)
+	: command(state, root), root(root), mmdl(state->get_model()), broken(false), scn(state->get_scene())
 	{
 		si = state->get_svs()->get_soar_interface();
 	}
 	
 	~assign_model_command() {
-		svsp->unassign_model(name);
+		mmdl->unassign_model(name);
 	}
 	
 	string description() {
@@ -121,7 +121,10 @@ public:
 		map<string, string> inputs;
 		map<string, string> outputs;
 		
-		if (!changed() && !broken) {
+		vector<string> new_scene_props;
+		scn->get_property_names(new_scene_props);
+		
+		if (!changed() && !broken && scene_props == new_scene_props) {
 			return true;
 		}
 		
@@ -161,7 +164,7 @@ public:
 			}
 		}
 		
-		if (!svsp->assign_model(name, inputs, outputs)) {
+		if (!mmdl->assign_model(name, inputs, outputs)) {
 			set_status("failed to assign model");
 			broken = true;
 			return false;
@@ -169,15 +172,18 @@ public:
 		
 		set_status("success");
 		broken = false;
+		scene_props = new_scene_props;
 		return true;
 	}
 
 private:
 	soar_interface *si;
 	Symbol         *root;
-	svs            *svsp;
+	multi_model    *mmdl;
 	string          name;
 	bool            broken;
+	vector<string>  scene_props;
+	scene          *scn;
 };
 
 command *_make_create_model_command_(svs_state *state, Symbol *root) {

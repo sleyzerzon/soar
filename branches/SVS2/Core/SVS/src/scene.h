@@ -10,7 +10,7 @@
 
 class scene : public sgnode_listener {
 public:
-	scene(std::string name, std::string rootname, bool display);
+	scene(const std::string &name, const std::string &rootname, bool display);
 	~scene();
 	
 	scene *copy() const;

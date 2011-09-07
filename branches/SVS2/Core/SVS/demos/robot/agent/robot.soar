@@ -20,3 +20,4 @@ sp {apply*count-time
               ^operator.name count-time)
 -->
    (<s> ^time <t> - (+ <t> 1))}
+

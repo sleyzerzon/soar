@@ -37,8 +37,8 @@ bool is_native_prop(const string &name, char &type, int &dim) {
 	return true;
 }
 
-scene::scene(string name, string rootname, bool display) 
-: name(name), rootname(rootname), dt(1.0), display(display), draw("/tmp/dispfifo", name)
+scene::scene(const string &name, const string &rootname, bool display) 
+: name(name), rootname(rootname), dt(1.0), display(display), draw(name)
 {
 	root = new sgnode(rootname);
 	nodes[rootname].node = root;

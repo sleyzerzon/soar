@@ -55,6 +55,21 @@ private:
 
 class svs;
 
+/*
+ Description of a single output dimension.
+*/
+struct output_dim_spec {
+	std::string name;
+	float min;
+	float max;
+	float def;
+};
+
+typedef std::vector<output_dim_spec> output_spec;
+
+/*
+ Each state in the state stack has its own SVS link, scene, models, etc.
+*/
 class svs_state {
 public:
 	svs_state(svs *svsp, Symbol *state, soar_interface *soar, common_syms *syms);
@@ -68,11 +83,20 @@ public:
 	void           update_scene_num();
 	void           clear_scene();
 	
-	int             get_level()          { return level;     }
-	int             get_scene_num()      { return scene_num; }
-	scene          *get_scene()          { return scn;       }
-	Symbol         *get_state()          { return state;     }
-	svs            *get_svs()            { return svsp;      }
+	int            get_level() const     { return level;     }
+	int            get_scene_num() const { return scene_num; }
+	scene         *get_scene() const     { return scn;       }
+	Symbol        *get_state()           { return state;     }
+	svs           *get_svs()             { return svsp;      }
+	multi_model   *get_model()           { return &mmdl;     }
+	
+	output_spec *get_output_spec() { return &outspec; }
+	void set_output_spec(const output_spec &s) { outspec = s; }
+	
+	void set_output(const floatvec &out);
+	bool get_output(floatvec &out) const;
+	
+	void update_models();
 
 private:
 	void init();
@@ -97,6 +121,12 @@ private:
 	
 	/* command changes per decision cycle */
 	std::map<wme*, command*> curr_cmds;
+	
+	std::vector<std::string> prev_pnames;
+	floatvec                 prev_pvals;
+	multi_model              mmdl;
+	output_spec              outspec;
+	floatvec                 next_out;
 };
 
 class svs {
@@ -111,38 +141,14 @@ public:
 
 	soar_interface *get_soar_interface() { return si; }
 
-	std::string get_env_input(const std::string &sgel);
-	void set_next_output(const namedvec &out);
-
-	void add_model(const std::string &name, model *m);
-	bool assign_model(const std::string &name,
-	                  const std::map<std::string, std::string> &inputs,
-	                  const std::map<std::string, std::string> &outputs)
-	{
-		return models.assign_model(name, inputs, outputs);
-	}
-
-	void unassign_model(const std::string &name) {
-		models.unassign_model(name);
-	}
-	
-	multi_model *get_model() {
-		return &models;
-	}
-	
 private:
 	void make_common_syms();
 	void del_common_syms();
-	void update_models();
 	
 	soar_interface*          si;
 	common_syms              cs;
 	std::vector<svs_state*>  state_stack;
 	ipcsocket                envsock;
-	namedvec                 next_out;
-	std::vector<std::string> prev_pnames;
-	floatvec                 prev_pvals;
-	multi_model              models;
 };
 
 #endif

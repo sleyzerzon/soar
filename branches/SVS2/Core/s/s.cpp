@@ -113,7 +113,7 @@ void execcmd(string c) {
 }
 
 void repl() {
-	string cmd;
+	string cmd, last;
 	
 	while (cin) {
 		cout << endl << "% ";
@@ -124,8 +124,13 @@ void repl() {
 		if (!cin) {
 			return;
 		}
-		if (!cmd.empty()) {
+		if (cmd.empty()) {
+			if (!last.empty()) {
+				execcmd(last);
+			}
+		} else {
 			execcmd(cmd);
+			last = cmd;
 		}
 	}
 }

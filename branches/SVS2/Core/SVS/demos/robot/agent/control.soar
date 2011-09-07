@@ -1,3 +1,12 @@
+sp {output
+   (state <s> ^superstate nil
+              ^svs.command <c>)
+-->
+   (<c> ^output <out>)
+   (<out> ^left <l> ^right <r>)
+   (<l> ^min -1.0 ^max 1.0 ^default 0.0)
+   (<r> ^min -1.0 ^max 1.0 ^default 0.0)}
+
 sp {move-to-box
    (state <s> ^superstate nil
               ^auto-control t
@@ -12,29 +21,26 @@ sp {move-to-box
      (<i> ^a splinter ^b box1)}
 -->
    (<c> ^seek <sk>)
-   (<sk> ^type tree
-         ^depth 300
-         ^outputs <out>
-         ^objective <obj1>)
-   (<out> ^left <left> ^right <right>)
-   (<left>  ^min -0.1 ^max 1.0 ^inc 1.0)
-   (<right> ^min -0.1 ^max 1.0 ^inc 1.0)
-   (<obj1> ^name behind
+   (<sk> ^type simplex
+         ^depth 50
+         ^objective <bhnd>)
+   (<bhnd> ^next <clnr>)
+   (<clnr> ^next <intr>)
+#   (<face> ^next <intr>)
+   
+   (<bhnd> ^name behind
            ^a box1
            ^b target1
-           ^c splinter
-           ^next <obj2>)
-   (<obj2> ^name collinear
+           ^c splinter)
+   (<clnr> ^name collinear
            ^a splinter
            ^b box1
-           ^c target1
-           ^next <obj3>)
-   (<obj3> ^name align_facing
-           ^a splinter
-           ^b box1
-           ^c target1
-           ^next <obj4>)
-   (<obj4> ^name euclidean
+           ^c target1)
+#   (<face> ^name align_facing
+#           ^a splinter
+#           ^b box1
+#           ^c target1)
+   (<intr> ^name euclidean
            ^a splinter
            ^b box1)}
 
@@ -53,11 +59,7 @@ sp {push-box-to-target
    (<c> ^seek <sk>)
    (<sk> ^type simplex
          ^depth 50
-         ^outputs <out>
          ^objective <obj>)
-   (<out> ^left <left> ^right <right>)
-   (<left>  ^min -0.1 ^max 1.0 ^inc 1.0)
-   (<right> ^min -0.1 ^max 1.0 ^inc 1.0)
    (<obj> ^name euclidean
           ^a box1
           ^b target1)}
@@ -67,7 +69,4 @@ sp {manual
               ^svs.command <c>
              -^auto-control t)
 -->
-   (<c> ^manual_control.outputs <out>)
-   (<out> ^left <left> ^right <right>)
-   (<left>  ^min 0.0 ^max 1.0 ^inc 1.0)
-   (<right> ^min 0.0 ^max 1.0 ^inc 1.0)}
+   (<c> ^manual_control <mc>)}

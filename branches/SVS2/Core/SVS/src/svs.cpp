@@ -199,6 +199,54 @@ void svs_state::clear_scene() {
 	scn->clear();
 }
 
+void svs_state::update_models() {
+	vector<string> curr_pnames, out_names;
+	output_spec::const_iterator i;
+	floatvec curr_pvals, out;
+	double dt;
+	
+	if (level > 0) {
+		/* No legitimate information to learn from in imagined states */
+		return;
+	}
+	
+	scn->get_property_names(curr_pnames);
+	for (i = outspec.begin(); i != outspec.end(); ++i) {
+		curr_pnames.push_back(i->name);
+	}
+	scn->get_properties(curr_pvals);
+	get_output(out);
+	dt = scn->get_dt();
+	
+	if (prev_pnames == curr_pnames) {
+		floatvec x(prev_pvals);
+		x.extend(out);
+		mmdl.learn(x, curr_pvals, dt);
+	} else {
+		mmdl.set_property_vector(curr_pnames);
+	}
+	prev_pnames = curr_pnames;
+	prev_pvals = curr_pvals;
+}
+
+void svs_state::set_output(const floatvec &out) {
+	assert(out.size() == outspec.size());
+	next_out = out;
+}
+
+bool svs_state::get_output(floatvec &out) const {
+	if (next_out.size() != outspec.size()) {
+		out.resize(outspec.size());
+		for (int i = 0; i < outspec.size(); ++i) {
+			out[i] = outspec[i].def;
+		}
+		return false;
+	} else {
+		out = next_out;
+		return true;
+	}
+}
+
 svs::svs(agent *a)
 : envsock('s', getnamespace() + "env", true)
 {
@@ -238,6 +286,7 @@ void svs::pre_env_callback() {
 	vector<svs_state*>::iterator i;
 	string sgel;
 	bool validout, validin;
+	svs_state *topstate = state_stack.front();
 	
 	for (i = state_stack.begin(); i != state_stack.end(); ++i) {
 		(**i).process_cmds();
@@ -247,49 +296,28 @@ void svs::pre_env_callback() {
 	}
 	
 	/* environment IO */
-	if (next_out.size() == 0) {
-		validout = false;
-		envsock.send("");
-	} else {
-		stringstream ss;
-		ss << next_out << endl;
-		validout = envsock.send(ss.str());
+	output_spec *outspec = topstate->get_output_spec();
+	floatvec out;
+	topstate->get_output(out);
+	
+	assert(outspec->size() == out.size());
+	stringstream ss;
+	for (int i = 0; i < outspec->size(); ++i) {
+		ss << (*outspec)[i].name << " " << out[i] << endl;
 	}
+	validout = envsock.send(ss.str());
+	
 	if (!envsock.receive(sgel)) {
 		validin = false;
 	} else {
 		validin = true;
-		state_stack.front()->get_scene()->parse_sgel(sgel);
+		topstate->get_scene()->parse_sgel(sgel);
 	}
 	if (validout && validin) {
-		update_models();
+		topstate->update_models();
 	}
 }
 
-void svs::update_models() {
-	map<string, model*>::iterator i;
-	vector<string> curr_pnames, out_names;
-	floatvec curr_pvals;
-	double dt;
-	
-	scene *scn = state_stack.front()->get_scene();
-	scn->get_property_names(curr_pnames);
-	scn->get_properties(curr_pvals);
-	next_out.get_names(out_names);
-	copy(out_names.begin(), out_names.end(), back_inserter(curr_pnames));
-	dt = scn->get_dt();
-	
-	if (prev_pnames == curr_pnames) {
-		floatvec x(prev_pvals), y(prev_pvals);
-		x.extend(next_out.vals);
-		//models.test(x, y);
-		models.learn(x, curr_pvals, dt);
-	} else {
-		models.set_property_vector(curr_pnames);
-	}
-	prev_pnames = curr_pnames;
-	prev_pvals = curr_pvals;
-}
 
 void svs::post_env_callback() {
 	string resp;
@@ -316,14 +344,3 @@ void svs::del_common_syms() {
 	si->del_sym(cs.result);
 }
 
-string svs::get_env_input(const string &sgel) {
-	return "";
-}
-
-void svs::set_next_output(const namedvec &out) {
-	next_out = out;
-}
-
-void svs::add_model(const std::string &name, model *m) {
-	models.add_model(name, m);
-}

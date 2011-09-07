@@ -969,7 +969,7 @@ bool KernelSML::HandleSVSInput(AgentSML* pAgentSML, char const* pCommandName, Co
 	
 	std::stringstream ss;
 
-	ss << pAgentSML->GetSoarAgent()->svs_instance->get_env_input(pLine);
+	//ss << pAgentSML->GetSoarAgent()->svs_instance->get_env_input(pLine);
 	std::string t = ss.str();
 	return this->ReturnResult(pConnection, pResponse, t.c_str()) ;
 }

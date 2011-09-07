@@ -3,6 +3,7 @@
 #include <string>
 #include <limits>
 #include <algorithm>
+#include <list>
 #include "command.h"
 #include "svs.h"
 #include "scene.h"
@@ -19,69 +20,6 @@ const double CCOEF = 0.5;
 const double SCOEF = 0.5;
 const int MAXITERS = 50;
 const double INF = numeric_limits<double>::infinity();
-
-/*
- Description of a single output dimension.
-*/
-struct output_dim_info {
-	string name;
-	float min;
-	float max;
-	float inc;
-};
-
-bool output_comp(const output_dim_info &a, const output_dim_info &b) {
-	return a.name < b.name;
-}
-
-typedef std::vector<output_dim_info> output_info_vec;
-
-/* Parses a WME structure that describes the output the environment expects.
-   Assumes this format:
-
-	^outputs (
-		^<name1> (
-			^min <val>
-			^max <val>
-			^inc <val>
-		)
-		^<name2> (
-			^min <val>
-			^max <val>
-			^inc <val>
-		)
-		...
-	)
-*/
-bool parse_wm_output_struct(soar_interface *si, Symbol *root, output_info_vec &out_info) {
-	wme_list dim_wmes;
-	wme_list::iterator i;
-	Symbol *dim_id;
-	wme *min_wme, *max_wme, *inc_wme;
-	output_dim_info d;
-	
-	out_info.clear();
-	if (!si->is_identifier(root)) {
-		return false;
-	}
-	si->get_child_wmes(root, dim_wmes);
-	for (i = dim_wmes.begin(); i != dim_wmes.end(); ++i) {
-		dim_id = si->get_wme_val(*i);
-		if (si->get_val(si->get_wme_attr(*i), d.name)    &&
-		    si->is_identifier(dim_id)                    &&
-		    si->find_child_wme(dim_id, "min", min_wme)   &&
-		    si->get_val(si->get_wme_val(min_wme), d.min) &&
-		    si->find_child_wme(dim_id, "max", max_wme)   &&
-		    si->get_val(si->get_wme_val(max_wme), d.max) &&
-		    si->find_child_wme(dim_id, "inc", inc_wme)   &&
-		    si->get_val(si->get_wme_val(inc_wme), d.inc))
-		{
-			out_info.push_back(d);
-		}
-	}
-	sort(out_info.begin(), out_info.end(), output_comp);
-	return true;
-}
 
 void draw_prediction(scene *scn, multi_model *mdl, const floatvec &traj, int stepsize) {
 	scene *copy = scn->copy();
@@ -375,6 +313,12 @@ public:
 		scn = init.copy();
 		scn->get_properties(initvals);
 	}
+	
+	traj_eval(int stepsize, multi_model *m, multi_objective *obj, const scene &tmp, const floatvec &initvals)
+	: mdl(m), stepsize(stepsize), obj(obj), numcalls(0), totaltime(0.), initvals(initvals)
+	{
+		scn = tmp.copy();
+	}
 
 	~traj_eval() {
 		delete scn;
@@ -446,7 +390,7 @@ void argmin(const vector<floatvec> &v, int &worst, int &nextworst, int &best) {
 	}
 }
 
-bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec &best, traj_eval &ev) {
+bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec &best, floatvec &bestval, traj_eval &ev) {
 	int ndim = min.size(), i, wi, ni, bi;
 	vector<floatvec> eval(ndim+1);
 	floatvec reval, eeval, ceval;
@@ -470,6 +414,7 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 		argmin(eval, wi, ni, bi);
 		worst = simplex[wi];
 		best = simplex[bi];
+		bestval = eval[bi];
 		floatvec sum(ndim);
 		
 		/*
@@ -542,117 +487,70 @@ bool nelder_mead_constrained(const floatvec &min, const floatvec &max, floatvec 
 }
 
 class tree_search {
-public:
-	tree_search(scene *scn, multi_model *mdl, multi_objective *obj, const output_info_vec &stepinfo, int maxnodes)
-	: nodes(node_compare()), stepinfo(stepinfo), maxnodes(maxnodes)
-	{
-		ci.scn = scn->copy();
-		ci.obj = obj;
-		ci.mdl = mdl;
-		floatvec initstate;
-		scn->get_properties(initstate);
-		nodes.push(new node(initstate, &ci));
-	}
-	
-	~tree_search() {
-		while (!nodes.empty()) {
-			node *n = nodes.top();
-			nodes.pop();
-			delete n;
-		}
-	}
-	
-	void expand() {
-		/*
-		 Since the underlying container for the queue is a vector,
-		 we know that &nodes.top() points to the first position
-		 of an internal array of nodes.
-		*/
-		node * const *front = &nodes.top();
-		const node *n = front[rand() % nodes.size()];
-		node *newnode = new node(*n);
-		
-		floatvec output(stepinfo.size());
-		for (int i = 0; i < stepinfo.size(); ++i) {
-			float range = stepinfo[i].max - stepinfo[i].min;
-			output[i] = stepinfo[i].min + (range * rand()) / RAND_MAX;
-		}
-		
-		if (!newnode->add_step(output)) {
-			cout << "TREE SEARCH ERROR" << endl;
-			delete newnode;
-			return;
-		}
-		nodes.push(newnode);
-		if (nodes.size() > maxnodes) {
-			node *old = nodes.top();
-			nodes.pop();
-			delete old;
-		}
-	}
-	
-	void search(int iterations, floatvec &besttraj, floatvec &bestval) {
-		for (int i = 0; i < iterations; ++i) {
-			expand();
-		}
-		node *bestnode = nodes.top();
-		besttraj = bestnode->traj;
-		bestval = bestnode->value;
-		cout << "BEST TRAJ LENGTH " << bestnode->offset / stepinfo.size() << endl;
-		cout << "OTHER VALUES" << endl;
-		while (nodes.size() > 0) {
-			node *n = nodes.top();
-			cout << nodes.size() << " " << n->value << endl;
-			nodes.pop();
-			delete n;
-		}
-	}
-	
 private:
 	struct common_info {
 		multi_objective *obj;
 		multi_model *mdl;
 		scene *scn;
+		output_spec *outspec;
+		floatvec min, max, range;
 	};
 	
 	class node {
 	public:
-		int offset;
+		int offset, depth;
 		floatvec traj;
 		floatvec value;
 		floatvec state;
 		common_info *ci;
 		
 		node(const floatvec &state, common_info *ci)
-		: offset(0), state(state), ci(ci)
+		: offset(0), depth(1), state(state), ci(ci)
 		{
 			ci->scn->set_properties(state);
 			ci->obj->eval(*ci->scn, value);
 		}
 		
 		node(const node &n) 
-		: offset(n.offset), traj(n.traj), value(n.value), state(n.state), ci(n.ci)
+		: offset(n.offset), depth(n.depth), traj(n.traj), value(n.value), state(n.state), ci(n.ci)
 		{}
 		
-		bool add_step(const floatvec &s) {
-			if (offset == traj.size()) {
-				if (traj.size() == 0) {
-					traj.resize(s.size());
-				} else {
-					traj.resize(traj.size() * 2);
+		bool add_step() {
+			floatvec step(ci->outspec->size()), newval;
+			
+			/*
+			 First try to seek toward goal with simplex,
+			 if that fails, then use random.
+			*/
+			traj_eval eval(ci->outspec->size(), ci->mdl, ci->obj, *ci->scn, state);
+			nelder_mead_constrained(ci->min, ci->max, step, newval, eval);
+			if (newval >= value) {
+				for (int i = 0; i < ci->outspec->size(); ++i) {
+					step[i] = ci->min[i] + (ci->range[i] * rand()) / RAND_MAX;
 				}
 			}
-			for (int i = 0; i < s.size(); ++i) {
-				traj[offset + i] = s[i];
-			}
-			offset += s.size();
-			floatvec x(state.size() + s.size());
-			x.combine(state, s);
+			floatvec x(state.size() + step.size());
+			x.combine(state, step);
 			if (!ci->mdl->predict(x, state)) {
 				return false;
 			}
 			ci->scn->set_properties(state);
 			ci->obj->eval(*ci->scn, value);
+			
+			if (offset == traj.size()) {
+				if (traj.size() == 0) {
+					traj.resize(step.size());
+				} else {
+					traj.resize(traj.size() * 2);
+				}
+			}
+			for (int i = 0; i < step.size(); ++i) {
+				traj[offset + i] = step[i];
+			}
+			
+			offset += step.size();
+			depth++;
+			
 			return true;
 		}
 	};
@@ -667,27 +565,136 @@ private:
 		}
 	};
 	
-	priority_queue<node*, vector<node*>, node_compare> nodes;
+public:
+	tree_search(scene *scn, multi_model *mdl, multi_objective *obj, output_spec *outspec, float thresh)
+	: outspec(outspec), thresh(thresh)
+	{
+		ci.scn = scn->copy();
+		ci.obj = obj;
+		ci.mdl = mdl;
+		ci.outspec = outspec;
+		ci.min.resize(outspec->size());
+		ci.max.resize(outspec->size());
+		ci.range.resize(outspec->size());
+		for (int i = 0; i < outspec->size(); ++i) {
+			ci.min[i] = (*outspec)[i].min;
+			ci.max[i] = (*outspec)[i].max;
+			ci.range[i] = ci.max[i] - ci.min[i];
+		}
+		
+		floatvec initstate;
+		scn->get_properties(initstate);
+		bestnode = new node(initstate, &ci);
+		leafs.push_back(bestnode);
+		num_nodes = 1;
+		total_depth = 1.0;
+		avg_depth = 1.0;
+		avg_bf = 1.0;
+ 	}
+	
+	~tree_search() {
+		std::list<node*>::iterator i;
+		for (i = leafs.begin(); i != leafs.end(); ++i) {
+			delete *i;
+		}
+		for (i = nonleafs.begin(); i != nonleafs.end(); ++i) {
+			delete *i;
+		}
+	}
+	
+	void expand() {
+		/*
+		 Since the underlying container for the queue is a vector,
+		 we know that &nodes.top() points to the first position
+		 of an internal array of nodes.
+		*/
+		bool isleaf;
+		node *newnode;
+		std::list<node*>::iterator selected;
+		
+		if (nonleafs.size() > 0 && avg_depth / avg_bf > thresh) {
+			int r = rand() % nonleafs.size();
+			selected = nonleafs.begin();
+			advance(selected, r);
+			isleaf = false;
+		} else {
+			int r = rand() % leafs.size();
+			selected = leafs.begin();
+			advance(selected, r);
+			isleaf = true;
+		}
+		
+		newnode = new node(**selected);
+		
+		if (!newnode->add_step()) {
+			cout << "TREE SEARCH ERROR" << endl;
+			delete newnode;
+			return;
+		}
+		
+		if (isleaf) {
+			nonleafs.push_back(*selected);
+			leafs.erase(selected);
+		}
+		
+		leafs.push_back(newnode);
+		num_nodes++;
+		total_depth += newnode->depth;
+		avg_depth = total_depth / num_nodes;
+		avg_bf = ((float) num_nodes) / nonleafs.size();
+		
+		if (newnode->value < bestnode->value) {
+			bestnode = newnode;
+		}
+	}
+	
+	void search(int iterations, floatvec &besttraj, floatvec &bestval) {
+		std::list<node*>::iterator i;
+		int j;
+		for (j = 0; j < iterations; ++j) {
+			expand();
+		}
+		
+		besttraj = bestnode->traj;
+		bestval = bestnode->value;
+		cout << "BEST TRAJ LENGTH " << bestnode->offset / outspec->size() << endl;
+		cout << "AVG DEPTH " << avg_depth << endl;
+		cout << "AVG BF " << avg_bf << endl;
+		
+		/*
+		floatvec lengths(leafs.size());
+		for (i = leafs.begin(), j = 0; i != leafs.end(); ++i, ++j) {
+			lengths[j] = (**i).depth;
+		}
+		histogram(lengths, 10);
+		*/
+	}
+	
+private:
+	//priority_queue<node*, vector<node*>, node_compare> nodes;
+	std::list<node*> leafs;
+	std::list<node*> nonleafs;
 	common_info ci;
-	output_info_vec stepinfo;
-	int maxnodes;
-
+	output_spec *outspec;
+	int num_nodes;
+	float total_depth, avg_depth, avg_bf, thresh;
+	node *bestnode;
 };
 
 class controller {
 public:
-	controller(svs *svsp, multi_objective *obj, const output_info_vec &stepinfo, int depth, string type)
-	: svsp(svsp), obj(obj), stepinfo(stepinfo), depth(depth), type(type), incr(depth, stepinfo)
+	controller(multi_model *mmdl, multi_objective *obj, output_spec *outspec, int depth, string type)
+	: mmdl(mmdl), obj(obj), outspec(outspec), depth(depth), type(type), incr(depth, outspec)
 	{
 		int i, j;
 		
-		stepsize = stepinfo.size();
-		min.resize(depth * stepinfo.size());
-		max.resize(depth * stepinfo.size());
+		stepsize = outspec->size();
+		min.resize(depth * outspec->size());
+		max.resize(depth * outspec->size());
 		for (i = 0; i < depth; ++i) {
 			for (j = 0; j < stepsize; ++j) {
-				min[i * stepsize + j] = stepinfo[j].min;
-				max[i * stepsize + j] = stepinfo[j].max;
+				min[i * stepsize + j] = (*outspec)[j].min;
+				max[i * stepsize + j] = (*outspec)[j].max;
 			}
 		}
 	}
@@ -696,14 +703,14 @@ public:
 		floatvec besttraj, currval, bestval;
 		bool result;
 		if (type == "tree") {
-			tree_search t(scn, svsp->get_model(), obj, stepinfo, 100);
-			t.search(2, besttraj, bestval);
+			tree_search t(scn, mmdl, obj, outspec, 10);
+			t.search(depth, besttraj, bestval);
 		} else {
-			traj_eval evaluator(stepsize, svsp->get_model(), obj, *scn);
+			traj_eval evaluator(stepsize, mmdl, obj, *scn);
 			if (type == "simplex") {
-				result = nelder_mead_constrained(min, max, besttraj, evaluator);
+				result = nelder_mead_constrained(min, max, besttraj, bestval, evaluator);
 			} else {
-				result = naive_seek(evaluator, besttraj);
+				result = naive_seek(evaluator, besttraj, bestval);
 			}
 			evaluator.print_stats();
 			if (!result) {
@@ -715,14 +722,14 @@ public:
 			return 1;
 		}
 		bestout = besttraj.slice(0, stepsize);
-		draw_prediction(scn, svsp->get_model(), besttraj, stepsize);
+		draw_prediction(scn, mmdl, besttraj, stepsize);
 		cout << "BEST VAL " << bestval << endl;
 		cout << "BEST OUT " << bestout << endl;
 		return 2;
 	}
 	
-	bool naive_seek(traj_eval &evaluator, floatvec &besttraj) {
-		floatvec val, bestval;
+	bool naive_seek(traj_eval &evaluator, floatvec &besttraj, floatvec &bestval) {
+		floatvec val;
 		bool found = false;
 		
 		incr.reset();
@@ -748,39 +755,38 @@ private:
 	*/
 	class step_incr {
 	public:
-		step_incr(const output_info_vec &dims, floatvec *traj, int start) 
-		: dims(dims), traj(traj), start(start)
+		step_incr(output_spec *outspec, floatvec *traj, int divisions, int start) 
+		: outspec(outspec), traj(traj), start(start), divisions(divisions), inc(outspec->size())
 		{
+			for (int i = 0; i < outspec->size(); ++i) {
+				inc[i] = ((*outspec)[i].max - (*outspec)[i].min) / divisions;
+			}
 			reset();
 		}
 	
 		void reset() {
-			output_info_vec::const_iterator i;
-			int j;
-			for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
-				(*traj)[start + j] = i->min;
+			for (int i = 0; i < outspec->size(); ++i) {
+				(*traj)[start + i] = (*outspec)[i].min;
 			}
 		}
 		
 		bool next() {
-			output_info_vec::const_iterator i;
-			int j;
-			
-			for (i = dims.begin(), j = 0; i != dims.end(); ++i, ++j) {
-				(*traj)[start + j] += i->inc;
-				if ((*traj)[start + j] <= i->max) {
+			for (int i = 0; i < outspec->size(); ++i) {
+				(*traj)[start + i] += inc[i];
+				if ((*traj)[start + i] <= (*outspec)[i].max) {
 					return true;
 				} else {
-					(*traj)[start + j] = i->min;  // roll over and move on to the next value
+					(*traj)[start + i] = (*outspec)[i].min;  // roll over and move on to the next value
 				}
 			}
 			return false;
 		}
 		
 	private:
-		output_info_vec dims;
-		int start;
+		output_spec *outspec;
+		int start, divisions;
 		floatvec *traj;
+		floatvec inc;
 	};
 	
 	/*
@@ -790,13 +796,13 @@ private:
 	public:
 		traj_incr() : len(0) {}
 		
-		traj_incr(int len, const output_info_vec &stepinfo)
+		traj_incr(int len, output_spec *outspec)
 		: len(len)
 		{
-			int stepsize = stepinfo.size();
+			int stepsize = outspec->size();
 			traj.resize(len * stepsize);
 			for (int i = 0; i < len; i++) {
-				steps.push_back(step_incr(stepinfo, &traj, i * stepsize));
+				steps.push_back(step_incr(outspec, &traj, 3, i * stepsize));
 			}
 			reset();
 		}
@@ -826,9 +832,9 @@ private:
 		int len;
 	};
 	
-	svs             *svsp;
+	multi_model     *mmdl;
 	multi_objective *obj;
-	output_info_vec  stepinfo;
+	output_spec     *outspec;
 	floatvec         min, max;   // for Nelder-Mead
 	int              depth;
 	int              stepsize;
@@ -855,6 +861,8 @@ public:
 	}
 	
 	bool update() {
+		floatvec out;
+		
 		if (changed()) {
 			broken = !parse_cmd();
 		}
@@ -864,7 +872,7 @@ public:
 		
 		timer t1;
 		t1.start();
-		int result = ctrl->seek(state->get_scene(), out.vals);
+		int result = ctrl->seek(state->get_scene(), out);
 		switch (result) {
 			case 0:
 				set_status("no valid output found");
@@ -873,11 +881,7 @@ public:
 				set_status("local minimum");
 				break;
 			case 2:
-				if (state->get_level() == 0) {
-					state->get_svs()->set_next_output(out);
-				}
-				// need to update scene with model otherwise
-		
+				state->set_output(out);
 				set_status("success");
 				step++;
 				//update_step();
@@ -895,20 +899,11 @@ private:
 	      ^objective ( ... )
 	*/
 	bool parse_cmd() {
-		output_info_vec out_info;
-		output_info_vec::iterator i;
-		wme *outputs_wme, *objective_wme, *model_wme, *depth_wme, *type_wme;
+		wme *objective_wme, *model_wme, *depth_wme, *type_wme;
 		long depth;
 		string type;
 		
 		cleanup();
-		if (!si->find_child_wme(get_root(), "outputs", outputs_wme) ||
-		    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
-		    !parse_wm_output_struct(si, si->get_wme_val(outputs_wme), out_info))
-		{
-			set_status("missing or invalid outputs specification");
-			return false;
-		}
 		if (!si->find_child_wme(get_root(), "type", type_wme) ||
 			!si->get_val(si->get_wme_val(type_wme), type))
 		{
@@ -929,11 +924,7 @@ private:
 			set_status("missing or invalid depth");
 			return false;
 		}
-		ctrl = new controller(state->get_svs(), obj, out_info, depth, type);
-		out.clear();
-		for (i = out_info.begin(); i != out_info.end(); ++i) {
-			out.add_name(i->name, 0.0);
-		}
+		ctrl = new controller(state->get_model(), obj, state->get_output_spec(), depth, type);
 		return true;
 	}
 
@@ -955,7 +946,6 @@ private:
 	wme             *stepwme;
 	int              step;
 	bool             broken;
-	namedvec         out;
 };
 
 command *_make_seek_command_(svs_state *state, Symbol *root) {
@@ -966,9 +956,7 @@ class random_control_command : public command {
 public:
 	random_control_command(svs_state *state, Symbol *root)
 	: command(state, root), state(state)
-	{
-		si = state->get_svs()->get_soar_interface();
-	}
+	{ }
 	
 	string description() {
 		return string("random control");
@@ -977,28 +965,18 @@ public:
 	bool update() {
 		if (changed()) {
 			wme *outputs_wme;
-			output_info_vec out_info;
-			if (!si->find_child_wme(get_root(), "outputs", outputs_wme) ||
-			    !si->is_identifier(si->get_wme_val(outputs_wme)) ||
-			    !parse_wm_output_struct(si, si->get_wme_val(outputs_wme), out_info))
-			{
-				set_status("missing or invalid outputs specification");
-				return false;
-			}
-			min.resize(out_info.size());
-			max.resize(out_info.size());
-			out.clear();
-			for (int i = 0; i < out_info.size(); ++i) {
-				min[i] = out_info[i].min;
-				max[i] = out_info[i].max;
-				out.add_name(out_info[i].name, 0.0);
+			output_spec *outspec = state->get_output_spec();
+			out.resize(outspec->size());
+			min.resize(outspec->size());
+			max.resize(outspec->size());
+			for (int i = 0; i < outspec->size(); ++i) {
+				min[i] = (*outspec)[i].min;
+				max[i] = (*outspec)[i].max;
 			}
 		}
 		
-		out.vals.randomize(min, max);
-		if (state->get_level() == 0) {
-			state->get_svs()->set_next_output(out);
-		}
+		out.randomize(min, max);
+		state->set_output(out);
 		set_status("success");
 		return true;
 	}
@@ -1006,10 +984,8 @@ public:
 	bool early() { return true; }
 	
 private:
-	soar_interface  *si;
-	svs_state       *state;
-	namedvec         out;
-	floatvec         min, max;
+	svs_state *state;
+	floatvec   out, min, max;
 };
 
 command *_make_random_control_command_(svs_state *state, Symbol *root) {
@@ -1018,7 +994,9 @@ command *_make_random_control_command_(svs_state *state, Symbol *root) {
 
 class manual_control_command : public command {
 public:
-	manual_control_command(svs_state *state, Symbol *root) : command(state, root), state(state) {
+	manual_control_command(svs_state *state, Symbol *root) 
+	: command(state, root), state(state), outspec(state->get_output_spec())
+	{
 		sock = new ipcsocket('s', "ctrl", false);
 	}
 	
@@ -1038,21 +1016,24 @@ public:
 		sock->receive(msg);
 		ss1.str(msg);
 		
-		namedvec out;
+		floatvec out(outspec->size());
 		while (getline(ss1, line)) {
 			stringstream ss2(line);
-			string label;
+			string name;
 			float val;
-			if (!(ss2 >> label) || !(ss2 >> val)) {
+			if (!(ss2 >> name) || !(ss2 >> val)) {
 				set_status("input error");
 				return false;
 			}
-			out.add_name(label, val);
+			for (int i = 0; i < outspec->size(); ++i) {
+				if ((*outspec)[i].name == name) {
+					out[i] = val;
+					break;
+				}
+			}
 		}
 		
-		if (state->get_level() == 0) {
-			state->get_svs()->set_next_output(out);
-		}
+		state->set_output(out);
 		set_status("success");
 		return true;
 	}
@@ -1060,6 +1041,7 @@ public:
 	bool early() { return true; }
 	
 private:
+	output_spec *outspec;
 	svs_state *state;
 	ipcsocket *sock;
 };

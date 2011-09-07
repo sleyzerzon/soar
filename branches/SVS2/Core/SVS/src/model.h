@@ -48,48 +48,51 @@ public:
 
 	multi_model() {}
 	
+	~multi_model() {
+		std::list<model_config*>::iterator i;
+		for (i = active_models.begin(); i != active_models.end(); ++i) {
+			delete *i;
+		}
+	}
+	
 	bool predict(const floatvec &x, floatvec &y) {
-		std::list<model_config>::const_iterator i;
+		std::list<model_config*>::const_iterator i;
 		int j;
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			if (i->error) {
+			model_config *cfg = *i;
+			floatvec xp(x.slice(cfg->in_indexes)), yp(y.slice(cfg->out_indexes));
+			if (!cfg->mdl->predict(xp, yp)) {
 				return false;
 			}
-			floatvec xp(x.slice(i->in_indexes)), yp(y.slice(i->out_indexes));
-			if (!i->mdl->predict(xp, yp)) {
-				return false;
-			}
-			y.set_indices(i->out_indexes, yp);
+			y.set_indices(cfg->out_indexes, yp);
 		}
 		return true;
 	}
 	
 	void learn(const floatvec &x, const floatvec &y, float dt) {
-		std::list<model_config>::iterator i;
+		std::list<model_config*>::iterator i;
 		int j;
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			if (i->error) {
-				continue;
-			}
-			floatvec xp = x.slice(i->in_indexes), yp = y.slice(i->out_indexes);
-			float error = i->mdl->test(xp, yp);
+			model_config *cfg = *i;
+			floatvec xp = x.slice(cfg->in_indexes), yp = y.slice(cfg->out_indexes);
+			/*
+			float error = cfg->mdl->test(xp, yp);
 			if (error < 0. || error > 1.0e-8) {
-				i->mdl->learn(xp, yp, dt);
+				cfg->mdl->learn(xp, yp, dt);
 			}
+			*/
+			cfg->mdl->learn(xp, yp, dt);
 		}
 	}
 	
 	float test(const floatvec &x, const floatvec &y) {
 		float s = 0.0;
-		std::list<model_config>::iterator i;
+		std::list<model_config*>::iterator i;
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			std::cerr << i->name << "(" << i->mdl->get_type() << "): ";
-			if (i->error) {
-				std::cerr << "NP (assign error)" << std::endl;
-				continue;
-			}
-			floatvec xp = x.slice(i->in_indexes), yp = y.slice(i->out_indexes);
-			float d = i->mdl->test(xp, yp);
+			model_config *cfg = *i;
+			std::cerr << cfg->name << "(" << cfg->mdl->get_type() << "): ";
+			floatvec xp = x.slice(cfg->in_indexes), yp = y.slice(cfg->out_indexes);
+			float d = cfg->mdl->test(xp, yp);
 			if (d < 0.) {
 				std::cerr << "NP" << std::endl;
 				s = -1.;
@@ -108,47 +111,34 @@ public:
 	                  const slot_prop_map &in_slot_props, 
 	                  const slot_prop_map &out_slot_props) 
 	{
-		model_config config;
 		std::vector<std::string> in_slots, out_slots;
 		std::vector<std::string>::iterator i;
+		model_config *cfg = new model_config();
 		
-		config.name = name;
-		if (!map_get(model_db, name, config.mdl)) {
+		cfg->name = name;
+		if (!map_get(model_db, name, cfg->mdl)) {
 			std::cerr << "ERROR (assign_model): no model " << name << std::endl;
+			delete cfg;
 			return false;
 		}
-		config.mdl->get_slots(in_slots, out_slots);
+		cfg->mdl->get_slots(in_slots, out_slots);
+		cfg->in_slot_props = in_slot_props;
+		cfg->out_slot_props = out_slot_props;
 		
-		for (i = in_slots.begin(); i != in_slots.end(); ++i) {
-			if (in_slot_props.find(*i) == in_slot_props.end()) {
-				std::cerr << "ERROR (assign_model): input slot " << *i << std::endl;
-				return false;
-			}
-		}
-		for (i = out_slots.begin(); i != out_slots.end(); ++i) {
-			if (out_slot_props.find(*i) == out_slot_props.end()) {
-				std::cout << "ERROR (assign_model): output slot " << std::endl;
-				return false;
-			}
-		}
-		
-		config.in_slot_props = in_slot_props;
-		config.out_slot_props = out_slot_props;
-		
-		if (!assign_slot_indexes(in_slots, in_slot_props, config.in_indexes, false) ||
-		    !assign_slot_indexes(out_slots, out_slot_props, config.out_indexes, true))
+		if (!assign_slot_indexes(in_slots, in_slot_props, cfg->in_indexes, false) ||
+		    !assign_slot_indexes(out_slots, out_slot_props, cfg->out_indexes, true))
 		{
+			delete cfg;
 			return false;
 		}
-		config.error = false;
-		active_models.push_back(config);
+		active_models.push_back(cfg);
 		return true;
 	}
 
 	void unassign_model(const std::string &name) {
-		std::list<model_config>::iterator i;
+		std::list<model_config*>::iterator i;
 		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			if (i->name == name) {
+			if ((**i).name == name) {
 				active_models.erase(i);
 				return;
 			}
@@ -161,32 +151,9 @@ public:
 	
 	void set_property_vector(const std::vector<std::string> &props) {
 		prop_vec = props;
-		reassign_indexes();
 	}
-	
 	
 private:
-	void reassign_indexes() {
-		std::list<model_config>::iterator i;
-		
-		for (i = active_models.begin(); i != active_models.end(); ++i) {
-			std::vector<std::string> in_slots, out_slots;
-			int index = -1;
-			i->mdl->get_slots(in_slots, out_slots);
-			i->in_indexes.clear();
-			if (!assign_slot_indexes(in_slots, i->in_slot_props, i->in_indexes, false)) {
-				i->error = true;
-				continue;
-			}
-			i->out_indexes.clear();
-			if (!assign_slot_indexes(out_slots, i->out_slot_props, i->out_indexes, true)) {
-				i->error = true;
-				continue;
-			}
-			i->error = false;
-		}
-	}
-	
 	bool assign_slot_indexes(const std::vector<std::string> &slots, 
 							 const slot_prop_map &assignments,
 							 std::vector<int> &indexes,
@@ -228,11 +195,10 @@ private:
 		slot_prop_map out_slot_props;
 		std::vector<int> in_indexes;
 		std::vector<int> out_indexes;
-		bool error;
 		model *mdl;
 	};
 	
-	std::list<model_config>       active_models;
+	std::list<model_config*>      active_models;
 	std::map<std::string, model*> model_db;
 	std::vector<std::string>      prop_vec;
 };
