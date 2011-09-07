@@ -14,6 +14,22 @@ Visit the [http://sitemaker.umich.edu/soar Soar home page] for news and general 
 
 The authoritative documentation for Soar is the Soar Manual. We also provide a set of tutorials for learning Soar hands-on. These are available in any recent Soar distribution in the `share/soar/Documentation` folder. The most recent version of the manual is also [http://code.google.com/p/soar/downloads/detail?name=SoarManual931.pdf here] and the tutorial [http://code.google.com/p/soar/downloads/detail?name=SoarTutorial.zip here].
 
+The [http://www.adobe.com/ Adobe Reader] is needed to view the tutorial and
+much of our other documentation (.pdf format).
+
+= Getting Started =
+
+The easiest way to get started with Soar is to obtain the latest distribution from [Downloads the downloads page] and work through all six parts of the tutorial (see above) and to do all of the exercises. Although it's tempting to skip the exercises, they're very useful and even fun.
+
+Be sure to install the appropriate version of Java for your system (32-bit downloads
+will not work with 64-bit Java virtual machines and vice versa).
+
+= Questions about Soar? =
+
+The best places for help with Soar are listed on the
+[http://code.google.com/p/soar project home page] under the heading _Help and
+Documentation_.
+
 = Other Documentation =
 
 See the links to the left, also:
@@ -27,3 +43,4 @@ See the links to the left, also:
   * [http://www.eecs.umich.edu/~soar/sitemaker/docs/misc/SoarRBSComparison.pdf Soar: A comparison with Rule-Based Systems]
   * [http://www.eecs.umich.edu/~soar/sitemaker/docs/misc/FutureSoarResearch.pdf Soar: Along the Frontiers] (regarding future research)
   * [http://www.eecs.umich.edu/~soar/sitemaker/misc/soar9.svg Block diagram of the Soar 9.3 architecture]
+
