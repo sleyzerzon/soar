@@ -1,0 +1,5 @@
+FIFO=/tmp/dispfifo
+rm -f $FIFO
+mkfifo $FIFO
+CLASSPATH=$CLASSPATH:build:quickhull3d.jar java Display $FIFO
+rm -f hs_err*
