@@ -12,6 +12,8 @@
 
 using namespace std;
 
+const bool do_debug_draw = false;
+
 struct node_info {
 	sgnode *node;
 	ptlist vertices;
@@ -41,7 +43,7 @@ void update_transforms(node_info &info) {
 class intersect_filter : public filter {
 public:
 	intersect_filter(filter_input *input) 
-	: filter(input) //drawer("/tmp/dispfifo")
+	: filter(input), drawer(NULL)
 	{
 		btVector3 worldAabbMin(-1000,-1000,-1000);
 		btVector3 worldAabbMax(1000,1000,1000);
@@ -51,13 +53,18 @@ public:
 		broadphase = new btSimpleBroadphase();
 		//broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax);
 		cworld = new btCollisionWorld(dispatcher, broadphase, config);
-		//cworld->setDebugDrawer(&drawer);
+		
+		if (do_debug_draw) {
+			drawer = new bullet_debug_drawer("/tmp/dispfifo");
+			cworld->setDebugDrawer(drawer);
+		}
 	}
 	
 	~intersect_filter() {
 		delete dispatcher;
 		delete broadphase;
 		delete cworld;
+		delete drawer;
 	}
 	
 	bool update_results() {
@@ -117,6 +124,11 @@ public:
 		}
 		*/
 		
+		for (j = results.begin(); j != results.end(); ++j) {
+			j->second.oldval = j->second.newval;
+			j->second.newval = false;
+		}
+		
 		cworld->performDiscreteCollisionDetection();
 		int num_manifolds = dispatcher->getNumManifolds();
 		for (int k = 0; k < num_manifolds; ++k) {
@@ -139,8 +151,11 @@ public:
 				change_result(r.fval);
 			}
 		}
-		//drawer.reset();
-		//cworld->debugDrawWorld();
+		
+		if (drawer) {
+			drawer->reset();
+			cworld->debugDrawWorld();
+		}
 		return true;
 	}
 	
@@ -264,8 +279,7 @@ private:
 	btCollisionDispatcher    *dispatcher;
 	btBroadphaseInterface    *broadphase;
 	btCollisionWorld         *cworld;
-	//bullet_debug_drawer      drawer;
-	//collision_callback       callback;
+	bullet_debug_drawer      *drawer;
 	
 	input_table_t      input_table;
 	result_table_t     results;
