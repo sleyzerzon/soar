@@ -1,4 +1,3 @@
-#labels Featured,Phase-Support
 #sidebar TableOfContents
 
 This wiki serves as living documentation on Soar as it evolves with ongoing research. See the sidebar for a table of interesting links. The Wiki index is [http://code.google.com/p/soar/w/list here].
