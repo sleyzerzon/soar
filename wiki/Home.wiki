@@ -2,4 +2,4 @@
 
 This wiki serves as living documentation on Soar as it evolves with ongoing research. See the sidebar for a table of interesting links. The Wiki index is [http://code.google.com/p/soar/w/list here].
 
-Most of the information that used to be on this page has all been moved to the [http://code.google.com/p/soar project home page].
+This is now just a placeholder page. Most of the information that used to be on this page has been moved to the [http://code.google.com/p/soar project home page].
