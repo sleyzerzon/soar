@@ -9,13 +9,14 @@ int drawer::SCALE = 1 << 3;
 int drawer::COLOR = 1 << 4;
 int drawer::VERTS = 1 << 5;
 
-drawer::drawer(const string &fifo_path, const string &sname) 
-: path(fifo_path), fifo(fifo_path.c_str()), scene_name(sname),
-  scl(1., 1., 1.), color(0., 1., 0.)
+ofstream drawer::fifo("/tmp/dispfifo");
+
+drawer::drawer(const string &sname) 
+: scene_name(sname), scl(1., 1., 1.), color(0., 1., 0.)
 {}
 
 drawer::~drawer() {
-	fifo.close();
+	// fifo.close();
 }
 
 void drawer::set_pos(const vec3 &p) {
@@ -64,7 +65,6 @@ void drawer::add(const string &name) {
 	copy(verts.begin(), verts.end(), ostream_iterator<vec3>(fifo, " "));
 	fifo << endl;
 	fifo << scene_name << " t " << name << "_label " << pos << " " << name << endl;
-	
 	fifo.flush();
 }
 

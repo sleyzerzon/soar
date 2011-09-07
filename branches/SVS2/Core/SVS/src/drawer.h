@@ -8,8 +8,9 @@
 class drawer {
 public:
 	static int POS, ROT, SCALE, COLOR, VERTS;
+	static std::ofstream fifo;
 	
-	drawer(const std::string &fifo_path, const std::string &sname);
+	drawer(const std::string &sname);
 	~drawer();
 	
 	void set_pos(const vec3 &p);
@@ -27,8 +28,7 @@ public:
 	void change(const std::string &name, int props);
 	
 private:
-	std::string path, scene_name;
-	std::ofstream fifo;
+	std::string scene_name;
 	vec3 pos, rot, scl, color;
 	ptlist verts;
 };
