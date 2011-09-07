@@ -504,4 +504,6 @@ vec3 calc_centroid(const ptlist &pts);
 */
 float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u);
 
+void histogram(const floatvec &vals, int nbins);
+
 #endif

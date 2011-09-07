@@ -1,3 +1,5 @@
+#include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -88,4 +90,40 @@ float dir_separation(const ptlist &a, const ptlist &b, const vec3 &u) {
 	}
 	
 	return max - min;
+}
+
+void histogram(const floatvec &vals, int nbins) {
+	assert(nbins > 0);
+	float min = vals[0], max = vals[0], binsize, hashes_per;
+	int i, b, maxcount = 0;
+	vector<int> counts(nbins, 0);
+	for (i = 1; i < vals.size(); ++i) {
+		if (vals[i] < min) {
+			min = vals[i];
+		}
+		if (vals[i] > max) {
+			max = vals[i];
+		}
+	}
+	binsize = (max - min) / (nbins - 1);
+	if (binsize == 0) {
+		cout << "All values identical (" << min << "), not drawing histogram" << endl;
+		return;
+	}
+	for (i = 0; i < vals.size(); ++i) {
+		b = (int) ((vals[i] - min) / binsize);
+		assert(b < counts.size());
+		counts[b]++;
+		if (counts[b] > maxcount) {
+			maxcount = counts[b];
+		}
+	}
+	hashes_per = 72.0 / maxcount;
+	streamsize p = cout.precision();
+	cout.precision(4);
+	for (i = 0; i < nbins; ++i) {
+		cout << setfill(' ') << setw(5) << min + binsize * i << " - " << setw(5) << min + binsize * (i + 1) << "|";
+		cout << setfill('#') << setw((int) (hashes_per * counts[i])) << '/' << counts[i] << endl;
+	}
+	cout.precision(p);
 }
