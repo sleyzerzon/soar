@@ -6,9 +6,7 @@ Begin Soar's execution cycle.
 == Synopsis ==
 
 {{{
-run  [-f|count]
-run -[d|e|o|p][s][un][g] [f|count]
-run -[d|e|o|p][un] count [-i e|p|d|o]
+run -[d|e|o|p][g][u|n][s] [count] [-i e|p|d|o]
 }}}
 
 === Default Aliases ===
@@ -26,7 +24,6 @@ run -[d|e|o|p][un] count [-i e|p|d|o]
 || `-s, --self` || If other agents exist within the kernel, do not run them at this time. ||
 || `-u, --update` || Sets a flag in the update event callback requesting that an environment updates. This is the default if `--self` is not specified. ||
 || `-n, --noupdate` || Sets a flag in the update event callback requesting that an environment does not update. This is the default if `--self` is specified. ||
-|| `-f, forever` || Run until halted by problem-solving completion or until stopped by an interrupt. ||
 || `count` || A single integer which specifies the number of cycles to run Soar. ||
 || `-i, --interleave` || Support round robin execution across agents at a finer grain than the run-size parameter. `e` = elaboration, `p` = phase, `d` = decision, `o` = output ||
 || `-g, --goal` || Run agent until a goal retracts ||
@@ -54,10 +51,8 @@ The run command takes optional arguments: an integer, `count`, which specifies
 how many units to run; and a `units` flag indicating what steps or increments
 to use. If `count` is specified, but no `units` are specified, then Soar is run
 by decision cycles. If `units` are specified, but `count` is unpecified, then
-`count` defaults to '1'. The argument `forever` (can be shortened to `f`) is a
-keyword used instead of an integer `count` and indicates Soar should be run
-indefinitely, until halted by problem-solving completion, or stopped by an
-interrupt.
+`count` defaults to '1'. If both are unspecified, Soar will run until either a
+`halt` is executed, an interrupt is received, or max stack depth is reached.
 
 If there are multiple Soar agents that exist in the same Soar process, then
 issuing a run command in any agent will cause all agents to run with the same
@@ -93,12 +88,10 @@ eventhough the run command issued is for 5 decisions. Some use cases include:
 || `run -o 3 -interleave d` || run the agent one decision cycle and then move to the next agent. When an agent generates output for the 3rd time, it no longer runs even if other agents continue. ||
 
 The `interleave` parameter must always be equal to or smaller than the
-specified run parameter.  This option is not currently compatible with the
-`forever` option.
+specified run parameter.
 
 === Note ===
 
 If Soar has been stopped due to a `halt` action, an
 [cmd_init_soar init-soar] command must be issued before Soar
 can be restarted with the run command.
-
