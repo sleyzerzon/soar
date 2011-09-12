@@ -3,6 +3,10 @@
 
 = 2011 =
 
+Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_wma.pdf Effective and Efficient Management of Soar's Working Memory via Base-Level Activation.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+
+Laird, J. E., Derbinsky, N. Tinkerhess, M.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_dice.pdf A Case Study in Integrating Probabilistic Decision Making and Learning in a Symbolic Cognitive Architecture: Soar Plays Dice.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011_derbinsky_laird.pdf A Functional Analysis of Historical Memory Retrieval Bias in the Word Sense Disambiguation Task.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence, 663-668. San Francisco, CA.
 
 Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression, 104-107. Oslo, Norway.
