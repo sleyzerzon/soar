@@ -3,6 +3,8 @@
 
 = 2011 =
 
+Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_wma.pdf Effective and Efficient Management of Soar's Working Memory via Base-Level Activation.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
 
 Laird, J. E., Derbinsky, N. Tinkerhess, M.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_dice.pdf A Case Study in Integrating Probabilistic Decision Making and Learning in a Symbolic Cognitive Architecture: Soar Plays Dice.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
