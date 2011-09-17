@@ -26,12 +26,10 @@ reloading later.
 
 This command may be used to start and stop the recording of input function
 commands as created by an external simulation. Commands are recorded decision
-cycle by decision cycle. Use the command [cmd_replay_input
-replay-input] to replay the sequence.
+cycle by decision cycle. Use the command [cmd_replay_input replay-input] to replay the sequence.
 
 Note that this command seeds the random number generator and writes the seed to
 the capture file.
 
 == See Also ==
 [cmd_replay_input replay-input]
-
