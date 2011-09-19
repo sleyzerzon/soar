@@ -1976,10 +1976,10 @@ epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fai
 // 1. value known in phase one (try reservation)
 // 2. value unknown in phase one, but known at phase two (try assignment adhering to constraint)
 // 3. value unknown in phase one/two (if anything is left, unconstrained assignment)
-inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_syms, std::queue< epmem_node_id >& parent_ids, tc_number tc, epmem_wme_list::iterator w_b, epmem_wme_list::iterator w_e, epmem_node_id parent_id, epmem_time_id time_counter, 
+inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_syms, std::queue< epmem_node_id >& parent_ids, tc_number tc, epmem_pooled_wme_set::iterator w_b, epmem_pooled_wme_set::iterator w_e, epmem_node_id parent_id, epmem_time_id time_counter, 
 							    std::map< wme*, epmem_id_reservation* >& id_reservations, std::set< Symbol* >& new_identifiers, std::queue< epmem_node_id >& epmem_node, std::queue< epmem_node_id >& epmem_edge )
 {
-	epmem_wme_list::iterator w_p;
+	epmem_pooled_wme_set::iterator w_p;
 	
 	// temporal hash
 	epmem_hash_id my_hash;	// attribute
@@ -2432,7 +2432,8 @@ void epmem_new_episode( agent *my_agent )
 			tc_number tc = get_new_tc_number( my_agent );
 
 			// children of the current identifier
-			epmem_wme_list* wmes = NULL;
+			epmem_pooled_wme_set* wmes = NULL;
+			epmem_wme_addition_map::iterator wmes_p;
 			epmem_wme_list::iterator w_p;
 
 			// breadth first search state
@@ -2459,14 +2460,17 @@ void epmem_new_episode( agent *my_agent )
 				parent_id = parent_ids.front();
 				parent_ids.pop();
 
-				// get children WMEs
-				wmes = epmem_get_augs_of_id( parent_sym, tc );
-
-				// store the level
-				_epmem_store_level( my_agent, parent_syms, parent_ids, tc, wmes->begin(), wmes->end(), parent_id, time_counter, id_reservations, new_identifiers, epmem_node, epmem_edge );
-
-				// deallocate children list
-				delete wmes;
+				// get augmentations
+				parent_sym->id.tc_num = tc;
+				wmes_p = my_agent->epmem_wme_adds->find( parent_sym );
+				if ( wmes_p != my_agent->epmem_wme_adds->end() )
+				{
+					wmes = wmes_p->second;
+					if ( !wmes->empty() )
+					{
+						_epmem_store_level( my_agent, parent_syms, parent_ids, tc, wmes->begin(), wmes->end(), parent_id, time_counter, id_reservations, new_identifiers, epmem_node, epmem_edge );
+					}
+				}
 			}
 		}
 
