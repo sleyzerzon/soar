@@ -1600,7 +1600,20 @@ void add_wme_to_rete (agent* thisAgent, wme *w) {
       {
 	    (*thisAgent->epmem_id_ref_counts)[ w->value->id.epmem_id ]++;
       }
-	}
+
+	  	epmem_pooled_wme_set** add_set =& (*thisAgent->epmem_wme_adds)[ w->id ];
+        if ( (*add_set) == NIL )
+        {
+          allocate_with_pool( thisAgent, &( thisAgent->epmem_add_set_pool ), add_set );
+#ifdef USE_MEM_POOL_ALLOCATORS
+          (*add_set) = new (*add_set) epmem_pooled_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( thisAgent ) );
+#else
+          (*add_set) = new (*add_set) epmem_pooled_wme_set();
+#endif
+        }
+        (*add_set)->insert( w );
+        (*thisAgent->epmem_wme_removes)[ w->timetag ] = (*add_set);
+    }
   }
 
   if ( ( w->id->id.smem_lti ) && ( !thisAgent->smem_ignore_changes ) && smem_enabled( thisAgent ) && ( thisAgent->smem_params->mirroring->get_value() == soar_module::on ) )
@@ -1649,6 +1662,20 @@ void remove_wme_from_rete (agent* thisAgent, wme *w) {
 	  else if ( ( w->epmem_id != EPMEM_NODEID_BAD ) && ( w->epmem_valid == thisAgent->epmem_validation ) )
 	  {
 	    (*thisAgent->epmem_node_removals)[ w->epmem_id ] = true;
+	  }
+	}
+
+	if ( ( w->epmem_id == EPMEM_NODEID_BAD ) && ( w->epmem_valid == NIL ) )
+	{
+	  epmem_wme_removal_map::iterator r_p = thisAgent->epmem_wme_removes->find( w->timetag );
+	  if ( r_p != thisAgent->epmem_wme_removes->end() )
+	  {
+		epmem_pooled_wme_set::iterator w_p = r_p->second->find( w );
+		if ( w_p != r_p->second->end() )
+		{
+		  r_p->second->erase( w_p );
+		  thisAgent->epmem_wme_removes->erase( r_p );
+		}
 	  }
 	}
   }

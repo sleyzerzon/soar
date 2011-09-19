@@ -483,15 +483,36 @@ typedef std::map<epmem_node_id, epmem_shared_literal *> epmem_literal_mapping;
 // types/structures to facilitate re-use of identifiers
 typedef std::map<epmem_node_id, epmem_node_id> epmem_id_pool;
 typedef std::map<epmem_node_id, epmem_id_pool *> epmem_hashed_id_pool;
-typedef std::map<epmem_node_id, epmem_hashed_id_pool *> epmem_parent_id_pool;
-typedef std::map<epmem_node_id, epmem_id_pool *> epmem_return_id_pool;
-typedef std::map<epmem_node_id, uint64_t> epmem_id_ref_counter;
+
 typedef struct epmem_id_reservation_struct
 {
 	epmem_node_id my_id;
 	epmem_hash_id my_hash;
 	epmem_id_pool *my_pool;
 } epmem_id_reservation;
+
+#ifdef USE_MEM_POOL_ALLOCATORS
+typedef std::map< epmem_node_id, epmem_hashed_id_pool*, std::less< epmem_node_id >, soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, epmem_hashed_id_pool* > > > epmem_parent_id_pool;
+typedef std::map< epmem_node_id, epmem_id_pool*, std::less< epmem_node_id >, soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, epmem_id_pool* > > > epmem_return_id_pool;
+typedef std::map< epmem_node_id, uint64_t, std::less< epmem_node_id >, soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, uint64_t > > > epmem_id_ref_counter;
+
+// types/structures to facilitate incremental storage
+typedef std::map< epmem_node_id, bool, std::less< epmem_node_id >, soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, bool > > > epmem_id_removal_map;
+typedef std::set< wme*, std::less< wme* >, soar_module::soar_memory_pool_allocator< wme* > > epmem_pooled_wme_set;
+typedef std::map< Symbol*, epmem_pooled_wme_set*, std::less< Symbol* >, soar_module::soar_memory_pool_allocator< std::pair< Symbol*, epmem_pooled_wme_set* > > > epmem_wme_addition_map;
+typedef std::map< uint64_t, epmem_pooled_wme_set*, std::less< uint64_t >, soar_module::soar_memory_pool_allocator< std::pair< uint64_t, epmem_pooled_wme_set* > > > epmem_wme_removal_map;
+
+#else
+typedef std::map<epmem_node_id, epmem_hashed_id_pool *> epmem_parent_id_pool;
+typedef std::map<epmem_node_id, epmem_id_pool *> epmem_return_id_pool;
+typedef std::map<epmem_node_id, uint64_t> epmem_id_ref_counter;
+
+// types/structures to facilitate incremental storage
+typedef std::map<epmem_node_id, bool> epmem_id_removal_map;
+typedef std::set< wme* > epmem_pooled_wme_set;
+typedef std::map< Symbol*, epmem_pooled_wme_set* > epmem_wme_addition_map;
+typedef std::map< uint64_t, epmem_pooled_wme_set* > epmem_wme_removal_map;
+#endif
 
 // represents a graph edge (i.e. identifier)
 // follows cs theory notation of finite automata: q1 = d( q0, w )
