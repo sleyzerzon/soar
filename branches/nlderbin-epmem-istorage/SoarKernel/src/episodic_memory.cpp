@@ -2325,7 +2325,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 			// continue to children?						
 			if ( (*w_p)->value->id.tc_num != tc )
 			{
-				// future exploration
+				(*w_p)->value->id.tc_num = tc;
 				parent_syms.push( (*w_p)->value );
 				parent_ids.push( (*w_p)->value->id.epmem_id );
 			}
@@ -2442,11 +2442,22 @@ void epmem_new_episode( agent *my_agent )
 			std::queue< epmem_node_id > parent_ids;
 			epmem_node_id parent_id;
 
-			// initialize BFS
+			// top-state is magic
 			my_agent->top_goal->id.epmem_id = EPMEM_NODEID_ROOT;
 			my_agent->top_goal->id.epmem_valid = my_agent->epmem_validation;
-			parent_syms.push( my_agent->top_goal );
-			parent_ids.push( EPMEM_NODEID_ROOT );
+			
+			// initialize queue with known levels
+			for ( epmem_wme_addition_map::iterator id_p=my_agent->epmem_wme_adds->begin(); id_p!=my_agent->epmem_wme_adds->end(); id_p++ )
+			{
+				if ( ( id_p->first->id.tc_num != tc ) &&
+					 ( id_p->first->id.epmem_id != EPMEM_NODEID_BAD ) &&
+					 ( id_p->first->id.epmem_valid == my_agent->epmem_validation ) )
+				{
+					id_p->first->id.tc_num = tc;
+					parent_syms.push( id_p->first );
+					parent_ids.push( id_p->first->id.epmem_id );
+				}
+			}
 			
 			// cross-level information
 			std::map< wme*, epmem_id_reservation* > id_reservations;
@@ -2461,7 +2472,6 @@ void epmem_new_episode( agent *my_agent )
 				parent_ids.pop();
 
 				// get augmentations
-				parent_sym->id.tc_num = tc;
 				wmes_p = my_agent->epmem_wme_adds->find( parent_sym );
 				if ( wmes_p != my_agent->epmem_wme_adds->end() )
 				{
