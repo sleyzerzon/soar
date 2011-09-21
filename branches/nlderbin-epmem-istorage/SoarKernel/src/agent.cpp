@@ -386,6 +386,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   newAgent->epmem_wme_adds = new epmem_wme_addition_map( std::less< Symbol* >(), soar_module::soar_memory_pool_allocator< std::pair< Symbol*, epmem_pooled_wme_set* > >( newAgent ) );
   newAgent->epmem_wme_removes = new epmem_wme_removal_map( std::less< uint64_t >(), soar_module::soar_memory_pool_allocator< std::pair< uint64_t, epmem_pooled_wme_set* > >( newAgent ) );
+  newAgent->epmem_promotions = new epmem_symbol_set( std::less< Symbol* >(), soar_module::soar_memory_pool_allocator< Symbol* >( newAgent ) );
 #else
   newAgent->epmem_node_removals = new epmem_id_removal_map();
   newAgent->epmem_edge_removals = new epmem_id_removal_map();
@@ -396,6 +397,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   newAgent->epmem_wme_adds = new epmem_wme_addition_map();
   newAgent->epmem_wme_removes = new epmem_wme_removal_map();
+  newAgent->epmem_promotions = new epmem_symbol_set();
 #endif
 
   newAgent->epmem_validation = 0;
@@ -488,6 +490,7 @@ void destroy_soar_agent (agent * delete_agent)
 
   delete delete_agent->epmem_wme_adds;
   delete delete_agent->epmem_wme_removes;
+  delete delete_agent->epmem_promotions;
 
   delete delete_agent->epmem_db;
 

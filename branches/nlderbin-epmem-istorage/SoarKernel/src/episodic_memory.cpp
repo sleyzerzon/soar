@@ -1361,6 +1361,12 @@ void epmem_close( agent *my_agent )
 
 			my_agent->epmem_wme_adds->clear();
 			my_agent->epmem_wme_removes->clear();
+
+			for ( epmem_symbol_set::iterator p_it=my_agent->epmem_promotions->begin(); p_it!=my_agent->epmem_promotions->end(); p_it++ )
+			{
+				symbol_remove_ref( my_agent, (*p_it) );
+			}
+			my_agent->epmem_promotions->clear();
 		}
 
 		// close the database
@@ -1798,53 +1804,38 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				temp_q = NULL;
 			}
 
-			// capture current state as a set of adds
+			// at init, top-state is considered the only known identifier
+			my_agent->top_goal->id.epmem_id = EPMEM_NODEID_ROOT;
+			my_agent->top_goal->id.epmem_valid = my_agent->epmem_validation;
+			
+			// capture augmentations of top-state as the sole set of adds,
+			// which catches up to what would have been incremental encoding
+			// to this point
 			{
-				tc_number tc = get_new_tc_number( my_agent );
-				
-				Symbol* parent_sym = NULL;
-				std::queue< Symbol* > parent_syms;
-
-				epmem_wme_list* wmes = NULL;
+				epmem_pooled_wme_set* add_set = NULL;
+					
+				epmem_wme_list* wmes = epmem_get_augs_of_id( my_agent->top_state, get_new_tc_number( my_agent ) );
 				epmem_wme_list::iterator w_p;
 
-				epmem_pooled_wme_set* add_set = NULL;
-
-				parent_syms.push( my_agent->top_goal );
-
-				while ( !parent_syms.empty() )
+				if ( !wmes->empty() )
 				{
-					parent_sym = parent_syms.front();
-					parent_syms.pop();
-					
-					wmes = epmem_get_augs_of_id( parent_sym, tc );
-
-					if ( !wmes->empty() )
-					{
-						allocate_with_pool( my_agent, &( my_agent->epmem_add_set_pool ), &( add_set ) );
+					allocate_with_pool( my_agent, &( my_agent->epmem_add_set_pool ), &( add_set ) );
 #ifdef USE_MEM_POOL_ALLOCATORS
-						add_set = new (add_set) epmem_pooled_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( my_agent ) );
+					add_set = new (add_set) epmem_pooled_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( my_agent ) );
 #else
-						add_set = new (add_set) epmem_pooled_wme_set();
+					add_set = new (add_set) epmem_pooled_wme_set();
 #endif
-
-						for ( w_p=wmes->begin(); w_p!=wmes->end(); w_p++ )
-						{
-							add_set->insert( (*w_p) );
-							(*my_agent->epmem_wme_removes)[ (*w_p)->timetag ] = add_set;
-							
-							if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-								 ( (*w_p)->value->id.tc_num != tc ) )
-							{
-								parent_syms.push( (*w_p)->value );
-							}
-						}
-
-						(*my_agent->epmem_wme_adds)[ parent_sym ] = add_set;
+					
+					for ( w_p=wmes->begin(); w_p!=wmes->end(); w_p++ )
+					{
+						add_set->insert( (*w_p) );
+						(*my_agent->epmem_wme_removes)[ (*w_p)->timetag ] = add_set;
 					}
 
-					delete wmes;
+					(*my_agent->epmem_wme_adds)[ my_agent->top_state ] = add_set;
 				}
+
+				delete wmes;
 			}
 		}
 
@@ -1971,6 +1962,27 @@ epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fai
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+void epmem_schedule_promotion( agent* my_agent, Symbol* id )
+{
+	if ( my_agent->epmem_db->get_status() == soar_module::connected )
+	{
+		if ( ( id->id.epmem_id != EPMEM_NODEID_BAD ) && ( id->id.epmem_valid == my_agent->epmem_validation ) )
+		{
+			symbol_add_ref( id );
+			my_agent->epmem_promotions->insert( id );
+		}
+	}
+}
+
+inline void _epmem_promote_id( agent* my_agent, Symbol* id, epmem_time_id t )
+{
+	// parent_id,letter,num,time_id
+	my_agent->epmem_stmts_graph->promote_id->bind_int( 1, id->id.epmem_id );
+	my_agent->epmem_stmts_graph->promote_id->bind_int( 2, static_cast<uint64_t>( id->id.name_letter ) );
+	my_agent->epmem_stmts_graph->promote_id->bind_int( 3, static_cast<uint64_t>( id->id.name_number ) );
+	my_agent->epmem_stmts_graph->promote_id->bind_int( 4, t );
+	my_agent->epmem_stmts_graph->promote_id->execute( soar_module::op_reinit );
+}
 
 // three cases for sharing ids amongst identifiers in two passes:
 // 1. value known in phase one (try reservation)
@@ -1980,6 +1992,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 							    std::map< wme*, epmem_id_reservation* >& id_reservations, std::set< Symbol* >& new_identifiers, std::queue< epmem_node_id >& epmem_node, std::queue< epmem_node_id >& epmem_edge )
 {
 	epmem_pooled_wme_set::iterator w_p;
+	bool value_known_apriori = false;
 	
 	// temporal hash
 	epmem_hash_id my_hash;	// attribute
@@ -1991,12 +2004,17 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 	epmem_id_pool::iterator pool_p;
 	std::map<wme *, epmem_id_reservation *>::iterator r_p;
 	epmem_id_reservation *new_id_reservation;
+
+	// identifier recursion
+	epmem_pooled_wme_set* add_set = NULL;
+	epmem_wme_list* wmes = NULL;
+	epmem_wme_list::iterator w_p2;
+	bool good_recurse = false;
 	
-	// pre-assign unknown identifiers with known children (prevents ordering issues with unknown children)
+	// pre-assign unknown identifier-valued WMEs with known children (prevents ordering issues with unknown children)
 	for ( w_p=w_b; w_p!=w_e; w_p++ )
 	{
-		if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&						 
-			 ( ( (*w_p)->epmem_id == EPMEM_NODEID_BAD ) || ( (*w_p)->epmem_valid != my_agent->epmem_validation ) ) &&
+		if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
 			 ( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) ) &&
 			 ( !(*w_p)->value->id.smem_lti ) )
 		{
@@ -2056,152 +2074,104 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 		}
 
 		if ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
-		{
-			// have we seen this WME during this database?
-			if ( ( (*w_p)->epmem_id == EPMEM_NODEID_BAD ) || ( (*w_p)->epmem_valid != my_agent->epmem_validation ) )
+		{			
+			(*w_p)->epmem_valid = my_agent->epmem_validation;
+			(*w_p)->epmem_id = EPMEM_NODEID_BAD;
+
+			my_hash = NIL;							
+			my_id_repo2 = NIL;
+
+			value_known_apriori = ( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) );
+
+			// if long-term identifier as value, special processing (we may need to promote, we don't add to/take from any pools)
+			if ( (*w_p)->value->id.smem_lti )
 			{
-				(*w_p)->epmem_valid = my_agent->epmem_validation;
-				(*w_p)->epmem_id = EPMEM_NODEID_BAD;
-
-				my_hash = NIL;							
-				my_id_repo2 = NIL;
-
-				// if long-term identifier as value, special processing (we may need to promote, we don't add to/take from any pools)
-				if ( (*w_p)->value->id.smem_lti )
+				// find the lti or add new one
+				if ( !value_known_apriori )
 				{
-					// find the lti or add new one
-					if ( ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD ) || ( (*w_p)->value->id.epmem_valid != my_agent->epmem_validation ) )
+					(*w_p)->value->id.epmem_id = EPMEM_NODEID_BAD;
+					(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
+
+					// try to find
 					{
-						(*w_p)->value->id.epmem_id = EPMEM_NODEID_BAD;
-						(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
+						my_agent->epmem_stmts_graph->find_lti->bind_int( 1, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
+						my_agent->epmem_stmts_graph->find_lti->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
 
-						// try to find
+						if ( my_agent->epmem_stmts_graph->find_lti->execute() == soar_module::row )
 						{
-							my_agent->epmem_stmts_graph->find_lti->bind_int( 1, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
-							my_agent->epmem_stmts_graph->find_lti->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
-
-							if ( my_agent->epmem_stmts_graph->find_lti->execute() == soar_module::row )
-							{
-								(*w_p)->value->id.epmem_id = static_cast<epmem_node_id>( my_agent->epmem_stmts_graph->find_lti->column_int( 0 ) );
-							}
-
-							my_agent->epmem_stmts_graph->find_lti->reinitialize();
+							(*w_p)->value->id.epmem_id = static_cast<epmem_node_id>( my_agent->epmem_stmts_graph->find_lti->column_int( 0 ) );
 						}
 
-						// add if necessary
-						if ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD )
-						{
-							(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();										
-							my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
-							epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
-
-							// add repository
-							(*my_agent->epmem_id_repository)[ (*w_p)->value->id.epmem_id ] = new epmem_hashed_id_pool;
-							
-							// parent_id,letter,num,time_id
-							my_agent->epmem_stmts_graph->promote_id->bind_int( 1, (*w_p)->value->id.epmem_id );
-							my_agent->epmem_stmts_graph->promote_id->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
-							my_agent->epmem_stmts_graph->promote_id->bind_int( 3, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
-							my_agent->epmem_stmts_graph->promote_id->bind_int( 4, time_counter );
-							my_agent->epmem_stmts_graph->promote_id->execute( soar_module::op_reinit );
-						}
+						my_agent->epmem_stmts_graph->find_lti->reinitialize();
 					}
 
-					// now perform deliberate edge search
-					// ltis don't use the pools, so we make a direct search in the edge_unique table
-					// if failure, drop below and use standard channels
+					// add if necessary
+					if ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD )
 					{
-						// get temporal hash
-						if ( (*w_p)->acceptable )
-						{
-							my_hash = EPMEM_HASH_ACCEPTABLE;
-						}
-						else
-						{
-							my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
-						}
-						
-						// q0, w, q1
-						my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 1, parent_id );
-						my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 2, my_hash );
-						my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 3, (*w_p)->value->id.epmem_id );
-						
-						if ( my_agent->epmem_stmts_graph->find_edge_unique_shared->execute() == soar_module::row )
-						{
-							(*w_p)->epmem_id = my_agent->epmem_stmts_graph->find_edge_unique_shared->column_int( 0 );
-						}
+						(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();										
+						my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
+						epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
 
-						my_agent->epmem_stmts_graph->find_edge_unique_shared->reinitialize();
+						// add repository
+						(*my_agent->epmem_id_repository)[ (*w_p)->value->id.epmem_id ] = new epmem_hashed_id_pool;
+
+						_epmem_promote_id( my_agent, (*w_p)->value, time_counter );
 					}
 				}
-				else
+
+				// now perform deliberate edge search
+				// ltis don't use the pools, so we make a direct search in the edge_unique table
+				// if failure, drop below and use standard channels
 				{
-					// in the case of a known child, we already have a reservation (case 1)						
-					if ( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) )
+					// get temporal hash
+					if ( (*w_p)->acceptable )
 					{
-						r_p = id_reservations.find( (*w_p) );
-
-						if ( r_p != id_reservations.end() )
-						{
-							// restore reservation info
-							my_hash = r_p->second->my_hash;
-							my_id_repo2 = r_p->second->my_pool;
-
-							if ( r_p->second->my_id != EPMEM_NODEID_BAD )
-							{
-								(*w_p)->epmem_id = r_p->second->my_id;
-								(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = my_id_repo2;
-							}
-
-							// delete reservation and map entry
-							delete r_p->second;
-							id_reservations.erase( r_p );
-						}
-						// OR a shared identifier at the same level, in which case we need an exact match (case 2)
-						else
-						{
-							// get temporal hash
-							if ( (*w_p)->acceptable )
-							{
-								my_hash = EPMEM_HASH_ACCEPTABLE;
-							}
-							else
-							{
-								my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
-							}
-
-							// try to get an id that matches new information
-							my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ my_hash ];
-							if ( (*my_id_repo) )
-							{
-								if ( !(*my_id_repo)->empty() )
-								{
-									pool_p = (*my_id_repo)->find( (*w_p)->value->id.epmem_id );
-									if ( pool_p != (*my_id_repo)->end() )
-									{
-										(*w_p)->epmem_id = pool_p->second;
-										(*my_id_repo)->erase( pool_p );
-
-										(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);											
-									}
-								}
-							}
-							else
-							{
-								// add repository
-								(*my_id_repo) = new epmem_id_pool;
-							}
-
-							// keep the address for later use
-							my_id_repo2 = (*my_id_repo);
-						}
+						my_hash = EPMEM_HASH_ACCEPTABLE;
 					}
-					// case 3
 					else
 					{
-						// UNKNOWN identifier
-						new_identifiers.insert( (*w_p)->value );
-						
+						my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+					}
+					
+					// q0, w, q1
+					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 1, parent_id );
+					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 2, my_hash );
+					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 3, (*w_p)->value->id.epmem_id );
+					
+					if ( my_agent->epmem_stmts_graph->find_edge_unique_shared->execute() == soar_module::row )
+					{
+						(*w_p)->epmem_id = my_agent->epmem_stmts_graph->find_edge_unique_shared->column_int( 0 );
+					}
+
+					my_agent->epmem_stmts_graph->find_edge_unique_shared->reinitialize();
+				}
+			}
+			else
+			{
+				// in the case of a known value, we already have a reservation (case 1)						
+				if ( value_known_apriori )
+				{
+					r_p = id_reservations.find( (*w_p) );
+
+					if ( r_p != id_reservations.end() )
+					{
+						// restore reservation info
+						my_hash = r_p->second->my_hash;
+						my_id_repo2 = r_p->second->my_pool;
+
+						if ( r_p->second->my_id != EPMEM_NODEID_BAD )
+						{
+							(*w_p)->epmem_id = r_p->second->my_id;
+							(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = my_id_repo2;
+						}
+
+						// delete reservation and map entry
+						delete r_p->second;
+						id_reservations.erase( r_p );
+					}
+					// OR a shared identifier at the same level, in which case we need an exact match (case 2)
+					else
+					{
 						// get temporal hash
 						if ( (*w_p)->acceptable )
 						{
@@ -2212,33 +2182,21 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 							my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
 						}
 
-						// try to find node
+						// try to get an id that matches new information
 						my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ my_hash ];
 						if ( (*my_id_repo) )
 						{
-							// if something leftover, try to use it
 							if ( !(*my_id_repo)->empty() )
-							{										
-								pool_p = (*my_id_repo)->begin();
-
-								do
+							{
+								pool_p = (*my_id_repo)->find( (*w_p)->value->id.epmem_id );
+								if ( pool_p != (*my_id_repo)->end() )
 								{
-									if ( (*my_agent->epmem_id_ref_counts)[ pool_p->first ] == 0 )
-									{
-										(*w_p)->epmem_id = pool_p->second;
-										(*w_p)->value->id.epmem_id = pool_p->first;
-										(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
-										(*my_id_repo)->erase( pool_p );
-										(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);
+									(*w_p)->epmem_id = pool_p->second;
+									(*my_id_repo)->erase( pool_p );
 
-										pool_p = (*my_id_repo)->end();
-									}
-									else
-									{
-										pool_p++;
-									}
-								} while ( pool_p != (*my_id_repo)->end() );
-							}									
+									(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);											
+								}
+							}
 						}
 						else
 						{
@@ -2246,88 +2204,162 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 							(*my_id_repo) = new epmem_id_pool;
 						}
 
-						// keep the address for later use
+						// keep the address for later (used if w->epmem_id was not assigned)
 						my_id_repo2 = (*my_id_repo);
 					}
-				}							
-
-				// add path if no success above
-				if ( (*w_p)->epmem_id == EPMEM_NODEID_BAD )
-				{
-					if ( ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD ) || ( (*w_p)->value->id.epmem_valid != my_agent->epmem_validation ) )
-					{
-						// update next id
-						(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();
-						(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
-						my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
-						epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
-
-						// add repository
-						(*my_agent->epmem_id_repository)[ (*w_p)->value->id.epmem_id ] = new epmem_hashed_id_pool;
-					}
-
-					// insert (q0,w,q1)
-					my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 1, parent_id );
-					my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 2, my_hash );
-					my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 3, (*w_p)->value->id.epmem_id );
-					my_agent->epmem_stmts_graph->add_edge_unique->execute( soar_module::op_reinit );
-
-					(*w_p)->epmem_id = static_cast<epmem_node_id>( my_agent->epmem_db->last_insert_rowid() );
-					
-					if ( !(*w_p)->value->id.smem_lti )
-					{
-						(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = my_id_repo2;
-					}
-
-					// new nodes definitely start
-					epmem_edge.push( (*w_p)->epmem_id );
-					my_agent->epmem_edge_mins->push_back( time_counter );
-					my_agent->epmem_edge_maxes->push_back( false );
 				}
+				// case 3
 				else
 				{
-					// definitely don't remove
-					(*my_agent->epmem_edge_removals)[ (*w_p)->epmem_id ] = false;
-
-					// we add ONLY if the last thing we did was remove
-					if ( (*my_agent->epmem_edge_maxes)[ (*w_p)->epmem_id - 1 ] )
+					// UNKNOWN identifier
+					new_identifiers.insert( (*w_p)->value );
+					
+					// get temporal hash
+					if ( (*w_p)->acceptable )
 					{
-						epmem_edge.push( (*w_p)->epmem_id );
-						(*my_agent->epmem_edge_maxes)[ (*w_p)->epmem_id - 1 ] = false;
+						my_hash = EPMEM_HASH_ACCEPTABLE;
 					}
+					else
+					{
+						my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
+					}
+
+					// try to find node
+					my_id_repo =& (*(*my_agent->epmem_id_repository)[ parent_id ])[ my_hash ];
+					if ( (*my_id_repo) )
+					{
+						// if something leftover, try to use it
+						if ( !(*my_id_repo)->empty() )
+						{										
+							pool_p = (*my_id_repo)->begin();
+
+							do
+							{
+								if ( (*my_agent->epmem_id_ref_counts)[ pool_p->first ] == 0 )
+								{
+									(*w_p)->epmem_id = pool_p->second;
+									(*w_p)->value->id.epmem_id = pool_p->first;
+									(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
+									(*my_id_repo)->erase( pool_p );
+									(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);
+
+									pool_p = (*my_id_repo)->end();
+								}
+								else
+								{
+									pool_p++;
+								}
+							} while ( pool_p != (*my_id_repo)->end() );
+						}									
+					}
+					else
+					{
+						// add repository
+						(*my_id_repo) = new epmem_id_pool;
+					}
+
+					// keep the address for later (used if w->epmem_id was not assgined)
+					my_id_repo2 = (*my_id_repo);
+				}
+			}							
+
+			// add wme if no success above
+			if ( (*w_p)->epmem_id == EPMEM_NODEID_BAD )
+			{
+				// can't use value_known_apriori, since value may have been assigned (lti, id repository via case 3)
+				if ( ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD ) || ( (*w_p)->value->id.epmem_valid != my_agent->epmem_validation ) )
+				{
+					// update next id
+					(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();
+					(*w_p)->value->id.epmem_valid = my_agent->epmem_validation;
+					my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
+					epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
+
+					// add repository
+					(*my_agent->epmem_id_repository)[ (*w_p)->value->id.epmem_id ] = new epmem_hashed_id_pool;
 				}
 
-				// at this point we have successfully added a new wme
-				// whose value was an identifier.  IF the identifier was
-				// unknown at the beginning of this episode, then we need
-				// to update its ref count for each WME added.
-				if ( new_identifiers.find( (*w_p)->value ) != new_identifiers.end() )
+				// insert (q0,w,q1)
+				my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 1, parent_id );
+				my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 2, my_hash );
+				my_agent->epmem_stmts_graph->add_edge_unique->bind_int( 3, (*w_p)->value->id.epmem_id );
+				my_agent->epmem_stmts_graph->add_edge_unique->execute( soar_module::op_reinit );
+
+				(*w_p)->epmem_id = static_cast<epmem_node_id>( my_agent->epmem_db->last_insert_rowid() );
+				
+				if ( !(*w_p)->value->id.smem_lti )
 				{
-					(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]++;
+					(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = my_id_repo2;
 				}
+
+				// new nodes definitely start
+				epmem_edge.push( (*w_p)->epmem_id );
+				my_agent->epmem_edge_mins->push_back( time_counter );
+				my_agent->epmem_edge_maxes->push_back( false );
 			}
 			else
 			{
-				if ( (*w_p)->value->id.smem_lti )
+				// definitely don't remove
+				(*my_agent->epmem_edge_removals)[ (*w_p)->epmem_id ] = false;
+
+				// we add ONLY if the last thing we did was remove
+				if ( (*my_agent->epmem_edge_maxes)[ (*w_p)->epmem_id - 1 ] )
 				{
-					if ( ( (*w_p)->value->id.smem_time_id == time_counter ) && ( (*w_p)->value->id.smem_valid == my_agent->epmem_validation ) )
-					{
-						// parent_id,letter,num,time_id
-						my_agent->epmem_stmts_graph->promote_id->bind_int( 1, (*w_p)->value->id.epmem_id );
-						my_agent->epmem_stmts_graph->promote_id->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
-						my_agent->epmem_stmts_graph->promote_id->bind_int( 3, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
-						my_agent->epmem_stmts_graph->promote_id->bind_int( 4, time_counter );
-						my_agent->epmem_stmts_graph->promote_id->execute( soar_module::op_reinit );
-					}
+					epmem_edge.push( (*w_p)->epmem_id );
+					(*my_agent->epmem_edge_maxes)[ (*w_p)->epmem_id - 1 ] = false;
 				}
 			}
 
-			// continue to children?						
+			// at this point we have successfully added a new wme
+			// whose value is an identifier.  IF the value was
+			// unknown at the beginning of this episode, then we need
+			// to update its ref count for each WME added (thereby catching
+			// up with ref counts that would have been accumulated via wme adds)
+			if ( new_identifiers.find( (*w_p)->value ) != new_identifiers.end() )
+			{
+				(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]++;
+			}
+
+			// continue to augmentations?						
 			if ( (*w_p)->value->id.tc_num != tc )
 			{
-				(*w_p)->value->id.tc_num = tc;
-				parent_syms.push( (*w_p)->value );
-				parent_ids.push( (*w_p)->value->id.epmem_id );
+				good_recurse = false;
+				
+				if ( value_known_apriori )
+				{
+					(*w_p)->value->id.tc_num = tc;
+					good_recurse = true;
+				}
+				else
+				{					
+					wmes = epmem_get_augs_of_id( (*w_p)->value, tc );
+
+					if ( !wmes->empty() )
+					{
+						allocate_with_pool( my_agent, &( my_agent->epmem_add_set_pool ), &( add_set ) );
+#ifdef USE_MEM_POOL_ALLOCATORS
+						add_set = new (add_set) epmem_pooled_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( my_agent ) );
+#else
+						add_set = new (add_set) epmem_pooled_wme_set();
+#endif
+						
+						for ( w_p2=wmes->begin(); w_p2!=wmes->end(); w_p2++ )
+						{
+							add_set->insert( (*w_p2) );
+						}
+
+						(*my_agent->epmem_wme_adds)[ (*w_p)->value ] = add_set;
+						good_recurse = true;
+					}
+
+					delete wmes;
+				}
+
+				if ( good_recurse )
+				{
+					parent_syms.push( (*w_p)->value );
+					parent_ids.push( (*w_p)->value->id.epmem_id );
+				}
 			}
 		}
 		else
@@ -2441,17 +2473,12 @@ void epmem_new_episode( agent *my_agent )
 			Symbol* parent_sym = NULL;
 			std::queue< epmem_node_id > parent_ids;
 			epmem_node_id parent_id;
-
-			// top-state is magic
-			my_agent->top_goal->id.epmem_id = EPMEM_NODEID_ROOT;
-			my_agent->top_goal->id.epmem_valid = my_agent->epmem_validation;
 			
-			// initialize queue with known levels
+			// initialize queue with known levels:
+			// any keys were known, but may have had their augmentations removed
 			for ( epmem_wme_addition_map::iterator id_p=my_agent->epmem_wme_adds->begin(); id_p!=my_agent->epmem_wme_adds->end(); id_p++ )
 			{
-				if ( ( id_p->first->id.tc_num != tc ) &&
-					 ( id_p->first->id.epmem_id != EPMEM_NODEID_BAD ) &&
-					 ( id_p->first->id.epmem_valid == my_agent->epmem_validation ) )
+				if ( !id_p->second->empty() )
 				{
 					id_p->first->id.tc_num = tc;
 					parent_syms.push( id_p->first );
@@ -2598,6 +2625,20 @@ void epmem_new_episode( agent *my_agent )
 				r++;
 			}
 			my_agent->epmem_edge_removals->clear();
+		}
+
+		// all in-place lti promotions
+		{
+			for ( epmem_symbol_set::iterator p_it=my_agent->epmem_promotions->begin(); p_it!=my_agent->epmem_promotions->end(); p_it++ )
+			{
+				if ( ( (*p_it)->id.smem_time_id == time_counter ) && ( (*p_it)->id.smem_valid == my_agent->epmem_validation ) )
+				{
+					_epmem_promote_id( my_agent, (*p_it), time_counter );
+				}
+
+				symbol_remove_ref( my_agent, (*p_it) );
+			}
+			my_agent->epmem_promotions->clear();
 		}
 
 		// add the time id to the times table

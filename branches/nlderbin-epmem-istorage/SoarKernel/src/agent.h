@@ -899,6 +899,7 @@ kernel time and total_cpu_time greater than the derived total CPU time. REW */
 
   epmem_wme_addition_map* epmem_wme_adds;
   epmem_wme_removal_map* epmem_wme_removes;
+  epmem_symbol_set* epmem_promotions;
 
   epmem_rit_state epmem_rit_state_graph[2];
 

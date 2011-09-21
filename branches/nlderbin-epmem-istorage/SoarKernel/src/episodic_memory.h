@@ -501,6 +501,7 @@ typedef std::map< epmem_node_id, bool, std::less< epmem_node_id >, soar_module::
 typedef std::set< wme*, std::less< wme* >, soar_module::soar_memory_pool_allocator< wme* > > epmem_pooled_wme_set;
 typedef std::map< Symbol*, epmem_pooled_wme_set*, std::less< Symbol* >, soar_module::soar_memory_pool_allocator< std::pair< Symbol*, epmem_pooled_wme_set* > > > epmem_wme_addition_map;
 typedef std::map< uint64_t, epmem_pooled_wme_set*, std::less< uint64_t >, soar_module::soar_memory_pool_allocator< std::pair< uint64_t, epmem_pooled_wme_set* > > > epmem_wme_removal_map;
+typedef std::set< Symbol*, std::less< Symbol* >, soar_module::soar_memory_pool_allocator< Symbol* > > epmem_symbol_set;
 
 #else
 typedef std::map<epmem_node_id, epmem_hashed_id_pool *> epmem_parent_id_pool;
@@ -512,6 +513,7 @@ typedef std::map<epmem_node_id, bool> epmem_id_removal_map;
 typedef std::set< wme* > epmem_pooled_wme_set;
 typedef std::map< Symbol*, epmem_pooled_wme_set* > epmem_wme_addition_map;
 typedef std::map< uint64_t, epmem_pooled_wme_set* > epmem_wme_removal_map;
+typedef std::set< Symbol* > epmem_symbol_set;
 #endif
 
 // represents a graph edge (i.e. identifier)
@@ -675,6 +677,7 @@ extern void epmem_close( agent *my_agent );
 // perform epmem actions
 extern void epmem_go( agent *my_agent );
 extern bool epmem_backup_db( agent* my_agent, const char* file_name, std::string *err );
+extern void epmem_schedule_promotion( agent* my_agent, Symbol* id );
 
 // visualization
 extern void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::string* buf );
