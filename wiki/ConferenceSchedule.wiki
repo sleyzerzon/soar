@@ -1,6 +1,6 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
-|| *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Deadline* || *Paper Deadline* || *Link* ||
+|| *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Deadline* || *Paper Deadline* ||
 || [http://www.aaai.org/Conferences/AAAI/aaai12.php AAAI] || National Conference on Artificial Intelligence || 0.99 || 2012-07-22 to 2012-07-26 || Toronto, Canada || 2012-01-20 || 2012-01-24 ||
 || [http://aamas2012.webs.upv.es/ AAMAS] || Autonomous Agents and Multi-Agent Systems || 0.76 || 2012-06-04 to 2012-06-08 || Valencia, Spain || 2011-10-07 || 2011-10-12 ||
 || AGI || Artificial General Intelligence ||  ||  ||  unknown ||  ||  ||
