@@ -1,24 +1,23 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
-|| *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Deadline* || *Paper Deadline* || *Link* ||
-|| AAAI || National Conference on Artificial Intelligence || 0.99 || 2012-07-22 to 2012-07-26 || Toronto, Canada || 2012-01-20 || 2012-01-24 || [http://www.aaai.org/Conferences/AAAI/aaai12.php AAAI] ||
-|| AAMAS || Autonomous Agents and Multi-Agent Systems || 0.76 || 2012-06-04 to 2012-06-08 || Valencia, Spain || 2011-10-07 || 2011-10-12 || [http://aamas2012.webs.upv.es/ AAMAS] ||
-|| AGI || Artificial General Intelligence ||  ||  ||  unknown ||  ||  ||  ||
-|| AIIDE || Artificial Intelligence and Interactive Digital Entertainment ||  ||  ||  unknown ||  ||  ||  ||
-|| BRIMS || Behavior Representation in Modeling and Simulation ||  || 2012-03-12 to 2012-03-15 || Amelia Island Plantation, FL ||  || 2011-12-14 || [http://brimsconference.org/ BRIMS] ||
-|| CogSci || Annual Conference of the Cognitive Science Society || 0.92 || 2012-08-01 to 2012-08-04 || Sapporo, Japan ||  || 2012-02-01 || [http://cognitivesciencesociety.org/conference2012/index.html CogSci] ||
-|| ECAL || European Conference on Artificial Life ||  ||  || unknown ||  ||  ||  ||
-|| FDG || Foundations of Digital Games ||  || 2012-05-30 to 2012-06-01 || Raleigh, NC ||  || 2011-12-19 || [http://www.fdg2012.org/ FDG] ||
-|| GECCO || Genetic and Evolutionary Computation Conference || 0.85 || 2012-07-07 to 2012-07-11 || Philadelphia, PA ||  || 2012-01-13 || [http://www.sigevo.org/gecco-2012/ GECCO] ||
-|| ICCBR || International Conference on Case-Based Reasoning ||  ||  || unknown ||  ||  ||  ||
-|| ICCM || International Conference on Cognitive Modeling ||  || 2012-04-13 to 2012-04-15 || Berlin, Germany || 2012-02-01 || 2011-12-15 || [http://www.iccm2012.com/ ICCM] ||
-|| ICDL || International Conference on Development and Learning ||  ||  || unknown ||  ||  ||  ||
-|| ICML || International Conference on Machine Learning || 0.95 || 2012-06-26 to 2012-07-01 || Edinburgh, Scotland ||  || 2012-02-24 || [http://icml.cc/2012/ ICML] ||
-|| IJCAI || International Joint Conference on Artificial Intelligence || 0.96 ||  || n/a ||  ||  ||  ||
-|| KR&R || Knowledge Representation and Reasoning ||  || 2012-06-10 to 2012-06-14 || Rome, Italy || 2011-11-30 || 2011-12-09 || [http://kr.org/KR2012/ KR&R] ||
-|| NIPS || Neural Information Processing Systems || 0.98 || 2012-12-03 to 2012-12-06 || Lake Tahoe, NV ||  || unknown || [http://nips.cc/Conferences/2012/ NIPS] ||
-|| SC || International Conference on Spatial Cognition ||  || 2012-09-04 to 2012-09-08 || Rome, Italy || 2012-01-31 || 2012-04-15 || [http://w3.uniroma1.it/icsc/2012/ SC] ||                                                                                                      
-|| UAI || Uncertainty in Artificial Intelligence || 0.91 || 2012-08-15 to 2012-08-17 || Catalina Islands, CA ||  || 2012-03-30 || [http://www.auai.org/uai2012/ UAI] ||
+|| [http://www.aaai.org/Conferences/AAAI/aaai12.php AAAI] || National Conference on Artificial Intelligence || 0.99 || 2012-07-22 to 2012-07-26 || Toronto, Canada || 2012-01-20 || 2012-01-24 ||
+|| [http://aamas2012.webs.upv.es/ AAMAS] || Autonomous Agents and Multi-Agent Systems || 0.76 || 2012-06-04 to 2012-06-08 || Valencia, Spain || 2011-10-07 || 2011-10-12 ||
+|| AGI || Artificial General Intelligence ||  ||  ||  unknown ||  ||  ||
+|| AIIDE || Artificial Intelligence and Interactive Digital Entertainment ||  ||  ||  unknown ||  ||  ||
+|| [http://brimsconference.org/ BRIMS] || Behavior Representation in Modeling and Simulation ||  || 2012-03-12 to 2012-03-15 || Amelia Island Plantation, FL ||  || 2011-12-14 ||
+|| [http://cognitivesciencesociety.org/conference2012/index.html CogSci] || Annual Conference of the Cognitive Science Society || 0.92 || 2012-08-01 to 2012-08-04 || Sapporo, Japan ||  || 2012-02-01 ||
+|| ECAL || European Conference on Artificial Life ||  ||  || unknown ||  ||  ||
+|| [http://www.fdg2012.org/ FDG] || Foundations of Digital Games ||  || 2012-05-30 to 2012-06-01 || Raleigh, NC ||  || 2011-12-19 ||
+|| [http://www.sigevo.org/gecco-2012/ GECCO] || Genetic and Evolutionary Computation Conference || 0.85 || 2012-07-07 to 2012-07-11 || Philadelphia, PA ||  || 2012-01-13 ||
+|| ICCBR || International Conference on Case-Based Reasoning ||  ||  || unknown ||  ||  ||
+|| [http://www.iccm2012.com/ ICCM] || International Conference on Cognitive Modeling ||  || 2012-04-13 to 2012-04-15 || Berlin, Germany || 2012-02-01 || 2011-12-15 ||
+|| ICDL || International Conference on Development and Learning ||  ||  || unknown ||  ||  ||
+|| [http://icml.cc/2012/ ICML] || International Conference on Machine Learning || 0.95 || 2012-06-26 to 2012-07-01 || Edinburgh, Scotland ||  || 2012-02-24 ||
+|| IJCAI || International Joint Conference on Artificial Intelligence || 0.96 ||  || n/a ||  ||  ||
+|| [http://kr.org/KR2012/ KR&R] || Knowledge Representation and Reasoning ||  || 2012-06-10 to 2012-06-14 || Rome, Italy || 2011-11-30 || 2011-12-09 ||
+|| [http://nips.cc/Conferences/2012/ NIPS] || Neural Information Processing Systems || 0.98 || 2012-12-03 to 2012-12-06 || Lake Tahoe, NV ||  || unknown ||
+|| [http://w3.uniroma1.it/icsc/2012/ SC] || International Conference on Spatial Cognition ||  || 2012-09-04 to 2012-09-08 || Rome, Italy || 2012-01-31 || 2012-04-15 ||
+|| [http://www.auai.org/uai2012/ UAI] || Uncertainty in Artificial Intelligence || 0.91 || 2012-08-15 to 2012-08-17 || Catalina Islands, CA ||  || 2012-03-30 ||
  
 = Workshop and Symposium Information =
 
