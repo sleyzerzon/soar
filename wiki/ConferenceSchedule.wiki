@@ -1,118 +1,24 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
-= Submission Deadline Calendar =
-
-Year to year, conference submission deadlines remain relatively constant. The
-table below lists typical conference deadlines by month.
-
-|| *Month* || *Conferences* ||
-|| *January* || [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI], [http://ijcai-11.iiia.csic.es/ IJCAI], [http://www.icml2010.org/ ICML], [http://www.sigevo.org/gecco-2010/ GECCO] ||
-|| *February* || [http://cognitivesciencesociety.org/conference2010/index.html CogSci], [http://sitemaker.umich.edu/icdl2010/home ICDL], [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR], [http://www.spatial-cognition-2010.com/ SC], [http://www.fdg2010.org/FDG_2010_Home.html FDG] ||
-|| *March* || [http://www.cs.mcgill.ca/~uai2009/ UAI] ||
-|| *April* || [http://iccm2010.cs.drexel.edu/ ICCM], [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE] ||
-|| *May* || [http://www.ecal2009.org/ ECAL] ||
-|| *June* || [http://nips.cc/ NIPS] ||
-|| *July* || ||
-|| *August* || ||
-|| *September* || || 
-|| *October* || [http://www.cse.yorku.ca/AAMAS2010/ AAMAS], [http://agi-conf.org/2010/ AGI] ||
-|| *November* || [http://www.kr.org/KR2010/ KR&R] ||
-|| *December* || [http://www.brimsconference.org/ BRIMS] ||
-
-= Submission Deadlines =
-
-These deadlines are official for a particular conference year:
-  * [http://www.kr.org/KR2010/ KR&R 2010] -- papers due November 30, 2009
-  * [http://www.brimsconference.org/ BRIMS 2010] -- papers due December 21, 2009
-  * [http://www.sigevo.org/gecco-2010/ GECCO 2010] -- papers due January 13th, 2010
-  * [http://www.aisb.org.uk/convention/aisb10/AISB2010.html Human Memory for Artifical Agents] -- papers due January 15th, 2010
-  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010] -- abstracts due January 18th, 2010; papers due January 21st
-  * [http://www.fdg2010.org/FDG_2010_Home.html FDG 2010] -- papers due February 5, 2010
-  * [http://www.spatial-cognition-2010.com/ SC 2010] -- papers due February 15, 2010
-  * [http://www.iccbr.org/iccbr2010 ICCBR 2010] -- papers due February 15, 2010
-  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010] -- papers due February 20th, 2010
-  * [http://iccm2010.cs.drexel.edu/ ICCM 2010] -- papers due April 13th, 2010
-
-These conferences have yet to announce official deadlines:
-  * [http://www.icml2010.org/ ICML 2010]
-  * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010]
-  * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010]
-  * [http://nips.cc/ NIPS 2010]
-  * [http://www.ecal2009.org/ ECAL 2010]
-  * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2010]
-  * [http://ijcai-11.iiia.csic.es/ IJCAI 2011]
-  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2011]
-  * [http://agi-conf.org/ AGI 2011]
-
-= Information =
-
-=== Top-tier AI ===
-  * [http://nips.cc/ NIPS 2009], December 7-12, 2009 in Vancouver, BC
-    * Neural Information Processing Systems Conference
-    * (EIC 0.98)
-    
-  * [http://www.cse.yorku.ca/AAMAS2010/ AAMAS 2010], May 10-14, 2010 in Toronto, Canada
-    * International Conference on Autonomous Agents and Multiagent Systems
-    * (EIC 0.76)    
-    
-  * [http://www.icml2010.org/ ICML 2010], June 21-24, 2010 in Haifa, Israel
-    * International Conference on Machine Learning
-    * (EIC 0.95)
-    
-  * [http://www.cs.mcgill.ca/~uai2009/ UAI 2010], TBD: June?, 2010 in ?
-    * Conference for Uncertainty in Artificial Intelligence
-    * (EIC 0.91)
-    
-  * [http://www.sigevo.org/gecco-2010/ GECCO 2010], July 7-11, 2010 in Portland, OR
-    * Genetic and Evolutionary Computation Conference
-    * (EIC 0.85)
-    
-  * [http://www.aaai.org/Conferences/AAAI/aaai10.php AAAI / IAAI 2010], July 11-15, 2010 in Atlanta, GA
-    * Conference of the Association for the Advancement of Artificial Intelligence
-    * (EIC 0.99)
-    
-  * [http://cognitivesciencesociety.org/conference2010/index.html CogSci 2010], August 11-14, 2010 in Portland, OR
-    * Also known as CSSAC
-    * The Annual Conference of the Cognitive Science Society
-    * 2011: Boston, MA on July 20-23
-    * (EIC 0.92)
-    
-  * [http://ijcai-11.iiia.csic.es/ IJCAI 2011], July 16-22, 2011 in Barcelona, Spain
-    * International Joint Conferences on Artifical Intelligence
-    * (EIC 0.96)
-  
-=== Specialties ===
-  * [http://www.aiide2009.org/AIIDE2009/Welcome.html AIIDE 2009], October 14-16, 2009 in Palo Alto, CA
-    * Artificial Intelligence and Interactive Digital Entertainment Conference
-    
-  * [http://agi-conf.org/2010/ AGI 2010], March 5-8, 2010 in Lugano, Switzerland
-    * Artificial General Intelligence
-    * 2011: San Francisco Bay area    
-
-  * [http://www.brimsconference.org/ BRIMS 2010], March 22-25, 2010 in Charleston, SC
-    * Behavior Representation in Modeling & Simulation
-    
-  * [http://www.kr.org/KR2010/ KR&R 2010], May 9-13, 2010 in Toronto, CA
-    * International Conference on the Principles of Knowledge Representation and Reasoning
-    
-  * [http://www.fdg2010.org/FDG_2010_Home.html FDG 2010], June 19-21, 2010 Monterey, CA
-    * Foundations of Digital Games
-    
-  * [http://www.iccbr.org/iccbr2010/iccbr2010.html ICCBR 2010], July 19-22, 2010 in Alessandria, Italy
-    * International Conference on Case-Based Reasoning
-
-  * [http://iccm2010.cs.drexel.edu/ ICCM 2010], August 5-8, 2010 in Philadelphia, PA 
-    * International Conference on Cognitive Modeling
-    
-  * [http://www.spatial-cognition-2010.com/ SC 2010], August 15-19, 2010 in Portland, OR
-    * International Conference on Spatial Cognition
-    
-  * [http://sitemaker.umich.edu/icdl2010/home ICDL 2010], August 18-21, 2010 in Ann Arbor, MI
-    * International Conference on Development and Learning
-    
-  * [http://www.ecal2009.org/ ECAL 2009], September 2010? in TBD?
-    * European Conference on Artificial Life
-    * (EIC 0.53)    
+|| *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Deadline* || *Paper Deadline* || *Link* ||
+|| AAAI || National Conference on Artificial Intelligence || 0.99 || 2012-07-22 to 2012-07-26 || Toronto, Canada || 2012-01-20 || 2012-01-24 || [http://www.aaai.org/Conferences/AAAI/aaai12.php AAAI] ||
+|| AAMAS || Autonomous Agents and Multi-Agent Systems || 0.76 || 2012-06-04 to 2012-06-08 || Valencia, Spain || 2011-10-07 || 2011-10-12 || [http://aamas2012.webs.upv.es/ AAMAS] ||
+|| AGI || Artificial General Intelligence ||  ||  ||  unknown ||  ||  ||  ||
+|| AIIDE || Artificial Intelligence and Interactive Digital Entertainment ||  ||  ||  unknown ||  ||  ||  ||
+|| BRIMS || Behavior Representation in Modeling and Simulation ||  || 2012-03-12 to 2012-03-15 || Amelia Island Plantation, FL ||  || 2011-12-14 || [http://brimsconference.org/ BRIMS] ||
+|| CogSci || Annual Conference of the Cognitive Science Society || 0.92 || 2012-08-01 to 2012-08-04 || Sapporo, Japan ||  || 2012-02-01 || [http://cognitivesciencesociety.org/conference2012/index.html CogSci] ||
+|| ECAL || European Conference on Artificial Life ||  ||  || unknown ||  ||  ||  ||
+|| FDG || Foundations of Digital Games ||  || 2012-05-30 to 2012-06-01 || Raleigh, NC ||  || 2011-12-19 || [http://www.fdg2012.org/ FDG] ||
+|| GECCO || Genetic and Evolutionary Computation Conference || 0.85 || 2012-07-07 to 2012-07-11 || Philadelphia, PA ||  || 2012-01-13 || [http://www.sigevo.org/gecco-2012/ GECCO] ||
+|| ICCBR || International Conference on Case-Based Reasoning ||  ||  || unknown ||  ||  ||  ||
+|| ICCM || International Conference on Cognitive Modeling ||  || 2012-04-13 to 2012-04-15 || Berlin, Germany || 2012-02-01 || 2011-12-15 || [http://www.iccm2012.com/ ICCM] ||
+|| ICDL || International Conference on Development and Learning ||  ||  || unknown ||  ||  ||  ||
+|| ICML || International Conference on Machine Learning || 0.95 || 2012-06-26 to 2012-07-01 || Edinburgh, Scotland ||  || 2012-02-24 || [http://icml.cc/2012/ ICML] ||
+|| IJCAI || International Joint Conference on Artificial Intelligence || 0.96 ||  || n/a ||  ||  ||  ||
+|| KR&R || Knowledge Representation and Reasoning ||  || 2012-06-10 to 2012-06-14 || Rome, Italy || 2011-11-30 || 2011-12-09 || [http://kr.org/KR2012/ KR&R] ||
+|| NIPS || Neural Information Processing Systems || 0.98 || 2012-12-03 to 2012-12-06 || Lake Tahoe, NV ||  || unknown || [http://nips.cc/Conferences/2012/ NIPS] ||
+|| SC || International Conference on Spatial Cognition ||  || 2012-09-04 to 2012-09-08 || Rome, Italy || 2012-01-31 || 2012-04-15 || [http://w3.uniroma1.it/icsc/2012/ SC] ||                                                                                                      
+|| UAI || Uncertainty in Artificial Intelligence || 0.91 || 2012-08-15 to 2012-08-17 || Catalina Islands, CA ||  || 2012-03-30 || [http://www.auai.org/uai2012/ UAI] ||
  
 = Workshop and Symposium Information =
 
