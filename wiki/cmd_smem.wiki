@@ -29,7 +29,7 @@ smem -b|--backup <file name>
 || `-p, --print` || Print semantic store in user-readable format ||
 || `-v, --viz` || Print semantic store in graphviz format ||
 || `-i, --init` || Reinitialize ALL memories ||
-|| `-b, --print` || Creates a backup of the semantic database on disk ||
+|| `-b, --backup` || Creates a backup of the semantic database on disk ||
 
 == Description ==
 
@@ -62,7 +62,7 @@ displays a summary of the parameter settings.
 
 If `activation-mode` is `base-level`, three parameters control bias values. The `base-decay` parameter sets the free decay parameter in the base-level model. Note that we do implement the (Petrov, 2006) approximation, with a history size set as a compile-time parameter (default=10). The `base-update-policy` sets the frequency with which activation is recomputed. The default, `stable`, only recomputes activation when a memory is referenced (through storage or retrieval). The `naive` setting will update the entire candidate set of memories (defined as those that match the most constraining cue WME) during a retrieval, which has severe performance detriment and should be used for experimentation or those agents that require high-fidelity retrievals. The `incremental` policy updates a constant number of memories, those with last-access ages defined by the `base-incremental-threshes` set.
 
-The `epmem --backup` command can be used to make 
+The `smem --backup` command can be used to make 
 a copy of the current state of the database, whether in memory or on
 disk. This command will commit all outstanding changes before
 initiating the copy.
