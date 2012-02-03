@@ -9,7 +9,7 @@ relation to the lexer/parser inside the Soar kernel. CLI often refers to
 the actual object instance (a member of KernelSML) but sometimes can
 refer to the whole component.
 
-The CLI takes an arbitrary string and transforms it in to method calls
+The CLI takes an arbitrary string and transforms it into method calls
 providing a general interface to Soar as described by the help document
 on the Soar wiki (on Google Code).
 
