@@ -1,6 +1,8 @@
 #summary Publications related to the Soar project.
 #labels Phase-Support,Featured
 
+= 2012 =
+
 = 2011 =
 
 Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
