@@ -84,7 +84,7 @@ void init_soar_agent(agent* thisAgent) {
   init_explain(thisAgent);  /* AGR 564 */
   select_init(thisAgent);
   predict_init(thisAgent);
-	
+
   init_memory_pool( thisAgent, &( thisAgent->gds_pool ), sizeof( goal_dependency_set ), "gds" );
 
   init_memory_pool( thisAgent, &( thisAgent->rl_info_pool ), sizeof( rl_data ), "rl_id_data" );
@@ -325,7 +325,8 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   // rl initialization
   newAgent->rl_params = new rl_param_container( newAgent );
-  newAgent->rl_stats = new rl_stat_container( newAgent ); 
+  newAgent->rl_stats = new rl_stat_container( newAgent );
+  newAgent->rl_prods = new rl_production_memory();
 
   rl_initialize_template_tracking( newAgent );
 
@@ -362,42 +363,41 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   // epmem initialization
   newAgent->epmem_params = new epmem_param_container( newAgent );
-  newAgent->epmem_stats = new epmem_stat_container( newAgent );  
+  newAgent->epmem_stats = new epmem_stat_container( newAgent );
   newAgent->epmem_timers = new epmem_timer_container( newAgent );
 
   newAgent->epmem_db = new soar_module::sqlite_database();
-  newAgent->epmem_stmts_common = NULL;  
+  newAgent->epmem_stmts_common = NULL;
   newAgent->epmem_stmts_graph = NULL;
-  
-  
+
   newAgent->epmem_node_mins = new std::vector<epmem_time_id>();
   newAgent->epmem_node_maxes = new std::vector<bool>();
 
   newAgent->epmem_edge_mins = new std::vector<epmem_time_id>();
   newAgent->epmem_edge_maxes = new std::vector<bool>();
+  newAgent->epmem_id_repository = new epmem_parent_id_pool();
+  newAgent->epmem_id_replacement = new epmem_return_id_pool();
+  newAgent->epmem_id_ref_counts = new epmem_id_ref_counter();
 
 #ifdef USE_MEM_POOL_ALLOCATORS
   newAgent->epmem_node_removals = new epmem_id_removal_map( std::less< epmem_node_id >(), soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, bool > >( newAgent ) );
   newAgent->epmem_edge_removals = new epmem_id_removal_map( std::less< epmem_node_id >(), soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, bool > >( newAgent ) );
 
-  newAgent->epmem_id_repository = new epmem_parent_id_pool( std::less< epmem_node_id >(), soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, epmem_hashed_id_pool* > >( newAgent ) );
-  newAgent->epmem_id_replacement = new epmem_return_id_pool( std::less< epmem_node_id >(), soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, epmem_id_pool* > >( newAgent ) );
-  newAgent->epmem_id_ref_counts = new epmem_id_ref_counter( std::less< epmem_node_id >(), soar_module::soar_memory_pool_allocator< std::pair< epmem_node_id, uint64_t > >( newAgent ) );
-
   newAgent->epmem_wme_adds = new epmem_wme_addition_map( std::less< Symbol* >(), soar_module::soar_memory_pool_allocator< std::pair< Symbol*, epmem_pooled_wme_set* > >( newAgent ) );
   newAgent->epmem_wme_removes = new epmem_wme_removal_map( std::less< uint64_t >(), soar_module::soar_memory_pool_allocator< std::pair< uint64_t, epmem_pooled_wme_set* > >( newAgent ) );
   newAgent->epmem_promotions = new epmem_symbol_set( std::less< Symbol* >(), soar_module::soar_memory_pool_allocator< Symbol* >( newAgent ) );
+
+  newAgent->epmem_id_removes = new epmem_symbol_stack( soar_module::soar_memory_pool_allocator< Symbol* >( newAgent ) );
 #else
   newAgent->epmem_node_removals = new epmem_id_removal_map();
   newAgent->epmem_edge_removals = new epmem_id_removal_map();
 
-  newAgent->epmem_id_repository = new epmem_parent_id_pool();
-  newAgent->epmem_id_replacement = new epmem_return_id_pool();
-  newAgent->epmem_id_ref_counts = new epmem_id_ref_counter();
 
   newAgent->epmem_wme_adds = new epmem_wme_addition_map();
   newAgent->epmem_wme_removes = new epmem_wme_removal_map();
   newAgent->epmem_promotions = new epmem_symbol_set();
+
+  newAgent->epmem_id_removes = new epmem_symbol_stack();
 #endif
 
   newAgent->epmem_validation = 0;
@@ -405,7 +405,7 @@ agent * create_soar_agent (char * agent_name) {                                 
 
   // smem initialization
   newAgent->smem_params = new smem_param_container( newAgent );
-  newAgent->smem_stats = new smem_stat_container( newAgent );  
+  newAgent->smem_stats = new smem_stat_container( newAgent );
   newAgent->smem_timers = new smem_timer_container( newAgent );
 
   newAgent->smem_db = new soar_module::sqlite_database();
@@ -453,8 +453,11 @@ void destroy_soar_agent (agent * delete_agent)
 	  delete delete_agent->exploration_params[ i ];
 
   // cleanup Soar-RL
+  delete_agent->rl_params->apoptosis->set_value( rl_param_container::apoptosis_none );
+  delete delete_agent->rl_prods;
   delete delete_agent->rl_params;
   delete delete_agent->rl_stats;
+  delete_agent->rl_params = NULL; // apoptosis needs to know this for excise_all_productions below
 
   // cleanup select
   select_init( delete_agent );
@@ -487,6 +490,7 @@ void destroy_soar_agent (agent * delete_agent)
   delete delete_agent->epmem_id_repository;
   delete delete_agent->epmem_id_replacement;
   delete delete_agent->epmem_id_ref_counts;
+  delete delete_agent->epmem_id_removes;
 
   delete delete_agent->epmem_wme_adds;
   delete delete_agent->epmem_wme_removes;
@@ -595,7 +599,7 @@ void destroy_soar_agent (agent * delete_agent)
   /* RPM 9/06 end */
 
   // dynamic memory pools (cleared in the last step)
-  for ( std::map< size_t, memory_pool* >::iterator it=delete_agent->dyn_memory_pools->begin(); it!=delete_agent->dyn_memory_pools->end(); it++ ) 
+  for ( std::map< size_t, memory_pool* >::iterator it=delete_agent->dyn_memory_pools->begin(); it!=delete_agent->dyn_memory_pools->end(); it++ )
   {
 	  delete it->second;
   }

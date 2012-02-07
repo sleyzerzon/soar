@@ -19,6 +19,7 @@
 #include <iterator>
 #include <fstream>
 #include <set>
+#include <climits>
 
 #include "episodic_memory.h"
 #include "semantic_memory.h"
@@ -34,6 +35,9 @@
 
 #ifdef EPMEM_EXPERIMENT
 
+uint64_t epmem_episodes_searched = 0;
+uint64_t epmem_dc_wme_adds = 0;
+uint64_t epmem_dc_wme_removes = 0;
 std::ofstream* epmem_exp_output = NULL;
 
 enum epmem_exp_states
@@ -44,6 +48,8 @@ enum epmem_exp_states
 };
 
 int64_t epmem_exp_state[] = { 0, 0, 0 };
+
+soar_module::timer* epmem_exp_timer = NULL;
 
 #endif
 
@@ -135,7 +141,7 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 
 	// auto-commit
 	lazy_commit = new soar_module::boolean_param( "lazy-commit", soar_module::on, new epmem_db_predicate<soar_module::boolean>( my_agent ) );
-	add( lazy_commit );	
+	add( lazy_commit );
 
 
 	////////////////////
@@ -143,7 +149,7 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	////////////////////
 
 	// graph-match
-	graph_match = new soar_module::boolean_param( "graph-match", soar_module::on, new soar_module::f_predicate<soar_module::boolean>() );	
+	graph_match = new soar_module::boolean_param( "graph-match", soar_module::on, new soar_module::f_predicate<soar_module::boolean>() );
 	add( graph_match );
 
 	// balance
@@ -162,7 +168,7 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	timers->add_mapping( soar_module::timer::two, "two" );
 	timers->add_mapping( soar_module::timer::three, "three" );
 	add( timers );
-	
+
 	// page_size
 	page_size = new soar_module::constant_param<page_choices>( "page-size", page_8k, new epmem_db_predicate<page_choices>( my_agent ) );
 	page_size->add_mapping( page_1k, "1k" );
@@ -181,7 +187,7 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	// opt
 	opt = new soar_module::constant_param<opt_choices>( "optimization", opt_speed, new epmem_db_predicate<opt_choices>( my_agent ) );
 	opt->add_mapping( opt_safety, "safety" );
-	opt->add_mapping( opt_speed, "performance" );	
+	opt->add_mapping( opt_speed, "performance" );
 	add( opt );
 
 
@@ -263,7 +269,7 @@ epmem_stat_container::epmem_stat_container( agent *new_agent ): soar_module::sta
 	// mem-high
 	mem_high = new epmem_mem_high_stat( my_agent, "mem-high", 0, new soar_module::predicate<int64_t>() );
 	add( mem_high );
-	
+
 	// cue-based-retrievals
 	cbr = new soar_module::integer_stat( "queries", 0, new soar_module::f_predicate<int64_t>() );
 	add( cbr );
@@ -341,7 +347,7 @@ epmem_stat_container::epmem_stat_container( agent *new_agent ): soar_module::sta
 	// connect to rit state
 	/////////////////////////////
 
-	// graph		
+	// graph
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].offset.stat = rit_offset_1;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].offset.var_key = var_rit_offset_1;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].leftroot.stat = rit_left_root_1;
@@ -349,8 +355,8 @@ epmem_stat_container::epmem_stat_container( agent *new_agent ): soar_module::sta
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].rightroot.stat = rit_right_root_1;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].rightroot.var_key = var_rit_rightroot_1;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].minstep.stat = rit_min_step_1;
-	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].minstep.var_key = var_rit_minstep_1;	
-	
+	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].minstep.var_key = var_rit_minstep_1;
+
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ].offset.stat = rit_offset_2;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ].offset.var_key = var_rit_offset_2;
 	my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ].leftroot.stat = rit_left_root_2;
@@ -398,7 +404,7 @@ int64_t epmem_mem_high_stat::get_value()
 epmem_timer_container::epmem_timer_container( agent *new_agent ): soar_module::timer_container( new_agent )
 {
 	// one
-	
+
 	total = new epmem_timer( "_total", my_agent, soar_module::timer::one );
 	add( total );
 
@@ -430,7 +436,7 @@ epmem_timer_container::epmem_timer_container( agent *new_agent ): soar_module::t
 
 	hash = new epmem_timer( "epmem_hash", my_agent, soar_module::timer::two );
 	add( hash );
-	
+
 	wm_phase = new epmem_timer( "epmem_wm_phase", my_agent, soar_module::timer::two );
 	add( wm_phase );
 
@@ -527,15 +533,15 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 	add_structure( "CREATE TABLE IF NOT EXISTS rit_right_nodes (node INTEGER)" );
 	add_structure( "CREATE TABLE IF NOT EXISTS temporal_symbol_hash (id INTEGER PRIMARY KEY, sym_const NONE, sym_type INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS temporal_symbol_hash_const_type ON temporal_symbol_hash (sym_type,sym_const)" );
-	
-	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE	
+
+	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
 	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (0,NULL,1)" );
 
 	// workaround for acceptable preference wmes: id 1 = "operator+"
 	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (1,'operator*',2)" );
 
 	//
-	
+
 	begin = new soar_module::sqlite_statement( new_db, "BEGIN" );
 	add( begin );
 
@@ -828,7 +834,7 @@ epmem_wme_list *epmem_get_augs_of_id( Symbol * id, tc_number tc )
 
 	// augs only exist for identifiers
 	if ( ( id->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-		 ( id->id.tc_num != tc ) )
+			( id->id.tc_num != tc ) )
 	{
 		id->id.tc_num = tc;
 
@@ -868,7 +874,7 @@ inline void _epmem_process_buffered_wme_list( agent* my_agent, Symbol* state, so
 	{
 		return;
 	}
-	
+
 	instantiation* inst = soar_module::make_fake_instantiation( my_agent, state, &cue_wmes, &my_list );
 
 	for ( preference* pref=inst->preferences_generated; pref; pref=pref->inst_next )
@@ -910,19 +916,19 @@ inline void _epmem_process_buffered_wme_list( agent* my_agent, Symbol* state, so
 		{
 			preference *just_pref = NIL;
 			instantiation *next_justification = NIL;
-			
+
 			for ( instantiation *my_justification=my_justification_list;
-				  my_justification!=NIL;
-				  my_justification=next_justification )
+					my_justification!=NIL;
+					my_justification=next_justification )
 			{
 				next_justification = my_justification->next;
-				
+
 				if ( my_justification->in_ms )
 				{
 					insert_at_head_of_dll( my_justification->prod->instantiations, my_justification, next, prev );
 				}
 
-				for ( just_pref=my_justification->preferences_generated; just_pref!=NIL; just_pref=just_pref->inst_next ) 
+				for ( just_pref=my_justification->preferences_generated; just_pref!=NIL; just_pref=just_pref->inst_next )
 				{
 					if ( add_preference_to_tm( my_agent, just_pref ) )
 					{
@@ -980,14 +986,14 @@ bool epmem_get_variable( agent *my_agent, epmem_variable_key variable_id, int64_
 	soar_module::sqlite_statement *var_get = my_agent->epmem_stmts_common->var_get;
 
 	var_get->bind_int( 1, variable_id );
-	status = var_get->execute();	
+	status = var_get->execute();
 
 	if ( status == soar_module::row )
 	{
 		(*variable_value) = var_get->column_int( 0 );
 	}
 
-	var_get->reinitialize();	
+	var_get->reinitialize();
 
 	return ( status == soar_module::row );
 }
@@ -1004,7 +1010,7 @@ void epmem_set_variable( agent *my_agent, epmem_variable_key variable_id, int64_
 	var_set->bind_int( 1, variable_id );
 	var_set->bind_int( 2, variable_value );
 
-	var_set->execute( soar_module::op_reinit );	
+	var_set->execute( soar_module::op_reinit );
 }
 
 //////////////////////////////////////////////////////////
@@ -1022,12 +1028,12 @@ int64_t epmem_rit_fork_node( int64_t lower, int64_t upper, bool /*bounds_offset*
 {
 	// never called
 	/*if ( !bounds_offset )
-	{
-		int64_t offset = rit_state->offset.stat->get_value();
+	  {
+	  int64_t offset = rit_state->offset.stat->get_value();
 
-		lower = ( lower - offset );
-		upper = ( upper - offset );
-	}*/
+	  lower = ( lower - offset );
+	  upper = ( upper - offset );
+	  }*/
 
 	// descend the tree down to the fork node
 	int64_t node = EPMEM_RIT_ROOT;
@@ -1074,7 +1080,7 @@ int64_t epmem_rit_fork_node( int64_t lower, int64_t upper, bool /*bounds_offset*
 void epmem_rit_clear_left_right( agent *my_agent )
 {
 	my_agent->epmem_stmts_common->rit_truncate_left->execute( soar_module::op_reinit );
-	my_agent->epmem_stmts_common->rit_truncate_right->execute( soar_module::op_reinit );	
+	my_agent->epmem_stmts_common->rit_truncate_right->execute( soar_module::op_reinit );
 }
 
 /***************************************************************************
@@ -1086,7 +1092,7 @@ void epmem_rit_add_left( agent *my_agent, epmem_time_id min, epmem_time_id max )
 {
 	my_agent->epmem_stmts_common->rit_add_left->bind_int( 1, min );
 	my_agent->epmem_stmts_common->rit_add_left->bind_int( 2, max );
-	my_agent->epmem_stmts_common->rit_add_left->execute( soar_module::op_reinit );	
+	my_agent->epmem_stmts_common->rit_add_left->execute( soar_module::op_reinit );
 }
 
 /***************************************************************************
@@ -1097,7 +1103,7 @@ void epmem_rit_add_left( agent *my_agent, epmem_time_id min, epmem_time_id max )
 void epmem_rit_add_right( agent *my_agent, epmem_time_id id )
 {
 	my_agent->epmem_stmts_common->rit_add_right->bind_int( 1, id );
-	my_agent->epmem_stmts_common->rit_add_right->execute( soar_module::op_reinit );	
+	my_agent->epmem_stmts_common->rit_add_right->execute( soar_module::op_reinit );
 }
 
 /***************************************************************************
@@ -1109,7 +1115,7 @@ void epmem_rit_add_right( agent *my_agent, epmem_time_id id )
 void epmem_rit_prep_left_right( agent *my_agent, int64_t lower, int64_t upper, epmem_rit_state *rit_state )
 {
 	////////////////////////////////////////////////////////////////////////////
-	rit_state->timer->start();	
+	rit_state->timer->start();
 	////////////////////////////////////////////////////////////////////////////
 
 	int64_t offset = rit_state->offset.stat->get_value();
@@ -1326,16 +1332,16 @@ void epmem_close( agent *my_agent )
 					delete my_agent->epmem_stmts_graph->pool_range_lti_queries[ k ][ m ];
 				}
 			}
-			
+
 			delete my_agent->epmem_stmts_graph->pool_range_lti_start;
 		}
-		
+
 		// de-allocate statements
 		delete my_agent->epmem_stmts_common;
 		delete my_agent->epmem_stmts_graph;
 
 		// de-allocate local data structures
-		{		
+		{
 			epmem_parent_id_pool::iterator p;
 			epmem_hashed_id_pool::iterator p_p;
 
@@ -1357,6 +1363,10 @@ void epmem_close( agent *my_agent )
 
 			my_agent->epmem_id_repository->clear();
 			my_agent->epmem_id_replacement->clear();
+			for ( epmem_id_ref_counter::iterator rf_it=my_agent->epmem_id_ref_counts->begin(); rf_it!=my_agent->epmem_id_ref_counts->end(); rf_it++ )
+			{
+				delete rf_it->second;
+			}
 			my_agent->epmem_id_ref_counts->clear();
 
 			my_agent->epmem_wme_adds->clear();
@@ -1379,6 +1389,11 @@ void epmem_close( agent *my_agent )
 		epmem_exp_output->close();
 		delete epmem_exp_output;
 		epmem_exp_output = NULL;
+
+		if ( epmem_exp_timer )
+		{
+			delete epmem_exp_timer;
+		}
 	}
 #endif
 }
@@ -1421,16 +1436,16 @@ void epmem_reset( agent *my_agent, Symbol *state )
 	{
 		epmem_data *data = state->id.epmem_info;
 
-		data->last_ol_time = 0;		
+		data->last_ol_time = 0;
 
 		data->last_cmd_time = 0;
 		data->last_cmd_count = 0;
 
 		data->last_memory = EPMEM_MEMID_NONE;
-		
+
 		// this will be called after prefs from goal are already removed,
 		// so just clear out result stack
-		data->epmem_wmes->clear();		
+		data->epmem_wmes->clear();
 
 		state = state->id.lower_goal;
 	}
@@ -1461,7 +1476,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->init->start();	
+	my_agent->epmem_timers->init->start();
 	////////////////////////////////////////////////////////////////////////////
 
 	const char *db_path;
@@ -1475,7 +1490,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 	}
 
 	// attempt connection
-	my_agent->epmem_db->connect( db_path );	
+	my_agent->epmem_db->connect( db_path );
 
 	if ( my_agent->epmem_db->get_status() == soar_module::problem )
 	{
@@ -1486,7 +1501,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 		xml_generate_warning( my_agent, buf );
 	}
 	else
-	{		
+	{
 		epmem_time_id time_max;
 		soar_module::sqlite_statement *temp_q = NULL;
 		soar_module::sqlite_statement *temp_q2 = NULL;
@@ -1500,45 +1515,45 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 					case ( epmem_param_container::page_1k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 1024" );
 						break;
-						
+
 					case ( epmem_param_container::page_2k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 2048" );
 						break;
-						
+
 					case ( epmem_param_container::page_4k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 4096" );
 						break;
-						
+
 					case ( epmem_param_container::page_8k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 8192" );
 						break;
-						
+
 					case ( epmem_param_container::page_16k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 16384" );
 						break;
-						
+
 					case ( epmem_param_container::page_32k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 32768" );
 						break;
-						
+
 					case ( epmem_param_container::page_64k ):
 						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 65536" );
 						break;
 				}
-				
+
 				temp_q->prepare();
 				temp_q->execute();
 				delete temp_q;
 				temp_q = NULL;
 			}
-			
+
 			// cache_size
 			{
 				std::string cache_sql( "PRAGMA cache_size = " );
-                char* str = my_agent->epmem_params->cache_size->get_string();
+				char* str = my_agent->epmem_params->cache_size->get_string();
 				cache_sql.append( str );
 				free(str);
-                str = NULL;
+				str = NULL;
 
 				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, cache_sql.c_str() );
 
@@ -1564,7 +1579,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				temp_q->execute();
 				delete temp_q;
 				temp_q = NULL;
-				
+
 				// locking_mode - no one else can view the database after our first write
 				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA locking_mode = EXCLUSIVE" );
 				temp_q->prepare();
@@ -1584,14 +1599,14 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 		// setup common structures/queries
 		my_agent->epmem_stmts_common = new epmem_common_statement_container( my_agent );
 		my_agent->epmem_stmts_common->structure();
-		my_agent->epmem_stmts_common->prepare();		
-		
+		my_agent->epmem_stmts_common->prepare();
+
 		{
 			// setup graph structures/queries
 			my_agent->epmem_stmts_graph = new epmem_graph_statement_container( my_agent );
 			my_agent->epmem_stmts_graph->structure();
 			my_agent->epmem_stmts_graph->prepare();
-			
+
 			// initialize range tracking
 			my_agent->epmem_node_mins->clear();
 			my_agent->epmem_node_maxes->clear();
@@ -1602,6 +1617,19 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 			my_agent->epmem_edge_removals->clear();
 
 			(*my_agent->epmem_id_repository)[ EPMEM_NODEID_ROOT ] = new epmem_hashed_id_pool;
+			{
+#ifdef USE_MEM_POOL_ALLOCATORS
+				epmem_wme_set* wms_temp = new epmem_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( my_agent ) );
+#else
+				epmem_wme_set* wms_temp = new epmem_wme_set();
+#endif
+
+				// voigtjr: Cast to wme* is necessary for compilation in VS10
+				// Without it, it picks insert(int) instead of insert(wme*) and does not compile.
+				wms_temp->insert( static_cast<wme*>(NULL) );
+
+				(*my_agent->epmem_id_ref_counts)[ EPMEM_NODEID_ROOT ] = wms_temp;
+			}
 
 			// initialize time
 			my_agent->epmem_stats->time->set_value( 1 );
@@ -1629,7 +1657,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				my_agent->epmem_rit_state_graph[ i ].minstep.stat->set_value( LONG_MAX );
 			}
 			my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ].add_query = my_agent->epmem_stmts_graph->add_node_range;
-			my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ].add_query = my_agent->epmem_stmts_graph->add_edge_range;		
+			my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ].add_query = my_agent->epmem_stmts_graph->add_edge_range;
 
 			////
 
@@ -1689,7 +1717,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				temp_q->prepare();
 				if ( temp_q->execute() == soar_module::row )
 					my_agent->epmem_stats->time->set_value( temp_q->column_int( 0 ) + 1 );
-				
+
 				delete temp_q;
 				temp_q = NULL;
 			}
@@ -1704,12 +1732,12 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				const char *now_select[] = { "SELECT id,start FROM node_now", "SELECT id,start FROM edge_now" };
 				soar_module::sqlite_statement *now_add[] = { my_agent->epmem_stmts_graph->add_node_point, my_agent->epmem_stmts_graph->add_edge_point };
 				const char *now_delete[] = { "DELETE FROM node_now", "DELETE FROM edge_now" };
-				
+
 				for ( int i=EPMEM_RIT_STATE_NODE; i<=EPMEM_RIT_STATE_EDGE; i++ )
 				{
 					temp_q = now_add[i];
 					temp_q->bind_int( 2, time_last );
-					
+
 					temp_q2 = new soar_module::sqlite_statement( my_agent->epmem_db, now_select[i] );
 					temp_q2->prepare();
 					while ( temp_q2->execute() == soar_module::row )
@@ -1729,8 +1757,8 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 					}
 					delete temp_q2;
 					temp_q2 = NULL;
-					temp_q = NULL;	
-					
+					temp_q = NULL;
+
 
 					// remove all NOW intervals
 					temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, now_delete[i] );
@@ -1745,7 +1773,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 			{
 				const char *minmax_select[] = { "SELECT MAX(child_id) FROM node_unique", "SELECT MAX(parent_id) FROM edge_unique" };
 				std::vector<bool> *minmax_max[] = { my_agent->epmem_node_maxes, my_agent->epmem_edge_maxes };
-				std::vector<epmem_time_id> *minmax_min[] = { my_agent->epmem_node_mins, my_agent->epmem_edge_mins };				
+				std::vector<epmem_time_id> *minmax_min[] = { my_agent->epmem_node_mins, my_agent->epmem_edge_mins };
 
 				for ( int i=EPMEM_RIT_STATE_NODE; i<=EPMEM_RIT_STATE_EDGE; i++ )
 				{
@@ -1759,7 +1787,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 						minmax_max[i]->resize( num_ids, true );
 						minmax_min[i]->resize( num_ids, time_max );
 					}
-					
+
 					delete temp_q;
 					temp_q = NULL;
 				}
@@ -1783,7 +1811,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 					q0 = temp_q->column_int( 0 );
 					w = temp_q->column_int( 1 );
 					q1 = temp_q->column_int( 2 );
-					parent_id = temp_q->column_int( 3 );					
+					parent_id = temp_q->column_int( 3 );
 
 					hp =& (*my_agent->epmem_id_repository)[ q0 ];
 					if ( !(*hp) )
@@ -1799,7 +1827,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 					if ( !(*hp) )
 						(*hp) = new epmem_hashed_id_pool;
 				}
-				
+
 				delete temp_q;
 				temp_q = NULL;
 			}
@@ -1807,13 +1835,13 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 			// at init, top-state is considered the only known identifier
 			my_agent->top_goal->id.epmem_id = EPMEM_NODEID_ROOT;
 			my_agent->top_goal->id.epmem_valid = my_agent->epmem_validation;
-			
+
 			// capture augmentations of top-state as the sole set of adds,
 			// which catches up to what would have been incremental encoding
 			// to this point
 			{
 				epmem_pooled_wme_set* add_set = NULL;
-					
+
 				epmem_wme_list* wmes = epmem_get_augs_of_id( my_agent->top_state, get_new_tc_number( my_agent ) );
 				epmem_wme_list::iterator w_p;
 
@@ -1825,7 +1853,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 #else
 					add_set = new (add_set) epmem_pooled_wme_set();
 #endif
-					
+
 					for ( w_p=wmes->begin(); w_p!=wmes->end(); w_p++ )
 					{
 						add_set->insert( (*w_p) );
@@ -1847,7 +1875,7 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->init->stop();	
+	my_agent->epmem_timers->init->stop();
 	////////////////////////////////////////////////////////////////////////////
 }
 
@@ -1878,21 +1906,21 @@ epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fai
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->epmem_timers->hash->start();
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	if ( ( sym->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) ||
-		 ( sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) ||
-		 ( sym->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE ) )
+			( sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) ||
+			( sym->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE ) )
 	{
 		if ( ( !sym->common.epmem_hash ) || ( sym->common.epmem_valid != my_agent->epmem_validation ) )
-		{		
+		{
 			sym->common.epmem_hash = NIL;
 			sym->common.epmem_valid = my_agent->epmem_validation;
-			
+
 			// basic process:
 			// - search
 			// - if found, return
 			// - else, add
-			
+
 			my_agent->epmem_stmts_common->hash_get->bind_int( 1, sym->common.symbol_type );
 			switch ( sym->common.symbol_type )
 			{
@@ -1938,7 +1966,7 @@ epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fai
 
 				my_agent->epmem_stmts_common->hash_add->execute( soar_module::op_reinit );
 				return_val = static_cast<epmem_hash_id>( my_agent->epmem_db->last_insert_rowid() );
-			}			
+			}
 
 			// cache results for later re-use
 			sym->common.epmem_hash = return_val;
@@ -1988,12 +2016,12 @@ inline void _epmem_promote_id( agent* my_agent, Symbol* id, epmem_time_id t )
 // 1. value known in phase one (try reservation)
 // 2. value unknown in phase one, but known at phase two (try assignment adhering to constraint)
 // 3. value unknown in phase one/two (if anything is left, unconstrained assignment)
-inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_syms, std::queue< epmem_node_id >& parent_ids, tc_number tc, epmem_pooled_wme_set::iterator w_b, epmem_pooled_wme_set::iterator w_e, epmem_node_id parent_id, epmem_time_id time_counter, 
-							    std::map< wme*, epmem_id_reservation* >& id_reservations, std::set< Symbol* >& new_identifiers, std::queue< epmem_node_id >& epmem_node, std::queue< epmem_node_id >& epmem_edge )
+inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_syms, std::queue< epmem_node_id >& parent_ids, tc_number tc, epmem_pooled_wme_set::iterator w_b, epmem_pooled_wme_set::iterator w_e, epmem_node_id parent_id, epmem_time_id time_counter,
+		std::map< wme*, epmem_id_reservation* >& id_reservations, std::set< Symbol* >& new_identifiers, std::queue< epmem_node_id >& epmem_node, std::queue< epmem_node_id >& epmem_edge )
 {
 	epmem_pooled_wme_set::iterator w_p;
 	bool value_known_apriori = false;
-	
+
 	// temporal hash
 	epmem_hash_id my_hash;	// attribute
 	epmem_hash_id my_hash2;	// value
@@ -2010,13 +2038,13 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 	epmem_wme_list* wmes = NULL;
 	epmem_wme_list::iterator w_p2;
 	bool good_recurse = false;
-	
+
 	// pre-assign unknown identifier-valued WMEs with known children (prevents ordering issues with unknown children)
 	for ( w_p=w_b; w_p!=w_e; w_p++ )
 	{
 		if ( ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-			 ( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) ) &&
-			 ( !(*w_p)->value->id.smem_lti ) )
+				( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) ) &&
+				( !(*w_p)->value->id.smem_lti ) )
 		{
 			// prevent exclusions from being recorded
 			if ( my_agent->epmem_params->exclusions->in_set( (*w_p)->attr ) )
@@ -2025,7 +2053,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 			}
 
 			// if still here, create reservation (case 1)
-			new_id_reservation = new epmem_id_reservation;						
+			new_id_reservation = new epmem_id_reservation;
 			new_id_reservation->my_id = EPMEM_NODEID_BAD;
 			new_id_reservation->my_pool = NULL;
 
@@ -2047,7 +2075,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 					pool_p = (*my_id_repo)->find( (*w_p)->value->id.epmem_id );
 					if ( pool_p != (*my_id_repo)->end() )
 					{
-						new_id_reservation->my_id = pool_p->second;									
+						new_id_reservation->my_id = pool_p->second;
 
 						(*my_id_repo)->erase( pool_p );
 					}
@@ -2074,11 +2102,11 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 		}
 
 		if ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
-		{			
+		{
 			(*w_p)->epmem_valid = my_agent->epmem_validation;
 			(*w_p)->epmem_id = EPMEM_NODEID_BAD;
 
-			my_hash = NIL;							
+			my_hash = NIL;
 			my_id_repo2 = NIL;
 
 			value_known_apriori = ( ( (*w_p)->value->id.epmem_id != EPMEM_NODEID_BAD ) && ( (*w_p)->value->id.epmem_valid == my_agent->epmem_validation ) );
@@ -2108,7 +2136,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 					// add if necessary
 					if ( (*w_p)->value->id.epmem_id == EPMEM_NODEID_BAD )
 					{
-						(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();										
+						(*w_p)->value->id.epmem_id = my_agent->epmem_stats->next_id->get_value();
 						my_agent->epmem_stats->next_id->set_value( (*w_p)->value->id.epmem_id + 1 );
 						epmem_set_variable( my_agent, var_next_id, (*w_p)->value->id.epmem_id + 1 );
 
@@ -2132,12 +2160,12 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 					{
 						my_hash = epmem_temporal_hash( my_agent, (*w_p)->attr );
 					}
-					
+
 					// q0, w, q1
 					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 1, parent_id );
 					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 2, my_hash );
 					my_agent->epmem_stmts_graph->find_edge_unique_shared->bind_int( 3, (*w_p)->value->id.epmem_id );
-					
+
 					if ( my_agent->epmem_stmts_graph->find_edge_unique_shared->execute() == soar_module::row )
 					{
 						(*w_p)->epmem_id = my_agent->epmem_stmts_graph->find_edge_unique_shared->column_int( 0 );
@@ -2148,7 +2176,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 			}
 			else
 			{
-				// in the case of a known value, we already have a reservation (case 1)						
+				// in the case of a known value, we already have a reservation (case 1)
 				if ( value_known_apriori )
 				{
 					r_p = id_reservations.find( (*w_p) );
@@ -2194,7 +2222,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 									(*w_p)->epmem_id = pool_p->second;
 									(*my_id_repo)->erase( pool_p );
 
-									(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);											
+									(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = (*my_id_repo);
 								}
 							}
 						}
@@ -2213,7 +2241,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 				{
 					// UNKNOWN identifier
 					new_identifiers.insert( (*w_p)->value );
-					
+
 					// get temporal hash
 					if ( (*w_p)->acceptable )
 					{
@@ -2230,12 +2258,12 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 					{
 						// if something leftover, try to use it
 						if ( !(*my_id_repo)->empty() )
-						{										
+						{
 							pool_p = (*my_id_repo)->begin();
 
 							do
 							{
-								if ( (*my_agent->epmem_id_ref_counts)[ pool_p->first ] == 0 )
+								if ( (*my_agent->epmem_id_ref_counts)[ pool_p->first ]->empty() )
 								{
 									(*w_p)->epmem_id = pool_p->second;
 									(*w_p)->value->id.epmem_id = pool_p->first;
@@ -2250,7 +2278,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 									pool_p++;
 								}
 							} while ( pool_p != (*my_id_repo)->end() );
-						}									
+						}
 					}
 					else
 					{
@@ -2261,7 +2289,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 					// keep the address for later (used if w->epmem_id was not assgined)
 					my_id_repo2 = (*my_id_repo);
 				}
-			}							
+			}
 
 			// add wme if no success above
 			if ( (*w_p)->epmem_id == EPMEM_NODEID_BAD )
@@ -2277,6 +2305,13 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 
 					// add repository
 					(*my_agent->epmem_id_repository)[ (*w_p)->value->id.epmem_id ] = new epmem_hashed_id_pool;
+
+					// add ref set
+#ifdef USE_MEM_POOL_ALLOCATORS
+					(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ] = new epmem_wme_set( std::less< wme* >(), soar_module::soar_memory_pool_allocator< wme* >( my_agent ) );
+#else
+					(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ] = new epmem_wme_set();
+#endif
 				}
 
 				// insert (q0,w,q1)
@@ -2286,7 +2321,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 				my_agent->epmem_stmts_graph->add_edge_unique->execute( soar_module::op_reinit );
 
 				(*w_p)->epmem_id = static_cast<epmem_node_id>( my_agent->epmem_db->last_insert_rowid() );
-				
+
 				if ( !(*w_p)->value->id.smem_lti )
 				{
 					(*my_agent->epmem_id_replacement)[ (*w_p)->epmem_id ] = my_id_repo2;
@@ -2317,21 +2352,21 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 			// up with ref counts that would have been accumulated via wme adds)
 			if ( new_identifiers.find( (*w_p)->value ) != new_identifiers.end() )
 			{
-				(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]++;
+				(*my_agent->epmem_id_ref_counts)[ (*w_p)->value->id.epmem_id ]->insert( (*w_p) );
 			}
 
-			// continue to augmentations?						
+			// continue to augmentations?
 			if ( (*w_p)->value->id.tc_num != tc )
 			{
 				good_recurse = false;
-				
+
 				if ( value_known_apriori )
 				{
 					(*w_p)->value->id.tc_num = tc;
 					good_recurse = true;
 				}
 				else
-				{					
+				{
 					wmes = epmem_get_augs_of_id( (*w_p)->value, tc );
 
 					if ( !wmes->empty() )
@@ -2342,7 +2377,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 #else
 						add_set = new (add_set) epmem_pooled_wme_set();
 #endif
-						
+
 						for ( w_p2=wmes->begin(); w_p2!=wmes->end(); w_p2++ )
 						{
 							add_set->insert( (*w_p2) );
@@ -2385,7 +2420,7 @@ inline void _epmem_store_level( agent* my_agent, std::queue< Symbol* >& parent_s
 						(*w_p)->epmem_id = my_agent->epmem_stmts_graph->find_node_unique->column_int( 0 );
 					}
 
-					my_agent->epmem_stmts_graph->find_node_unique->reinitialize();								
+					my_agent->epmem_stmts_graph->find_node_unique->reinitialize();
 				}
 
 				// act depending on new/existing feature
@@ -2436,7 +2471,7 @@ void epmem_new_episode( agent *my_agent )
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->storage->start();	
+	my_agent->epmem_timers->storage->start();
 	////////////////////////////////////////////////////////////////////////////
 
 	epmem_time_id time_counter = my_agent->epmem_stats->time->get_value();
@@ -2451,13 +2486,13 @@ void epmem_new_episode( agent *my_agent )
 		print( my_agent, buf );
 		xml_generate_warning( my_agent, buf );
 	}
-	
+
 	// perform storage
 	{
 		// seen nodes (non-identifiers) and edges (identifiers)
 		std::queue<epmem_node_id> epmem_node;
 		std::queue<epmem_node_id> epmem_edge;
-		
+
 		// walk appropriate levels
 		{
 			// prevents infinite loops
@@ -2473,23 +2508,27 @@ void epmem_new_episode( agent *my_agent )
 			Symbol* parent_sym = NULL;
 			std::queue< epmem_node_id > parent_ids;
 			epmem_node_id parent_id;
-			
+
 			// initialize queue with known levels:
 			// any keys were known, but may have had their augmentations removed
 			for ( epmem_wme_addition_map::iterator id_p=my_agent->epmem_wme_adds->begin(); id_p!=my_agent->epmem_wme_adds->end(); id_p++ )
 			{
 				if ( !id_p->second->empty() )
 				{
-					id_p->first->id.tc_num = tc;
-					parent_syms.push( id_p->first );
-					parent_ids.push( id_p->first->id.epmem_id );
+					// make sure the WME is valid
+					// it can be invalid a child WME was added, but then the parent was removed, setting the epmem_id to EPMEM_NODEID_BAD
+					if (id_p->first->id.epmem_id != EPMEM_NODEID_BAD) {
+						id_p->first->id.tc_num = tc;
+						parent_syms.push( id_p->first );
+						parent_ids.push( id_p->first->id.epmem_id );
+					}
 				}
 			}
-			
+
 			// cross-level information
 			std::map< wme*, epmem_id_reservation* > id_reservations;
 			std::set< Symbol* > new_identifiers;
-			
+
 			while ( !parent_syms.empty() )
 			{
 				parent_sym = parent_syms.front();
@@ -2514,6 +2553,10 @@ void epmem_new_episode( agent *my_agent )
 		// all inserts
 		{
 			epmem_node_id *temp_node;
+
+#ifdef EPMEM_EXPERIMENT
+			epmem_dc_wme_adds = epmem_node.size() + epmem_edge.size();
+#endif
 
 			// nodes
 			while ( !epmem_node.empty() )
@@ -2549,30 +2592,38 @@ void epmem_new_episode( agent *my_agent )
 				epmem_edge.pop();
 			}
 		}
-		
+
 		// all removals
 		{
 			epmem_id_removal_map::iterator r;
 			epmem_time_id range_start;
 			epmem_time_id range_end;
 
+#ifdef EPMEM_EXPERIMENT
+			epmem_dc_wme_removes = 0;
+#endif
+
 			// nodes
 			r = my_agent->epmem_node_removals->begin();
 			while ( r != my_agent->epmem_node_removals->end() )
 			{
 				if ( r->second )
-				{					
+				{
+#ifdef EPMEM_EXPERIMENT
+					epmem_dc_wme_removes++;
+#endif
+
 					// remove NOW entry
 					// id = ?
 					my_agent->epmem_stmts_graph->delete_node_now->bind_int( 1, r->first );
 					my_agent->epmem_stmts_graph->delete_node_now->execute( soar_module::op_reinit );
-					
+
 					range_start = (*my_agent->epmem_node_mins)[ r->first - 1 ];
 					range_end = ( time_counter - 1 );
 
 					// point (id, start)
 					if ( range_start == range_end )
-					{						
+					{
 						my_agent->epmem_stmts_graph->add_node_point->bind_int( 1, r->first );
 						my_agent->epmem_stmts_graph->add_node_point->bind_int( 2, range_start );
 						my_agent->epmem_stmts_graph->add_node_point->execute( soar_module::op_reinit );
@@ -2596,7 +2647,11 @@ void epmem_new_episode( agent *my_agent )
 			while ( r != my_agent->epmem_edge_removals->end() )
 			{
 				if ( r->second )
-				{					
+				{
+#ifdef EPMEM_EXPERIMENT
+					epmem_dc_wme_removes++;
+#endif
+
 					// remove NOW entry
 					// id = ?
 					my_agent->epmem_stmts_graph->delete_edge_now->bind_int( 1, r->first );
@@ -2607,7 +2662,7 @@ void epmem_new_episode( agent *my_agent )
 
 					// point (id, start)
 					if ( range_start == range_end )
-					{						
+					{
 						my_agent->epmem_stmts_graph->add_edge_point->bind_int( 1, r->first );
 						my_agent->epmem_stmts_graph->add_edge_point->bind_int( 2, range_start );
 						my_agent->epmem_stmts_graph->add_edge_point->execute( soar_module::op_reinit );
@@ -2619,7 +2674,7 @@ void epmem_new_episode( agent *my_agent )
 					}
 
 					// update max
-					(*my_agent->epmem_edge_maxes)[ r->first - 1 ] = true;					
+					(*my_agent->epmem_edge_maxes)[ r->first - 1 ] = true;
 				}
 
 				r++;
@@ -2660,7 +2715,7 @@ void epmem_new_episode( agent *my_agent )
 				}
 
 				state->id.epmem_time_wme = soar_module::add_module_wme( my_agent, state->id.epmem_header, my_agent->epmem_sym_present_id, my_time_sym );
-				
+
 				state = state->id.higher_goal;
 			}
 
@@ -2675,13 +2730,13 @@ void epmem_new_episode( agent *my_agent )
 				free_with_pool( &( my_agent->epmem_add_set_pool ), it->second );
 			}
 			my_agent->epmem_wme_adds->clear();
-			
+
 			my_agent->epmem_wme_removes->clear();
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->storage->stop();	
+	my_agent->epmem_timers->storage->stop();
 	////////////////////////////////////////////////////////////////////////////
 }
 
@@ -2708,10 +2763,10 @@ void epmem_new_episode( agent *my_agent )
 bool epmem_valid_episode( agent *my_agent, epmem_time_id memory_id )
 {
 	bool return_val = false;
-	
+
 	{
 		soar_module::sqlite_statement *my_q = my_agent->epmem_stmts_graph->valid_episode;
-		
+
 		my_q->bind_int( 1, memory_id );
 		my_q->execute();
 		return_val = ( my_q->column_int( 0 ) > 0 );
@@ -2725,7 +2780,7 @@ inline void _epmem_install_id_wme( agent* my_agent, Symbol* parent, Symbol* attr
 {
 	std::map< epmem_node_id, std::pair< Symbol*, bool > >::iterator id_p = ids->find( q1 );
 	bool existing_identifier = ( id_p != ids->end() );
-	
+
 	if ( val_is_short_term )
 	{
 		if ( !existing_identifier )
@@ -2756,7 +2811,7 @@ inline void _epmem_install_id_wme( agent* my_agent, Symbol* parent, Symbol* attr
 		}
 		else
 		{
-			Symbol* value = smem_lti_soar_make( my_agent, smem_lti_get_id( my_agent, val_letter, val_num ), val_letter, val_num, parent->id.level );			
+			Symbol* value = smem_lti_soar_make( my_agent, smem_lti_get_id( my_agent, val_letter, val_num ), val_letter, val_num, parent->id.level );
 
 			if ( id_record )
 			{
@@ -2769,7 +2824,7 @@ inline void _epmem_install_id_wme( agent* my_agent, Symbol* parent, Symbol* attr
 
 			epmem_buffer_add_wme( retrieval_wmes, parent, attr, value );
 			symbol_remove_ref( my_agent, value );
-			
+
 			ids->insert( std::make_pair< epmem_node_id, std::pair< Symbol*, bool > >( q1, std::make_pair< Symbol*, bool >( value, !( ( value->id.impasse_wmes ) || ( value->id.input_wmes ) || ( value->id.slots ) ) ) ) );
 		}
 	}
@@ -2792,7 +2847,7 @@ inline void _epmem_install_id_wme( agent* my_agent, Symbol* parent, Symbol* attr
 void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_id, soar_module::symbol_triple_list& meta_wmes, soar_module::symbol_triple_list& retrieval_wmes, epmem_id_mapping *id_record = NULL )
 {
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->ncb_retrieval->start();	
+	my_agent->epmem_timers->ncb_retrieval->start();
 	////////////////////////////////////////////////////////////////////////////
 
 	// get the ^result header for this state
@@ -2804,7 +2859,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 
 	// if no memory, say so
 	if ( ( memory_id == EPMEM_MEMID_NONE ) ||
-		 !epmem_valid_episode( my_agent, memory_id ) )
+			!epmem_valid_episode( my_agent, memory_id ) )
 	{
 		epmem_buffer_add_wme( meta_wmes, result_header, my_agent->epmem_sym_retrieved, my_agent->epmem_sym_no_memory );
 		state->id.epmem_info->last_memory = EPMEM_MEMID_NONE;
@@ -2812,7 +2867,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		////////////////////////////////////////////////////////////////////////////
 		my_agent->epmem_timers->ncb_retrieval->stop();
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		return;
 	}
 
@@ -2826,7 +2881,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 	{
 		(*id_record)[ EPMEM_NODEID_ROOT ] = retrieved_header;
 	}
-	
+
 	epmem_buffer_add_wme( meta_wmes, result_header, my_agent->epmem_sym_retrieved, retrieved_header );
 	symbol_remove_ref( my_agent, retrieved_header );
 
@@ -2835,7 +2890,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		Symbol *my_meta;
 
 		my_meta = make_int_constant( my_agent, static_cast<int64_t>( memory_id ) );
-		epmem_buffer_add_wme( meta_wmes, result_header, my_agent->epmem_sym_memory_id, my_meta );		
+		epmem_buffer_add_wme( meta_wmes, result_header, my_agent->epmem_sym_memory_id, my_meta );
 		symbol_remove_ref( my_agent, my_meta );
 
 		my_meta = make_int_constant( my_agent, static_cast<int64_t>( my_agent->epmem_stats->time->get_value() ) );
@@ -2860,7 +2915,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		std::map< epmem_node_id, std::pair< Symbol*, bool > > ids;
 		bool dont_abide_by_ids_second = ( my_agent->epmem_params->merge->get_value() == epmem_param_container::merge_add );
 
-		// symbols used to create WMEs		
+		// symbols used to create WMEs
 		Symbol *attr = NULL;
 
 		// lookup query
@@ -2870,7 +2925,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		ids[ EPMEM_NODEID_ROOT ] = std::make_pair< Symbol*, bool >( retrieved_header, true );
 
 		// first identifiers (i.e. reconstruct)
-		my_q = my_agent->epmem_stmts_graph->get_edges;		
+		my_q = my_agent->epmem_stmts_graph->get_edges;
 		{
 			// relates to finite automata: q1 = d(q0, w)
 			epmem_node_id q0; // id
@@ -2887,7 +2942,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 
 			// orphaned children
 			std::queue< epmem_edge* > orphans;
-			epmem_edge *orphan;			
+			epmem_edge *orphan;
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
 
@@ -2901,7 +2956,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 				// q0, w, q1, w_type
 				q0 = my_q->column_int( 0 );
 				q1 = my_q->column_int( 2 );
-				w_type = my_q->column_int( 3 );				
+				w_type = my_q->column_int( 3 );
 
 				switch ( w_type )
 				{
@@ -2960,7 +3015,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 					orphans.push( orphan );
 				}
 			}
-			my_q->reinitialize();			
+			my_q->reinitialize();
 			epmem_rit_clear_left_right( my_agent );
 
 			// take care of any orphans
@@ -2984,7 +3039,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 						{
 							if ( dont_abide_by_ids_second || id_p->second.second )
 							{
-								_epmem_install_id_wme( my_agent, id_p->second.first, orphan->w, &( ids ), orphan->q1, orphan->val_is_short_term, orphan->val_letter, orphan->val_num, id_record, retrieval_wmes );							
+								_epmem_install_id_wme( my_agent, id_p->second.first, orphan->w, &( ids ), orphan->q1, orphan->val_is_short_term, orphan->val_letter, orphan->val_num, id_record, retrieval_wmes );
 								num_wmes++;
 							}
 
@@ -3027,7 +3082,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			int64_t value_type;
 
 			std::pair< Symbol*, bool > parent;
-			Symbol *value = NULL;			
+			Symbol *value = NULL;
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
 
@@ -3144,13 +3199,13 @@ epmem_time_id epmem_next_episode( agent *my_agent, epmem_time_id memory_id )
 epmem_time_id epmem_previous_episode( agent *my_agent, epmem_time_id memory_id )
 {
 	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->prev->start();	
+	my_agent->epmem_timers->prev->start();
 	////////////////////////////////////////////////////////////////////////////
 
 	epmem_time_id return_val = EPMEM_MEMID_NONE;
 
 	if ( memory_id != EPMEM_MEMID_NONE )
-	{		
+	{
 		soar_module::sqlite_statement *my_q = my_agent->epmem_stmts_graph->prev_episode;
 		my_q->bind_int( 1, memory_id );
 		if ( my_q->execute() == soar_module::row )
@@ -3276,9 +3331,9 @@ inline epmem_leaf_node *epmem_create_leaf_node( epmem_node_id leaf_id, double le
  * 				  (see above description).
  **************************************************************************/
 void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list, int64_t &ct, double &v, int64_t &updown )
-{	
+{
 	int64_t ct_change = ( ( list == EPMEM_RANGE_START )?( -1 ):( 1 ) );
-	
+
 	// if recursive propogation, count change
 	// is dependent upon wme count
 	bool alter_ct = true;
@@ -3295,18 +3350,18 @@ void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list
 			// initialize counts below
 			{
 				bool rooted = ( flip->q0 == EPMEM_NODEID_ROOT );
-				
+
 				epmem_shared_incoming_ids_book::iterator id_p;
-				epmem_wme_list::iterator w_p;								
+				epmem_wme_list::iterator w_p;
 				epmem_shared_incoming_identity_counter* new_identity_counter;
-				
+
 				for ( id_p=flip->lit->incoming->parents->begin(); id_p!=flip->lit->incoming->parents->end(); id_p++ )
-				{				
+				{
 					new_identity_counter = new epmem_shared_incoming_identity_counter;
 
 					new_identity_counter->ct = 0;
 
-					new_identity_counter->cts = new epmem_shared_incoming_wme_counter_map;					
+					new_identity_counter->cts = new epmem_shared_incoming_wme_counter_map;
 					for ( w_p=id_p->second->outgoing->begin(); w_p!=id_p->second->outgoing->end(); w_p++ )
 					{
 						new_identity_counter->cts->insert( std::make_pair( (*w_p), ( ( rooted )?( 1 ):( 0 ) ) ) );
@@ -3317,11 +3372,11 @@ void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list
 			}
 		}
 
-		// find the wme map, get the literal count		
+		// find the wme map, get the literal count
 		epmem_shared_incoming_identity_counter* sym_ct = (*(*id_map))[ flip->wme->id ];
-		uint64_t *lit_ct =& (*(sym_ct->cts))[ flip->wme ];		
+		uint64_t *lit_ct =& (*(sym_ct->cts))[ flip->wme ];
 
-		// update the count	
+		// update the count
 		(*lit_ct) += ct_change;
 
 		// if appropriate, change the id count
@@ -3340,7 +3395,7 @@ void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list
 						book_p = (*flip->lit->incoming->parents)[ flip->wme->id ];
 
 						book_p->satisfactory->erase( flip->q0 );
-						alter_ct = ( book_p->satisfactory->empty() );						
+						alter_ct = ( book_p->satisfactory->empty() );
 					}
 				}
 				else
@@ -3368,7 +3423,7 @@ void epmem_shared_flip( epmem_shared_literal_pair *flip, const unsigned int list
 			{
 				epmem_shared_literal_group::iterator wme_p;
 				epmem_shared_literal_map::iterator lit_p;
-				
+
 				for ( wme_p=flip->lit->children->begin(); wme_p!= flip->lit->children->end(); wme_p++ )
 				{
 					for ( lit_p=wme_p->second->begin(); lit_p!=wme_p->second->end(); lit_p++ )
@@ -3460,9 +3515,9 @@ void _epmem_gm_sort_wmes_dfs( Symbol* id, tc_number tc, std::list< wme* >& order
 	wme* w;
 	Symbol* val;
 
-	for ( s=id->id.slots; s; s=s->next ) 
+	for ( s=id->id.slots; s; s=s->next )
 	{
-		for ( w=s->wmes; w; w=w->next ) 
+		for ( w=s->wmes; w; w=w->next )
 		{
 			ordered_wmes.push_back( w );
 			val = w->value;
@@ -3511,9 +3566,9 @@ inline bool epmem_gm_pair_satisfiable( epmem_shared_literal_pair* pair )
 inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assignment_map* id_assignments, epmem_shared_literal_set* used_ids, epmem_gm_sym_constraints* sym_constraints )
 {
 	bool return_val = false;
-	
+
 	Symbol* id = lit->shared_sym;
-	epmem_node_id assignment = lit->shared_id;	
+	epmem_node_id assignment = lit->shared_id;
 
 	{
 		// find if the value has already been assigned
@@ -3522,7 +3577,7 @@ inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assi
 		// if so, satisfied only if this literal agrees
 		if ( existing_assignment != EPMEM_NODEID_BAD )
 		{
-			return_val = ( existing_assignment == assignment );		
+			return_val = ( existing_assignment == assignment );
 		}
 		else
 		{
@@ -3533,19 +3588,19 @@ inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assi
 			{
 				bool good_state = true;
 				epmem_gm_sym_constraints::iterator existing_constraint;
-				
+
 				// and we can't violate constraints on the symbol
 				existing_constraint = sym_constraints->find( id );
 				if ( existing_constraint != sym_constraints->end() )
 				{
 					good_state = ( existing_constraint->second.find( assignment ) != existing_constraint->second.end() );
 				}
-				
+
 				// and no parents can violate constraints
 				if ( good_state )
 				{
-					epmem_shared_literal_set constraint_intersection;				
-					epmem_shared_incoming_ids_book::iterator incoming_p = lit->incoming->parents->begin();				
+					epmem_shared_literal_set constraint_intersection;
+					epmem_shared_incoming_ids_book::iterator incoming_p = lit->incoming->parents->begin();
 
 					while ( good_state && ( incoming_p != lit->incoming->parents->end() ) )
 					{
@@ -3558,11 +3613,11 @@ inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assi
 						}
 						else
 						{
-							// make sure the added constraint will allow for a valid parent identifier (i.e. intersection is not null)						
+							// make sure the added constraint will allow for a valid parent identifier (i.e. intersection is not null)
 							existing_constraint = sym_constraints->find( incoming_p->first );
 							if ( existing_constraint != sym_constraints->end() )
 							{
-								constraint_intersection.clear();							
+								constraint_intersection.clear();
 								set_intersection( existing_constraint->second.begin(), existing_constraint->second.end(), incoming_p->second->satisfactory->begin(), incoming_p->second->satisfactory->end(), inserter( constraint_intersection, constraint_intersection.begin() ) );
 
 								if ( !constraint_intersection.empty() )
@@ -3579,7 +3634,7 @@ inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assi
 							{
 								// if there are no existing constraints, just copy this literal's satisfying set for the edge
 								sym_constraints->insert( std::make_pair( incoming_p->first, (*incoming_p->second->satisfactory) ) );
-							}						
+							}
 						}
 
 						if ( good_state )
@@ -3591,7 +3646,7 @@ inline bool epmem_gm_assign_identifier( epmem_shared_literal* lit, epmem_gm_assi
 					// all constraints are satisfied!
 					// add assignment, add used id, (constraints are added above)
 					if ( good_state )
-					{					
+					{
 						id_assignments->insert( std::make_pair( id, assignment ) );
 						used_ids->insert( assignment );
 
@@ -3610,7 +3665,7 @@ inline bool epmem_gm_pair_satisfied( epmem_shared_literal_pair* pair, epmem_gm_a
 	if ( pair->wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 	{
 		return ( ( ( !pair->parent_lit ) || epmem_gm_assign_identifier( pair->parent_lit, id_assignments, used_ids, sym_constraints ) ) &&
-			epmem_gm_assign_identifier( pair->lit, id_assignments, used_ids, sym_constraints ) );
+				epmem_gm_assign_identifier( pair->lit, id_assignments, used_ids, sym_constraints ) );
 	}
 	else
 	{
@@ -3638,7 +3693,7 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_pair_vector::iterator wme
 		next_wme_p++;
 
 		// the pair call can modify these
-		// note: we only propogate if the rest of the wmes are satisfied	
+		// note: we only propogate if the rest of the wmes are satisfied
 		epmem_gm_assignment_map temp_id_assignments;
 		epmem_shared_literal_set temp_used_ids;
 		epmem_gm_sym_constraints temp_sym_constraints;
@@ -3646,11 +3701,11 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_pair_vector::iterator wme
 		while ( ( !return_val ) && ( pair_p != pairs->end() ) )
 		{
 			if ( epmem_gm_pair_satisfiable( (*pair_p) ) )
-			{			
+			{
 				temp_id_assignments = (*id_assignments);
 				temp_used_ids = (*used_ids);
 				temp_sym_constraints = (*sym_constraints);
-				
+
 				return_val = ( epmem_gm_pair_satisfied( (*pair_p), &( temp_id_assignments ), &( temp_used_ids ), &( temp_sym_constraints ) ) && epmem_gm_wme_satisfied( next_wme_p, end_wme_p, &( temp_id_assignments ) , &( temp_used_ids ), &( temp_sym_constraints ) ) );
 
 				if ( !return_val )
@@ -3663,12 +3718,12 @@ bool epmem_gm_wme_satisfied( epmem_shared_literal_pair_pair_vector::iterator wme
 				// a small optimization to prevent unnecessary copying
 				// and function calls
 				pair_p++;
-			}	
+			}
 		}
 
 		// if all went well, pass back the constraints
 		if ( return_val )
-		{		
+		{
 			(*id_assignments) = temp_id_assignments;
 			(*used_ids) = temp_used_ids;
 			(*sym_constraints) = temp_sym_constraints;
@@ -3701,7 +3756,7 @@ inline void epmem_add_literal_to_group( epmem_shared_literal_group *dest_group, 
 {
 	// refer to appropriate literal map (keyed by cue wme)
 	epmem_shared_literal_map **dest_map =& (*dest_group)[ literal_pair->wme ];
-	
+
 	// if literal map doesn't exist, create it
 	if ( !(*dest_map) )
 	{
@@ -3728,7 +3783,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->epmem_timers->query->start();
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	epmem_wme_list *wmes_query = NULL;
 	if ( query != NULL )
 	{
@@ -3755,7 +3810,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 		{
 			std::sort( prohibit.begin(), prohibit.end() );
 		}
-		
+
 		// perform query
 		{
 			// queries
@@ -3769,7 +3824,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 			std::list<epmem_shared_literal *> literals;
 
 			// pairs
-			epmem_shared_literal_pair_list pairs;						
+			epmem_shared_literal_pair_list pairs;
 
 			// graph match
 			bool graph_match = ( my_agent->epmem_params->graph_match->get_value() ==  soar_module::on );
@@ -3816,11 +3871,11 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 				epmem_node_id parent_id;
 				epmem_shared_literal *parent_literal;
 
-				// misc query				
+				// misc query
 				int position;
 
 				// misc
-				int i, k, m;				
+				int i, k, m;
 				epmem_wme_list::iterator w_p, w_p2;
 
 				// special variables for LTIs
@@ -3865,7 +3920,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 					epmem_wme_list *starter_wmes = NULL;
 
 					// query
-					new_cache_element = new epmem_wme_cache_element;					
+					new_cache_element = new epmem_wme_cache_element;
 					new_cache_element->wmes = wmes_query;
 					new_cache_element->parents = new epmem_wme_list;
 					new_cache_element->lits = new epmem_literal_mapping;
@@ -3873,7 +3928,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 					new_cache_element = NULL;
 
 					// negative query
-					new_cache_element = new epmem_wme_cache_element;					
+					new_cache_element = new epmem_wme_cache_element;
 					new_cache_element->wmes = wmes_neg_query;
 					new_cache_element->parents = new epmem_wme_list;
 					new_cache_element->lits = new epmem_literal_mapping;
@@ -3885,11 +3940,11 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 						switch ( i )
 						{
 							case EPMEM_NODE_POS:
-								starter_wmes = wmes_query;								
+								starter_wmes = wmes_query;
 								break;
 
 							case EPMEM_NODE_NEG:
-								starter_wmes = wmes_neg_query;								
+								starter_wmes = wmes_neg_query;
 								break;
 						}
 
@@ -3916,12 +3971,12 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 								cache_hit =& wme_cache[ parent_sym ];
 								if ( (*cache_hit) )
-								{									
+								{
 									(*cache_hit)->parents->push_back( parent_wme );
 								}
 								else
 								{
-									new_cache_element = new epmem_wme_cache_element;									
+									new_cache_element = new epmem_wme_cache_element;
 									new_cache_element->lits = new epmem_literal_mapping;
 
 									// look at children, if not lti
@@ -3933,20 +3988,20 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 									{
 										new_cache_element->wmes = new epmem_wme_list;
 									}
-									
+
 									// incoming
 									{
 										new_cache_element->parents = new epmem_wme_list;
 										new_cache_element->parents->push_back( parent_wme );
 									}
-									
+
 									// add to cache
 									wme_cache[ parent_sym ] = new_cache_element;
-									
+
 
 									if ( new_cache_element->wmes->size() )
 									{
-										for ( w_p=new_cache_element->wmes->begin(); w_p!=new_cache_element->wmes->end(); w_p++ )										
+										for ( w_p=new_cache_element->wmes->begin(); w_p!=new_cache_element->wmes->end(); w_p++ )
 										{
 											if ( (*w_p)->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 											{
@@ -4008,7 +4063,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 						if ( current_cache_element->wmes )
 						{
-							for ( w_p=current_cache_element->wmes->begin(); w_p!=current_cache_element->wmes->end(); w_p++ )							
+							for ( w_p=current_cache_element->wmes->begin(); w_p!=current_cache_element->wmes->end(); w_p++ )
 							{
 								// add to cue list
 								cue_wmes.insert( (*w_p) );
@@ -4045,7 +4100,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										// q0=? AND w=?
 										my_q->bind_int( 1, parent_id );
 										my_q->bind_int( 2, my_hash );
-										
+
 										while ( my_q->execute() == soar_module::row )
 										{
 											// get identity
@@ -4065,8 +4120,8 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 											else
 											{
 												// create new literal
-												new_literal = new epmem_shared_literal;											
-												
+												new_literal = new epmem_shared_literal;
+
 												// incoming edges
 												{
 													new_incoming = new epmem_shared_incoming_book;
@@ -4081,7 +4136,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 															if ( !(*new_incoming_wme_book) )
 															{
 																(*new_incoming_wme_book) = new epmem_shared_incoming_id_book;
-																
+
 																(*new_incoming_wme_book)->outgoing = new epmem_wme_list;
 																(*new_incoming_wme_book)->satisfactory = new epmem_shared_literal_set;
 															}
@@ -4093,7 +4148,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 													// book
 													{
 														new_incoming->book = new epmem_shared_incoming_book_map;
-													}												
+													}
 
 													new_literal->incoming = new_incoming;
 												}
@@ -4125,15 +4180,15 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 											// add literal to appropriate group
 											{
-												if ( parent_id != EPMEM_NODEID_ROOT )											
+												if ( parent_id != EPMEM_NODEID_ROOT )
 												{
 													// if this is parent's first child, init
 													if ( !parent_literal->children )
 													{
 														parent_literal->children = new epmem_shared_literal_group;
 													}
-													
-													epmem_add_literal_to_group( parent_literal->children, new_literal_pair );											
+
+													epmem_add_literal_to_group( parent_literal->children, new_literal_pair );
 												}
 											}
 
@@ -4144,17 +4199,17 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 												new_trigger_list = new epmem_shared_literal_pair_list;
 												trigger_lists.push_back( new_trigger_list );
 
-                                                // find the promotion time for an LTI
-                                                promotion_time = 0;
-                                                if ( (*w_p)->value->id.smem_lti )
-                                                {
-                                                    // get the promotion time of the LTI
-                                                    my_agent->epmem_stmts_graph->find_lti_promotion_time->bind_int( 1, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
-                                                    my_agent->epmem_stmts_graph->find_lti_promotion_time->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
-                                                    my_agent->epmem_stmts_graph->find_lti_promotion_time->execute();
-                                                    promotion_time = my_agent->epmem_stmts_graph->find_lti_promotion_time->column_int( 0 );
-                                                    my_agent->epmem_stmts_graph->find_lti_promotion_time->reinitialize();
-                                                }
+												// find the promotion time for an LTI
+												promotion_time = 0;
+												if ( (*w_p)->value->id.smem_lti )
+												{
+													// get the promotion time of the LTI
+													my_agent->epmem_stmts_graph->find_lti_promotion_time->bind_int( 1, static_cast<uint64_t>( (*w_p)->value->id.name_letter ) );
+													my_agent->epmem_stmts_graph->find_lti_promotion_time->bind_int( 2, static_cast<uint64_t>( (*w_p)->value->id.name_number ) );
+													my_agent->epmem_stmts_graph->find_lti_promotion_time->execute();
+													promotion_time = my_agent->epmem_stmts_graph->find_lti_promotion_time->column_int( 0 );
+													my_agent->epmem_stmts_graph->find_lti_promotion_time->reinitialize();
+												}
 
 												// add all respective queries
 												for ( k=EPMEM_RANGE_START; k<=EPMEM_RANGE_END; k++ )
@@ -4188,39 +4243,39 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 															new_stmt->prepare();
 
 															// add special query for promotion start point to query list (if start)
-                                                            if ( k == EPMEM_RANGE_START )
-                                                            {
+															if ( k == EPMEM_RANGE_START )
+															{
 																lti_start_stmt = my_agent->epmem_stmts_graph->pool_range_lti_start->request( new_timer );
-                                                                lti_start_stmt->prepare();
-					                                            assert( lti_start_stmt->get_status() == soar_module::ready );
-                                                                lti_start_stmt->bind_int( 1, promotion_time );
-                                                                lti_start_stmt->execute();
-                                                                new_query = new epmem_shared_query;
-                                                                new_query->val = lti_start_stmt->column_int( 0 );
-                                                                new_query->stmt = lti_start_stmt;
-                                                                new_query->unique_id = unique_identity;
-                                                                new_query->triggers = new_trigger_list;
-                                                                queries[ k ].push( new_query );
-                                                                new_query = NULL;
-                                                                lti_start_stmt = NULL;
-                                                            }
+																lti_start_stmt->prepare();
+																assert( lti_start_stmt->get_status() == soar_module::ready );
+																lti_start_stmt->bind_int( 1, promotion_time );
+																lti_start_stmt->execute();
+																new_query = new epmem_shared_query;
+																new_query->val = lti_start_stmt->column_int( 0 );
+																new_query->stmt = lti_start_stmt;
+																new_query->unique_id = unique_identity;
+																new_query->triggers = new_trigger_list;
+																queries[ k ].push( new_query );
+																new_query = NULL;
+																lti_start_stmt = NULL;
+															}
 														}
 														else
 														{
 															new_stmt = my_agent->epmem_stmts_graph->pool_range_queries[ EPMEM_RIT_STATE_EDGE ][ k ][ m ]->request( new_timer );
 															new_stmt->prepare();
 														}
-                                                        assert( new_stmt->get_status() == soar_module::ready );
+														assert( new_stmt->get_status() == soar_module::ready );
 
 														if ( ( m == EPMEM_RANGE_NOW ) && ( k == EPMEM_RANGE_END ) )
 														{
 															new_stmt->bind_int( position++, time_now );
 														}
-                                                        if ( (promotion_time > 0) && ( ( k != EPMEM_RANGE_END ) || ( m == EPMEM_RANGE_EP ) ) )
+														if ( (promotion_time > 0) && ( ( k != EPMEM_RANGE_END ) || ( m == EPMEM_RANGE_EP ) ) )
 														{
 															new_stmt->bind_int( position++, promotion_time );
 														}
-														new_stmt->bind_int( position, unique_identity );													
+														new_stmt->bind_int( position, unique_identity );
 
 														// take first step
 														if ( new_stmt->execute() == soar_module::row )
@@ -4292,7 +4347,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 									// parent_id=? AND attr=? AND value=?
 									my_agent->epmem_stmts_graph->find_node_unique->bind_int( 1, parent_id );
 									my_agent->epmem_stmts_graph->find_node_unique->bind_int( 2, my_hash );
-									my_agent->epmem_stmts_graph->find_node_unique->bind_int( 3, my_hash2 );									
+									my_agent->epmem_stmts_graph->find_node_unique->bind_int( 3, my_hash2 );
 
 									if ( my_agent->epmem_stmts_graph->find_node_unique->execute() == soar_module::row )
 									{
@@ -4303,13 +4358,13 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										new_literal = new epmem_shared_literal;
 
 										new_literal->ct = 0;
-										new_literal->max = EPMEM_DNF;										
+										new_literal->max = EPMEM_DNF;
 										new_literal->incoming = NULL;
 
 										new_literal->shared_id = EPMEM_NODEID_ROOT;
 										new_literal->shared_sym = NULL;
 
-										new_literal->wme_kids = 0;										
+										new_literal->wme_kids = 0;
 										new_literal->children = NULL;
 
 										literals.push_back( new_literal );
@@ -4321,8 +4376,8 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										new_literal_pair->q0 = parent_id;
 										new_literal_pair->q1 = 0;
 										new_literal_pair->wme = (*w_p);
-										pairs.push_back( new_literal_pair );										
-										
+										pairs.push_back( new_literal_pair );
+
 										// add to appropriate group
 										{
 											if ( parent_id == EPMEM_NODEID_ROOT )
@@ -4334,7 +4389,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 												// if this is parent's first child, init
 												if ( !parent_literal->children )
 												{
-													parent_literal->children = new epmem_shared_literal_group;												
+													parent_literal->children = new epmem_shared_literal_group;
 												}
 
 												epmem_add_literal_to_group( parent_literal->children, new_literal_pair );
@@ -4395,7 +4450,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 													{
 														new_stmt->bind_int( position++, time_now );
 													}
-													new_stmt->bind_int( position, unique_identity );													
+													new_stmt->bind_int( position, unique_identity );
 
 													// take first step
 													if ( new_stmt->execute() == soar_module::row )
@@ -4424,7 +4479,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 											(*query_triggers) = new_trigger_list;
 											new_trigger_list = NULL;
-										}										
+										}
 										(*query_triggers)->push_back( new_literal_pair );
 
 										new_literal = NULL;
@@ -4495,6 +4550,10 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 			uint64_t king_cardinality = 0;
 			bool king_graph_match = false;
 			epmem_gm_assignment_map king_assignments;
+
+#ifdef EPMEM_EXPERIMENT
+			epmem_episodes_searched = 0;
+#endif
 
 			// perform range search if any leaf wmes
 			if ( ( level > 1 ) && cue_size && !matches.empty() )
@@ -4610,6 +4669,10 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 								xml_generate_warning( my_agent, buf );
 							}
 
+#ifdef EPMEM_EXPERIMENT
+							epmem_episodes_searched++;
+#endif
+
 							if ( graph_match )
 							{
 								// policy:
@@ -4637,9 +4700,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										{
 											epmem_param_container::gm_ordering_choices gm_ordering = my_agent->epmem_params->gm_ordering->get_value();
 											epmem_shared_literal_pair_map::iterator it;
-											
+
 											if ( ( gm_ordering == epmem_param_container::gm_order_undefined ) ||
-												 ( gm_ordering == epmem_param_container::gm_order_mcv ) )
+													( gm_ordering == epmem_param_container::gm_order_mcv ) )
 											{
 												for ( it=gm_pairs->begin(); it!=gm_pairs->end(); it++ )
 												{
@@ -4676,12 +4739,12 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										////////////////////////////////////////////////////////////////////////////
 
 										if ( ( king_id == EPMEM_MEMID_NONE ) ||
-											 ( current_score > king_score ) ||
-											 ( graph_match_result ) )
+												( current_score > king_score ) ||
+												( graph_match_result ) )
 										{
 											king_id = current_valid_end;
 											king_score = current_score;
-											king_cardinality = sum_ct;											
+											king_cardinality = sum_ct;
 											king_assignments = current_assignments;
 
 											if ( graph_match_result )
@@ -4698,7 +4761,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 												print( my_agent, buf );
 												xml_generate_warning( my_agent, buf );
-											}											
+											}
 										}
 									}
 									else
@@ -4707,7 +4770,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 										{
 											king_id = current_valid_end;
 											king_score = current_score;
-											king_cardinality = sum_ct;											
+											king_cardinality = sum_ct;
 
 											// provide trace output
 											if ( my_agent->sysparams[ TRACE_EPMEM_SYSPARAM ] )
@@ -4786,9 +4849,9 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 					if ( (*literal_p)->children )
 					{
 						epmem_clear_literal_group( (*literal_p)->children );
-						
+
 						delete (*literal_p)->children;
-					}					
+					}
 
 					if ( (*literal_p)->incoming )
 					{
@@ -4811,15 +4874,15 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 								for ( incoming_wme_p=incoming_book_p->second->begin(); incoming_wme_p!=incoming_book_p->second->end(); incoming_wme_p++ )
 								{
 									delete incoming_wme_p->second->cts;
-									
+
 									delete incoming_wme_p->second;
 								}
-								
+
 								delete incoming_book_p->second;
 							}
 							delete (*literal_p)->incoming->book;
 						}
-						
+
 						delete (*literal_p)->incoming;
 					}
 
@@ -4891,7 +4954,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 
 				// match score
 				my_meta = make_float_constant( my_agent, king_score );
-				epmem_buffer_add_wme( meta_wmes, state->id.epmem_result_header, my_agent->epmem_sym_match_score, my_meta );				
+				epmem_buffer_add_wme( meta_wmes, state->id.epmem_result_header, my_agent->epmem_sym_match_score, my_meta );
 				symbol_remove_ref( my_agent, my_meta );
 
 				// cue-size
@@ -4934,7 +4997,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 							// create the node
 							my_meta2 = make_new_identifier( my_agent, 'N', my_meta->id.level );
 							epmem_buffer_add_wme( meta_wmes, my_meta, my_agent->epmem_sym_graph_match_mapping_node, my_meta2 );
-							symbol_remove_ref( my_agent, my_meta2 );							
+							symbol_remove_ref( my_agent, my_meta2 );
 
 							// point to the cue identifier
 							epmem_buffer_add_wme( meta_wmes, my_meta2, my_agent->epmem_sym_graph_match_mapping_cue, c_p->first );
@@ -4973,7 +5036,7 @@ void epmem_process_query( agent *my_agent, Symbol *state, Symbol *query, Symbol 
 							}
 						}
 					}
-					
+
 					delete my_mapping;
 					delete my_mapping_nodes;
 				}
@@ -5046,8 +5109,8 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 	// if bad memory, bail
 	buf->clear();
 	if ( ( memory_id == EPMEM_MEMID_NONE ) ||
-		 !epmem_valid_episode( my_agent, memory_id ) )
-	{		
+			!epmem_valid_episode( my_agent, memory_id ) )
+	{
 		return;
 	}
 
@@ -5060,13 +5123,13 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 		double temp_d;
 		int64_t temp_i;
 
-		my_q = my_agent->epmem_stmts_graph->get_edges;		
+		my_q = my_agent->epmem_stmts_graph->get_edges;
 		{
 			epmem_node_id q0;
 			epmem_node_id q1;
 			int64_t w_type;
 			bool val_is_short_term;
-			
+
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
 
 			// query for edges
@@ -5117,7 +5180,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 
 				ep[ q0 ][ temp_s ].push_back( temp_s2 );
 			}
-			my_q->reinitialize();			
+			my_q->reinitialize();
 			epmem_rit_clear_left_right( my_agent );
 		}
 
@@ -5125,7 +5188,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 		{
 			epmem_node_id parent_id;
 			int64_t attr_type, value_type;
-			
+
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
 
 			my_q->bind_int( 1, memory_id );
@@ -5174,7 +5237,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 
 				ep[ parent_id ][ temp_s ].push_back( temp_s2 );
 			}
-			my_q->reinitialize();			
+			my_q->reinitialize();
 			epmem_rit_clear_left_right( my_agent );
 		}
 	}
@@ -5230,8 +5293,8 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 	// if bad memory, bail
 	buf->clear();
 	if ( ( memory_id == EPMEM_MEMID_NONE ) ||
-		 !epmem_valid_episode( my_agent, memory_id ) )
-	{		
+			!epmem_valid_episode( my_agent, memory_id ) )
+	{
 		return;
 	}
 
@@ -5245,7 +5308,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 		soar_module::sqlite_statement *my_q;
 
 		// first identifiers (i.e. reconstruct)
-		my_q = my_agent->epmem_stmts_graph->get_edges;		
+		my_q = my_agent->epmem_stmts_graph->get_edges;
 		{
 			// for printing
 			std::map< epmem_node_id, std::string > stis;
@@ -5253,11 +5316,11 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			std::list< std::string > edges;
 			std::map< epmem_node_id, std::string >::iterator sti_p;
 			std::map< epmem_node_id, std::pair< std::string, std::string > >::iterator lti_p;
-			
+
 			// relates to finite automata: q1 = d(q0, w)
 			epmem_node_id q0; // id
 			epmem_node_id q1; // attribute
-			int64_t w_type; // we support any constant attribute symbol			
+			int64_t w_type; // we support any constant attribute symbol
 			std::string temp, temp2, temp3, temp4;
 			double temp_d;
 			int64_t temp_i;
@@ -5280,7 +5343,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			my_q->bind_int( 4, memory_id );
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
-			{				
+			{
 				// q0, w, q1, w_type, letter, num
 				q0 = my_q->column_int( 0 );
 				q1 = my_q->column_int( 2 );
@@ -5310,7 +5373,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 					lti_p = ltis.find( q1 );
 
 					if ( lti_p == ltis.end() )
-					{						
+					{
 						// "L#"
 						val_letter = static_cast<char>( my_q->column_int( 4 ) );
 						to_string( val_letter, temp4 );
@@ -5323,7 +5386,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				}
 
 				// " -> ID_Q1"
-				temp.append( " -> " );				
+				temp.append( " -> " );
 				temp.append( temp3 );
 
 				// " [ label="w" ];\n"
@@ -5349,7 +5412,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 
 				edges.push_back( temp );
 			}
-			my_q->reinitialize();			
+			my_q->reinitialize();
 			epmem_rit_clear_left_right( my_agent );
 
 			// identifiers
@@ -5436,12 +5499,12 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				{
 					case INT_CONSTANT_SYMBOL_TYPE:
 						temp_i = static_cast<int64_t>( my_q->column_int( 2 ) );
-						to_string( temp_i, temp2 );						
+						to_string( temp_i, temp2 );
 						break;
 
 					case FLOAT_CONSTANT_SYMBOL_TYPE:
 						temp_d = my_q->column_double( 2 );
-						to_string( temp_d, temp2 );						
+						to_string( temp_d, temp2 );
 						break;
 
 					case SYM_CONSTANT_SYMBOL_TYPE:
@@ -5463,16 +5526,16 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				{
 					case INT_CONSTANT_SYMBOL_TYPE:
 						temp_i = static_cast<int64_t>( my_q->column_int( 3 ) );
-						to_string( temp_i, temp2 );						
+						to_string( temp_i, temp2 );
 						break;
 
 					case FLOAT_CONSTANT_SYMBOL_TYPE:
 						temp_d = my_q->column_double( 3 );
-						to_string( temp_d, temp2 );						
+						to_string( temp_d, temp2 );
 						break;
 
 					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 3 ) ) ) );						
+						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 3 ) ) ) );
 						break;
 				}
 
@@ -5480,7 +5543,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				temp.append( "\" ];\n" );
 
 				consts.push_back( temp );
-				
+
 			}
 			my_q->reinitialize();
 			epmem_rit_clear_left_right( my_agent );
@@ -5499,7 +5562,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 
 			// edges
 			{
-				std::list< std::string >::iterator e_p;				
+				std::list< std::string >::iterator e_p;
 
 				for ( e_p=edges.begin(); e_p!=edges.end(); e_p++ )
 				{
@@ -5591,7 +5654,7 @@ bool epmem_consider_new_episode( agent *my_agent )
 void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, bool& good_cue, int& path, epmem_time_id& retrieve, Symbol*& next, Symbol*& previous, Symbol*& query, Symbol*& neg_query, epmem_time_list& prohibit, epmem_time_id& before, epmem_time_id& after, soar_module::wme_set& cue_wmes )
 {
 	cue_wmes.clear();
-	
+
 	retrieve = EPMEM_MEMID_NONE;
 	next = NULL;
 	previous = NULL;
@@ -5602,20 +5665,20 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 	after = EPMEM_MEMID_NONE;
 	good_cue = true;
 	path = 0;
-	
+
 	for ( epmem_wme_list::iterator w_p=cmds->begin(); w_p!=cmds->end(); w_p++ )
 	{
 		cue_wmes.insert( (*w_p) );
-		
+
 		if ( good_cue )
 		{
 			// collect information about known commands
 			if ( (*w_p)->attr == my_agent->epmem_sym_retrieve )
 			{
 				if ( ( (*w_p)->value->ic.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) &&
-					 ( path == 0 ) &&
-					 ( (*w_p)->value->ic.value > 0 ) )
-				{							
+						( path == 0 ) &&
+						( (*w_p)->value->ic.value > 0 ) )
+				{
 					retrieve = (*w_p)->value->ic.value;
 					path = 1;
 				}
@@ -5627,8 +5690,8 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_next )
 			{
 				if ( ( (*w_p)->value->id.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-					 ( path == 0 ) )
-				{							
+						( path == 0 ) )
+				{
 					next = (*w_p)->value;
 					path = 2;
 				}
@@ -5640,7 +5703,7 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_prev )
 			{
 				if ( ( (*w_p)->value->id.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-					 ( path == 0 ) )
+						( path == 0 ) )
 				{
 					previous = (*w_p)->value;
 					path = 2;
@@ -5653,8 +5716,8 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_query )
 			{
 				if ( ( (*w_p)->value->id.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-					 ( ( path == 0 ) || ( path == 3 ) ) &&
-					 ( query == NULL ) )
+						( ( path == 0 ) || ( path == 3 ) ) &&
+						( query == NULL ) )
 
 				{
 					query = (*w_p)->value;
@@ -5668,8 +5731,8 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_negquery )
 			{
 				if ( ( (*w_p)->value->id.common_symbol_info.symbol_type == IDENTIFIER_SYMBOL_TYPE ) &&
-					 ( ( path == 0 ) || ( path == 3 ) ) &&
-					 ( neg_query == NULL ) )
+						( ( path == 0 ) || ( path == 3 ) ) &&
+						( neg_query == NULL ) )
 
 				{
 					neg_query = (*w_p)->value;
@@ -5683,7 +5746,7 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_before )
 			{
 				if ( ( (*w_p)->value->ic.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) &&
-					 ( ( path == 0 ) || ( path == 3 ) ) )
+						( ( path == 0 ) || ( path == 3 ) ) )
 				{
 					before = (*w_p)->value->ic.value;
 					path = 3;
@@ -5696,7 +5759,7 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_after )
 			{
 				if ( ( (*w_p)->value->ic.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) &&
-					 ( ( path == 0 ) || ( path == 3 ) ) )
+						( ( path == 0 ) || ( path == 3 ) ) )
 				{
 					after = (*w_p)->value->ic.value;
 					path = 3;
@@ -5709,7 +5772,7 @@ void inline _epmem_respond_to_cmd_parse( agent* my_agent, epmem_wme_list* cmds, 
 			else if ( (*w_p)->attr == my_agent->epmem_sym_prohibit )
 			{
 				if ( ( (*w_p)->value->ic.common_symbol_info.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) &&
-					 ( ( path == 0 ) || ( path == 3 ) ) )
+						( ( path == 0 ) || ( path == 3 ) ) )
 				{
 					prohibit.push_back( (*w_p)->value->ic.value );
 					path = 3;
@@ -5779,7 +5842,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 	epmem_time_id before, after;
 	bool good_cue;
 	int path;
-	
+
 	uint64_t wme_count;
 	bool new_cue;
 
@@ -5790,15 +5853,15 @@ void epmem_respond_to_cmd( agent *my_agent )
 		////////////////////////////////////////////////////////////////////////////
 		my_agent->epmem_timers->api->start();
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		// make sure this state has had some sort of change to the cmd
 		new_cue = false;
 		wme_count = 0;
 		cmds = NULL;
-		{			
+		{
 			tc_number tc = get_new_tc_number( my_agent );
 			std::queue<Symbol *> syms;
-			Symbol *parent_sym;			
+			Symbol *parent_sym;
 
 			// initialize BFS at command
 			syms.push( state->id.epmem_cmd_header );
@@ -5808,7 +5871,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 				// get state
 				parent_sym = syms.front();
 				syms.pop();
-			
+
 				// get children of the current identifier
 				wmes = epmem_get_augs_of_id( parent_sym, tc );
 				{
@@ -5827,7 +5890,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 							syms.push( (*w_p)->value );
 						}
 					}
-					
+
 					// free space from aug list
 					if ( cmds == NIL )
 					{
@@ -5859,7 +5922,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 		// a command is issued if the cue is new
 		// and there is something on the cue
 		if ( new_cue && wme_count )
-		{			
+		{
 			_epmem_respond_to_cmd_parse( my_agent, cmds, good_cue, path, retrieve, next, previous, query, neg_query, prohibit, before, after, cue_wmes );
 
 			////////////////////////////////////////////////////////////////////////////
@@ -5883,18 +5946,18 @@ void epmem_respond_to_cmd( agent *my_agent )
 					if ( next )
 					{
 						epmem_install_memory( my_agent, state, epmem_next_episode( my_agent, state->id.epmem_info->last_memory ), meta_wmes, retrieval_wmes );
-						
+
 						// add one to the next stat
 						my_agent->epmem_stats->nexts->set_value( my_agent->epmem_stats->nexts->get_value() + 1 );
 					}
 					else
 					{
 						epmem_install_memory( my_agent, state, epmem_previous_episode( my_agent, state->id.epmem_info->last_memory ), meta_wmes, retrieval_wmes );
-						
+
 						// add one to the prev stat
 						my_agent->epmem_stats->prevs->set_value( my_agent->epmem_stats->prevs->get_value() + 1 );
 					}
-					
+
 					if ( state->id.epmem_info->last_memory == EPMEM_MEMID_NONE )
 					{
 						epmem_buffer_add_wme( meta_wmes, state->id.epmem_result_header, my_agent->epmem_sym_failure, ( ( next )?( next ):( previous ) ) );
@@ -5908,14 +5971,14 @@ void epmem_respond_to_cmd( agent *my_agent )
 				else if ( path == 3 )
 				{
 					epmem_process_query( my_agent, state, query, neg_query, prohibit, before, after, cue_wmes, meta_wmes, retrieval_wmes );
-					
+
 					// add one to the cbr stat
 					my_agent->epmem_stats->cbr->set_value( my_agent->epmem_stats->cbr->get_value() + 1 );
 				}
 			}
 			else
 			{
-				epmem_buffer_add_wme( meta_wmes, state->id.epmem_result_header, my_agent->epmem_sym_status, my_agent->epmem_sym_bad_cmd );			
+				epmem_buffer_add_wme( meta_wmes, state->id.epmem_result_header, my_agent->epmem_sym_status, my_agent->epmem_sym_bad_cmd );
 			}
 
 			// clear prohibit list
@@ -5935,7 +5998,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 						symbol_remove_ref( my_agent, (*mw_it)->id );
 						symbol_remove_ref( my_agent, (*mw_it)->attr );
 						symbol_remove_ref( my_agent, (*mw_it)->value );
-						
+
 						delete (*mw_it);
 					}
 					retrieval_wmes.clear();
@@ -5945,7 +6008,7 @@ void epmem_respond_to_cmd( agent *my_agent )
 						symbol_remove_ref( my_agent, (*mw_it)->id );
 						symbol_remove_ref( my_agent, (*mw_it)->attr );
 						symbol_remove_ref( my_agent, (*mw_it)->value );
-						
+
 						delete (*mw_it);
 					}
 					meta_wmes.clear();
@@ -5979,9 +6042,9 @@ void epmem_respond_to_cmd( agent *my_agent )
 		////////////////////////////////////////////////////////////////////////////
 		my_agent->epmem_timers->wm_phase->start();
 		////////////////////////////////////////////////////////////////////////////
-		
+
 		do_working_memory_phase( my_agent );
-		
+
 		////////////////////////////////////////////////////////////////////////////
 		my_agent->epmem_timers->wm_phase->stop();
 		////////////////////////////////////////////////////////////////////////////
@@ -6002,12 +6065,24 @@ void inline _epmem_exp( agent* my_agent )
 	//               <fs> ^|key| |value|
 	//            ^commands <cmds>
 	//               <cmds> ^|label| <cmd>
+	
+	if ( !epmem_exp_timer )
+	{
+		epmem_exp_timer = new soar_module::timer( "exp", my_agent, soar_module::timer::zero, new soar_module::predicate<soar_module::timer::timer_level>(), false );
+	}
 
-	clock_t c1;
+	if ( !epmem_exp_timer )
+	{
+		epmem_exp_timer = new soar_module::timer( "exp", my_agent, soar_module::timer::zero, new soar_module::predicate<soar_module::timer::timer_level>(), false );
+	}
 
-	c1 = clock();
+	double c1;
+
+	epmem_exp_timer->reset();
+	epmem_exp_timer->start();
 	bool new_episode = epmem_consider_new_episode( my_agent );
-	c1 = ( clock() - c1 );
+	epmem_exp_timer->stop();
+	c1 = epmem_exp_timer->value();
 
 	if ( new_episode )
 	{
@@ -6024,7 +6099,7 @@ void inline _epmem_exp( agent* my_agent )
 		if ( queries_slot )
 		{
 			wme* queries_wme = queries_slot->wmes;
-			
+
 			if ( queries_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 			{
 				Symbol* queries_id = queries_wme->value;
@@ -6045,9 +6120,9 @@ void inline _epmem_exp( agent* my_agent )
 					wme* commands_wme = commands_slot->wmes;
 
 					if ( ( reps_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) &&
-						 ( output_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) && 
-						 ( format_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) &&
-						 ( commands_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) )
+							( output_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) &&
+							( format_wme->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) &&
+							( commands_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE ) )
 					{
 						int64_t reps = reps_wme->value->ic.value;
 						int64_t mod = ( ( mod_wme && ( mod_wme->value->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) )?( mod_wme->value->ic.value ):(1) );
@@ -6056,7 +6131,7 @@ void inline _epmem_exp( agent* my_agent )
 						std::list< std::pair< std::string, std::string > > output_contents;
 						std::string temp_str, temp_str2;
 						std::set< std::string > cmd_names;
-						
+
 						std::map< std::string, std::string > features;
 						if ( features_wme && features_wme->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
 						{
@@ -6065,7 +6140,7 @@ void inline _epmem_exp( agent* my_agent )
 								for ( wme* w=s->wmes; w; w=w->next )
 								{
 									if ( ( w->attr->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) &&
-										 ( w->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) )
+											( w->value->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) )
 									{
 										features[ w->attr->sc.name ] = w->value->sc.name;
 									}
@@ -6089,7 +6164,7 @@ void inline _epmem_exp( agent* my_agent )
 									to_string( my_agent->d_cycle_count, temp_str );
 									output_contents.push_back( std::make_pair< std::string, std::string >( "dc", temp_str ) );
 								}
-								
+
 								// episode number
 								{
 									to_string( my_agent->epmem_stats->time->get_value()-1, temp_str );
@@ -6119,10 +6194,19 @@ void inline _epmem_exp( agent* my_agent )
 									epmem_exp_state[ exp_state_wm_removes ] = static_cast< int64_t >( my_agent->wme_removal_count );
 								}
 
+								// dc wme add/removes
+								{
+									to_string( epmem_dc_wme_adds, temp_str );
+									output_contents.push_back( std::make_pair< std::string, std::string >( "dcadds", temp_str ) );
+
+									to_string( epmem_dc_wme_removes, temp_str );
+									output_contents.push_back( std::make_pair< std::string, std::string >( "dcremoves", temp_str ) );
+								}
+
 								// sqlite memory
 								{
 									int64_t sqlite_mem = my_agent->epmem_stats->mem_usage->get_value();
-									
+
 									to_string( ( sqlite_mem - epmem_exp_state[ exp_state_sqlite_mem ] ), temp_str );
 									output_contents.push_back( std::make_pair< std::string, std::string >( "sqlitememadd", temp_str ) );
 									epmem_exp_state[ exp_state_sqlite_mem ] = sqlite_mem;
@@ -6130,11 +6214,11 @@ void inline _epmem_exp( agent* my_agent )
 									to_string( sqlite_mem, temp_str );
 									output_contents.push_back( std::make_pair< std::string, std::string >( "sqlitememcurrent", temp_str ) );
 								}
-								
+
 								// storage time in seconds
 								{
-									to_string( static_cast<double>( static_cast<double>( c1 ) / static_cast<double>( CLOCKS_PER_SEC ) ), temp_str );
-									
+									to_string( c1, temp_str );
+
 									output_contents.push_back( std::make_pair< std::string, std::string >( "storage", temp_str ) );
 									cmd_names.insert( "storage" );
 								}
@@ -6143,6 +6227,9 @@ void inline _epmem_exp( agent* my_agent )
 								for ( slot* s=commands_wme->value->id.slots; s; s=s->next )
 								{
 									output_contents.push_back( std::make_pair< std::string, std::string >( s->attr->sc.name, "" ) );
+									std::string searched = "numsearched";
+									searched.append(s->attr->sc.name);
+									output_contents.push_back( std::make_pair< std::string, std::string >( searched , "" ) );
 								}
 							}
 
@@ -6185,7 +6272,7 @@ void inline _epmem_exp( agent* my_agent )
 								int path;
 
 								//
-								
+
 								for ( slot* s=commands_wme->value->id.slots; s; s=s->next )
 								{
 									if ( s->wmes->value->common.symbol_type == IDENTIFIER_SYMBOL_TYPE )
@@ -6199,11 +6286,12 @@ void inline _epmem_exp( agent* my_agent )
 										if ( good_cue && ( path == 3 ) )
 										{
 											// execute lots of times
-											clock_t c_total = 0;
+											double c_total = 0;
 											{
-												c1 = clock();
+												epmem_exp_timer->reset();
+												epmem_exp_timer->start();
 												for ( int64_t i=1; i<=reps; i++ )
-												{												
+												{
 													epmem_process_query( my_agent, my_agent->top_goal, query, neg_query, prohibit, before, after, cue_wmes, meta_wmes, retrieval_wmes, 2 );
 
 													if ( !retrieval_wmes.empty() || !meta_wmes.empty() )
@@ -6215,7 +6303,7 @@ void inline _epmem_exp( agent* my_agent )
 															symbol_remove_ref( my_agent, (*mw_it)->id );
 															symbol_remove_ref( my_agent, (*mw_it)->attr );
 															symbol_remove_ref( my_agent, (*mw_it)->value );
-															
+
 															delete (*mw_it);
 														}
 														retrieval_wmes.clear();
@@ -6225,27 +6313,31 @@ void inline _epmem_exp( agent* my_agent )
 															symbol_remove_ref( my_agent, (*mw_it)->id );
 															symbol_remove_ref( my_agent, (*mw_it)->attr );
 															symbol_remove_ref( my_agent, (*mw_it)->value );
-															
+
 															delete (*mw_it);
 														}
 														meta_wmes.clear();
 													}
 												}
-												c_total += ( clock() - c1 );
+												epmem_exp_timer->stop();
+												c_total = epmem_exp_timer->value();
 											}
 
 											// update results
 											{
-												to_string( static_cast<double>( static_cast<double>( c_total ) / static_cast<double>( CLOCKS_PER_SEC ) ), temp_str );
+												to_string( c_total, temp_str );
 
 												for ( std::list< std::pair< std::string, std::string > >::iterator oc_it=output_contents.begin(); oc_it!=output_contents.end(); oc_it++ )
 												{
 													if ( oc_it->first.compare( s->attr->sc.name ) == 0 )
 													{
 														oc_it->second.assign( temp_str );
+														oc_it++;
+														to_string( epmem_episodes_searched , temp_str );
+														oc_it->second.assign( temp_str );
 													}
 												}
-												
+
 												cmd_names.insert( s->attr->sc.name );
 											}
 										}
@@ -6281,11 +6373,15 @@ void inline _epmem_exp( agent* my_agent )
 									{
 										if ( cmd_names.find( it->first ) == cmd_names.end() )
 										{
+											if ( it->first.substr( 0, 11 ).compare( "numsearched" ) == 0 )
+											{
+												continue;
+											}
+
 											if ( it != output_contents.begin() )
 											{
 												(*epmem_exp_output) << " ";
 											}
-											
 											if ( ( it->first.compare( "reps" ) == 0 ) && ( c_it->compare( "storage" ) == 0 ) )
 											{
 												(*epmem_exp_output) << it->first << "=" << "1";
@@ -6298,9 +6394,17 @@ void inline _epmem_exp( agent* my_agent )
 										else if ( c_it->compare( it->first ) == 0 )
 										{
 											(*epmem_exp_output) << " command=" << it->first << " totalsec=" << it->second;
+											if ( it->first.compare( "storage" ) == 0 ) {
+												(*epmem_exp_output) << " numsearched=0";
+												break;
+											} else {
+												it++;
+												(*epmem_exp_output) << " numsearched=" << it->second;
+												break;
+											}
 										}
 									}
-									
+
 									(*epmem_exp_output) << std::endl;
 								}
 							}
@@ -6330,7 +6434,7 @@ void inline _epmem_exp( agent* my_agent )
  **************************************************************************/
 void epmem_go( agent *my_agent )
 {
-	
+
 	my_agent->epmem_timers->total->start();
 
 #ifndef EPMEM_EXPERIMENT
@@ -6352,7 +6456,7 @@ void epmem_go( agent *my_agent )
 bool epmem_backup_db( agent* my_agent, const char* file_name, std::string *err )
 {
 	bool return_val = false;
-	
+
 	if ( my_agent->epmem_db->get_status() == soar_module::connected )
 	{
 		if ( my_agent->epmem_params->lazy_commit->get_value() == soar_module::on )
