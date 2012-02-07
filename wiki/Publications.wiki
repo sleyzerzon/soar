@@ -17,11 +17,11 @@ Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/n
 
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ Proceedings of the 2nd Symposium on Human Memory for Artificial Agents, AISB, 25-29. York, England.
 
-Gorski, N. A., Laird, J. E. (2011) [http://www.sciencedirect.com/science?_ob=MImg&_imagekey=B6W6C-50R6KGK-1-1&_cdi=6595&_user=99318&_pii=S1389041710000537&_origin=browse&_zone=rslt_list_item&_coverDate=06%2F30%2F2011&_sk=999879997&wchp=dGLzVlb-zSkzS&md5=4e9b6c793735b716156e24816ce49574&ie=/sdarticle.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
+Gorski, N. A., Laird, J. E. (2011) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/GorskiLaird_CogSysRes10.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
 
 Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of the 20th Behavior Representation in Modeling & Simulation Conference, 33-40. Sundance, UT.
 
-Wang, Y. (2011). _[http://www.eecs.umich.edu/~yongjiaw/WangThesis.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
+Wang, Y. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/yongjiaw_1.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
 Xu, J. Z., Laird, J. E. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
 
@@ -37,9 +37,9 @@ Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemak
 
 Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ICCM-final.pdf Using Diverse Cognitive Mechanisms for Action Modeling]_. Proceedings of the Tenth International Conference on Cognitive Modeling, Philadelphia, PA.
 
-Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangIAT10.pdf Efficient Value Function Approximation with Unsupervised Hierarchical Categorization for a Reinforcement Learning Agent.]_ International Conference on Intelligent Agent Technology (IAT-10), Toronto. (Best Paper Award Nomination)
+Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/4191b197.pdf Efficient Value Function Approximation with Unsupervised Hierarchical Categorization for a Reinforcement Learning Agent.]_ International Conference on Intelligent Agent Technology (IAT-10), Toronto. (Best Paper Award Nomination)
 
-Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~yongjiaw/WangICCM10.pdf A Computational Model of Functional Category Learning in a Cognitive Architecture.]_ Proceedings of the Tenth International Conference on Cognitive Modeling (ICCM-10), Philadelphia, PA.
+Wang, Y., Laird, J. E. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Wang.pdf A Computational Model of Functional Category Learning in a Cognitive Architecture.]_ Proceedings of the Tenth International Conference on Cognitive Modeling (ICCM-10), Philadelphia, PA.
 
 Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute_aaai2010.pdf Using Imagery to Simplify Perceptual Abstraction in Reinforcement Learning Agents]_. Proceedings of the Twenty-Fourth AAAI Conference on Artificial Intelligence (AAAI-10), Atlanta, Georgia
 
