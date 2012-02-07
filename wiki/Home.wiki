@@ -1,7 +1,8 @@
 #sidebar TableOfContents
 
-This is the wiki for the '''Soar''' general cognitive architecture.  It serves as living documentation on '''Soar''' as it evolves with ongoing research. See the sidebar for a table of interesting links.
+This is the Wiki for the *Soar* general cognitive architecture.  It serves as living documentation on 
+*Soar* as it evolves with ongoing research. See the sidebar for a table of interesting links.
 
-'''Soar''' is a general cognitive architecture for developing systems that exhibit intelligent behavior. Researchers all over the world, both from the fields of artificial intelligence and cognitive science, are using '''Soar''' for a variety of tasks. It has been in use since 1983, evolving through many different versions to where it is now '''Soar''', Version 9.
+*Soar* is a general cognitive architecture for developing systems that exhibit intelligent behavior. Researchers all over the world, both from the fields of artificial intelligence and cognitive science, are using *Soar* for a variety of tasks. It has been in use since 1983, evolving through many different versions to where it is now *Soar*, Version 9.
 
-For more general information about '''Soar''', see [http://sitemaker.umich.edu/soar the Soar home page].
+For more general information about *Soar*, see [http://sitemaker.umich.edu/soar the Soar home page].
