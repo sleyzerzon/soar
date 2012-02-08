@@ -1,10 +1,10 @@
 #summary Frequently Asked Questions
 #labels Phase-Support,Phase-Implementation
 
-[http://acs.ist.psu.edu/soar-faq/soar-faq.html Soar FAQ hosted at PSU is here].
+[http://acs.ist.psu.edu/soar-faq/soar-faq.html General Soar FAQ hosted at PSU is here].
 
+= Soar Technical FAQ = 
 <wiki:toc max_depth="3"/>
-
 ----
 
 = Getting Soar =
