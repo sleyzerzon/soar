@@ -4,25 +4,12 @@
     * [ReleaseNotes All Release Notes]
     * [WordNet WordNet]
   * [Publications]
-  * [FAQ]
   * [CommandIndex Command Line Help]
   * Programming Soar
     * [IntroSoarDebugger Intro to the Soar Debugger]
     * [SoarDogma Soar Dogma]
     * [Soar7To8 Soar 7 to Soar 8 Conversion]
     * [VSKeyBindings VisualSoar Key Bindings Help]
-  * Environments
-    * [Soar2D]
-    * [QuickLinkTutorial Quick Link]
-    * [SoarTextIO Soar Text IO]
-    * [RoboticsNotes Robotics Notes]
-    * Unsupported Environments
-      * [Sps Splinter Soar (old)]
-      * [Room Room Environment (old)]
-      * [MissionLab Mission Lab]
-      * [Msrs Microsoft Robotics Studio]
-      * [PlayerStageGazebo Player/Stage/Gazebo]
-      * [USARSim USARSim]
   * Developers
     * Building Soar
       * [Build Getting the Source Code]
@@ -30,6 +17,7 @@
       * [BuildLinux Building Linux]
       * [BuildMac Building MacOS]
       * [ConfigEclipse Configuring Eclipse]
+    * [Soar Technical FAQ]
     * [ProjectLayout Project Layout]
     * [SMLQuickStartGuide SML Quick Start Guide]
     * [ThreadsInSML Threads in SML]
@@ -49,4 +37,16 @@
     * [SoarOniPhone Soar on iOS]
     * [SoarTimers Timers in Soar]
     * [CliDev Command Line Interface Development]
+  * Environments
+    * [Soar2D]
+    * [QuickLinkTutorial Quick Link]
+    * [SoarTextIO Soar Text IO]
+    * [RoboticsNotes Robotics Notes]
+    * Unsupported Environments
+      * [Sps Splinter Soar (old)]
+      * [Room Room Environment (old)]
+      * [MissionLab Mission Lab]
+      * [Msrs Microsoft Robotics Studio]
+      * [PlayerStageGazebo Player/Stage/Gazebo]
+      * [USARSim USARSim]
   * [ConferenceSchedule Conferences]
