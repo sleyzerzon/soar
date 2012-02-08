@@ -1,10 +1,10 @@
 = Getting the Source =
 
 There are two ways to get the source code:
-  # Download the the [http://soar.googlecode.com/files/SoarSuite-9.3.1-source.tar.gz 9.3.1 platform-independent source].  This will contain the last major release of the entire SoarSuite.  It will probably contain many modules that you don't need.
+  # Download the the [http://soar.googlecode.com/files/SoarSuite-9.3.1-source.tar.gz 9.3.1 platform-independent source].  This will contain the last major release of the entire !SoarSuite.  It will probably contain many modules that you don't need.
   # Checkout the latest code directly from the Soar SVN repository.
 
-If you chose the first option and manually downloaded the full SoarSuite, skip down to your operating system notes below:
+If you chose the first option and manually downloaded the full !SoarSuite, skip down to your operating system notes below:
 
   * [BuildWindows Windows Build Notes]
   * [BuildLinux Linux Build Notes]
@@ -19,7 +19,7 @@ Otherwise, follow the instructions in the next section to download Soar from the
     ** *Ubuntu Linux*: Install package `subversion`.
     ** *Mac*: Do nothing! Subversion ships with Leopard and newer.
   # Check out `SoarSuite` *non-recursively*
-    ** *Do not check out the entire trunk.* The SoarSuite contains many projects that you probably will not need. For now, you just want to check out the top level folder and the immediate files within it. In the next step, you will add the individual components that you need for your project. 
+    ** *Do not check out the entire trunk.* The !SoarSuite contains many projects that you probably will not need. For now, you just want to check out the top level folder and the immediate files within it. In the next step, you will add the individual components that you need for your project. 
     ** The URL for the repository is *http://soar.googlecode.com/svn/trunk/SoarSuite/ * (if you are a Soar developer affiliated with the U of M and plan to check in changes, use *https:// *)
     ** To check out the top-level folder, do the following: 
       ** *Command-line SVN program*: Use the command `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite --depth files`
@@ -27,12 +27,12 @@ Otherwise, follow the instructions in the next section to download Soar from the
     ** *Note*:  Your username is your Google account name without the `@` or domain. [http://code.google.com/hosting/settings Your password is your googlecode.com password].
   # Check out the component that you will need for what you're trying to do.
     ** Here is a partial list of components you can check out.
-      ** *Core*: *Required* module.  Contains the Soar kernel.
+      ** *Core*: *Required* module.  Contains the Soar kernel, documentation, and a few test suites.
       ** *Java*: *Required* module, used to interface with Java, which almost everyone will need since the Soar debugger is written in Jave.
       ** *Python*: Used to interface with Python code.
       ** *CSharp*: Used to interface with CSharp code.
       ** *Tcl*: Used to interface with Tcl code.
-      ** *Soar2d*: Contains the TankSoar and Eaters test environments used in the Soar tutorial
+      ** *Soar2d*: Contains the !TankSoar and Eaters test environments used in the Soar tutorial
       ** A full list of components is available [ProjectLayout#Components here].
     ** *Command-line SVN program*: There are command-line shortcuts in the [http://code.google.com/p/soar/source/browse/trunk/SoarSuite/Makefile Makefile] at the top level.  Simply type the shortcut in, and it will retrieve the files.  For example, `make checkout` will checkout the core and java files.
     ** *TortoiseSVN (Windows)*:
