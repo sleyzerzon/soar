@@ -24,6 +24,12 @@
       * [PlayerStageGazebo Player/Stage/Gazebo]
       * [USARSim USARSim]
   * Developers
+    * Building Soar
+      * [BuildGettingSource Getting the Source Code]
+      * [BuildWindows Building Windows]
+      * [BuildLinux Building Linux]
+      * [BuildMac Building MacOS]
+      * [ConfigEclipse Configuring Eclipse]
     * [Build Checkout and Build Procedure]
     * [ProjectLayout Project Layout]
     * [SMLQuickStartGuide SML Quick Start Guide]
