@@ -25,7 +25,7 @@
       * [USARSim USARSim]
   * Developers
     * Building Soar
-      * [BuildCheckout Getting the Source Code]
+      * [Build Getting the Source Code]
       * [BuildWindows Building Windows]
       * [BuildLinux Building Linux]
       * [BuildMac Building MacOS]
