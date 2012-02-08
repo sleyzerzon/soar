@@ -42,6 +42,6 @@ Otherwise, follow the instructions in the next section to download Soar from the
 
 You can now skip to your operating system build notes:
 
-  * [http://code.google.com/p/soar/wiki/Build#Windows Windows Build Notes]
-  * [http://code.google.com/p/soar/wiki/Build#Linux Linux Build Notes]
-  * [http://code.google.com/p/soar/wiki/Build#Mac_OS_X Mac OS X Build Notes]
+  * [BuildWindows Windows Build Notes]
+  * [BuildLinux Linux Build Notes]
+  * [BuildMac Mac OS X Build Notes]
