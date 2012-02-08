@@ -92,6 +92,6 @@ Visual Studio uses Windows environment variables for a number of program locatio
 We're now finally ready to build Soar!  
 
   # If you need CSharp or Tcl, you will have to open the "core.sln" solution file (in the "Core" directory) and add those projects.
-  # Double-click `build.bat` to build everything. You will see many errors about projects not being loaded unless you checked out the entire SoarSuite.  This is normal.  
+  # Double-click `build.bat` to build everything. You will see many errors about projects not being loaded unless you checked out the entire !SoarSuite.  This is normal.  
 
 See the [FAQ] for common solutions to build errors.
