@@ -1,0 +1,97 @@
+= Windows =
+
+32-bit and 64-bit Windows platforms are supported for Windows XP, Vista, and 7.
+Other versions of 32-bit windows might work but are not officially supported.
+
+== Windows Prerequisites ==
+
+Please note that *if some _recommended_ prerequisites are not installed, some build errors will be encountered as unsupported language interfaces fail to build*.  Open the solution and remove the related projects to fix the errors.
+
+=== Microsoft Visual Studio 2008 ===
+
+*Who Needs It*: Anybody who wants to build Soar.  You must have either Microsoft Visual Studio 2008 or Microsoft Visual C++ 2008 Express Edition. If you want to build C# project, Visual C# Express is needed as well. Note that the free Express Edition does not include a 64-bit compiler.
+
+*Where is it*:  Install Visual Studio 2008 if you have access to it, or download and install Visual C++ 2008 Express Edition from [http://www.microsoft.com/express/vc/ microsoft.com]. 
+
+*How to install*: Follow the instructions from your CD or the download.  
+  * *Warning*: *If you are on a 64-bit machine, make sure to install the 64-bit compiler*!  It is not installed by default! Moreover, the Express Edition does not have a 64-bit option at all.
+
+=== Java SE 6 JDK ===
+*Who Needs It*: Everyone, since the Soar debugger and most of the Soar tools and environments are written in Java.
+
+*Where is it*:  The latest Java SE 6 JDK from [http://java.sun.com/javase/downloads/index.jsp java.sun.com].  Make sure to download the 64-bit version, if you are on a 64-bit machine.
+
+*How to install*: Follow the instructions on the download page.
+
+=== SWIG ===
+*Who Needs It*: Everyone.  SWIG acts as a bridge between the Soar C++ libraries and the various other languages, like Java, Tcl, Python, Perl. Since nearly everyone will need the Soar debugger, which is written in Java, this component is required.
+
+*Where is it*:  [http://www.swig.org/download.html swig.org]
+
+*How to install*: Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`
+
+=== Apache Ant ===
+*Who Needs It*: Everyone.  The Apache Ant build system is required if using Java applications.
+
+*Where is it*:  Download ant from [http://ant.apache.org/ ant.apache.org].
+
+*How to install*: 
+  * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
+  * Helpful: Add ant's `bin` folder to your PATH environment variable.
+
+=== Eclipse ===
+*Who Needs It*: People who want to either (a) use the SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
+
+*Where is it*: [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org]
+
+*How to install*: Extract anywhere you have write permissions without authentication, such as your home folder. System folders (such as `C:\Program Files`) are not recommended locations for Eclipse.
+
+=== Python ===
+*Who Needs It*: People who want to use the Python SML interface to interface with a Python-based system.
+
+*Where is it*:  You must use Python 2.6.  Other versions of Python will not work "out of the box."  You can find it at [http://www.python.org/download/releases/2.6/ python.org]
+
+*How to install*: 
+  * Follow the instructions on the download page.
+  * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
+
+=== PyDev ===
+*Who Needs It*: People who want to write Python code within Eclipse.
+
+*Where is it*:  No manual download necessary.  You can add this component from within Eclipse.
+
+*How to install*: 
+  * Inside Eclipse, visit the Help -> Install new software dialog
+  * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
+
+=== Tcl/Tk ===
+*Who Needs It*: People who want to use the Tcl SML interface to interface with a Tcl-based system.
+
+*Where is it*: [http://www.activestate.com/activetcl/downloads/ activestate.com]
+
+*How to install*: Follow the instructions on the download page.
+
+== Windows Environment Variables ==
+
+Visual Studio uses Windows environment variables for a number of program locations, depending on what language interfaces you are building.  Windows 7 no longer allows you to set environment variables through your autoexec.bat file, so we recommend setting them through the Windows System Control Panel as follows:
+  # Right-click on "My Computer" and choose "Properties"
+  # Click on "Advanced System Settings"
+  # In the dialog box that appears, click on the "Environment Variables" button
+  # Now you can manually add, the following variables, depending on what you installed:
+    * `ANT_HOME`: Full path to the Apache Ant folder.
+    * `SWIG_HOME`: Full path to the Swig folder.
+    * `JAVA_HOME`: Full path to the JDK home folder.
+    * `PYTHON_HOME`: Full path to Python folder.
+    * `TCL_HOME`: Full path to Tcl folder.
+  # Make additions to your PATH variable. The PATH variable will already exist and contain many values, so you need to add the ANT path to the end.  To do so, find "PATH" under "System variables", click "Edit", then type a ";" to the end of the value and then the full path in question.
+    * Full path to Ant's bin folder. This will facilitate command line Java builds.
+    * Eclipse users targeting 64-bit should also add SlikSVN's bin folder, usually `C:\Program Files\SlikSvn\bin`.
+
+== Windows Build ==
+
+We're now finally ready to build Soar!  
+
+  # If you need CSharp or Tcl, you will have to open the "core.sln" solution file (in the "Core" directory) and add those projects.
+  # Double-click `build.bat` to build everything. You will see many errors about projects not being loaded unless you checked out the entire SoarSuite.  This is normal.  
+
+See the [FAQ] for common solutions to build errors.
