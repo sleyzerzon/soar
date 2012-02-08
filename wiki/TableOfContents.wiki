@@ -30,7 +30,6 @@
       * [BuildLinux Building Linux]
       * [BuildMac Building MacOS]
       * [ConfigEclipse Configuring Eclipse]
-    * [Build Checkout and Build Procedure]
     * [ProjectLayout Project Layout]
     * [SMLQuickStartGuide SML Quick Start Guide]
     * [ThreadsInSML Threads in SML]
