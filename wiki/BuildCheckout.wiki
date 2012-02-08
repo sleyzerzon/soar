@@ -6,9 +6,9 @@ There are two ways to get the source code:
 
 If you chose the first option and manually downloaded the full SoarSuite, skip down to your operating system notes below:
 
-  * [http://code.google.com/p/soar/wiki/Build#Windows Windows Build Notes]
-  * [http://code.google.com/p/soar/wiki/Build#Linux Linux Build Notes]
-  * [http://code.google.com/p/soar/wiki/Build#Mac_OS_X Mac OS X Build Notes]
+  * [BuildWindows Windows Build Notes]
+  * [BuildLinux Linux Build Notes]
+  * [BuildMac Mac OS X Build Notes]
 
 Otherwise, follow the instructions in the next section to download Soar from the SVN repository.
 
