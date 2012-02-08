@@ -103,7 +103,7 @@ See [Build the build document] for more details.
 
 ==How can I use Eclipse to work with SML Java apps?==
 
-See [Build#Eclipse the Eclipse section on the build document] for information on how to get Eclipse running with Soar projects.
+See [ConfigEclipse the Eclipse configuration document] for information on how to get Eclipse running with Soar projects.
 
 ==How do I get the trace for the initial S1 creation?==
 
@@ -126,7 +126,7 @@ This works for any identifier, not just at the top level of the input link.
 It is often desirable to maximize the performance of your SML application. This section assumes that you just want to make things as fast as possible after you have finished debugging your application. Debugging is an inherently slow process, so these tips will be less helpful while you’re still debugging.
 
   * Compile with optimizations turned on. In Visual Studio this means doing a release build. On Linux and OS X, the default settings are probably sufficient, but you can experiment with new settings if you want (let us know if you find better settings).
-  * Put primary application and Soar in the same process. That is, use CreateInNewThread or CreateInCurrentThread, not CreateRemoteConnection. Using a remote kernel means socket communications are used, which is slow.
+  * Put primary application and Soar in the same process. That is, use CreateInNewThread or CreateInCurrentThread, not CreateRemoteConnection. Using a remote kernel means socket communication is used, which is slow.
   * Don’t register for unnecessary events. Every event that is registered for causes extra work to be done. Try to find an appropriate event to register for so you don’t end up getting more event calls than you actually need – that is, try to avoid registering for events which occur more frequently than you need and then filtering them on the application side.
   * Don’t connect the debugger. Connecting the debugger creates a remote connection and also registers for several events.
 Set watch level 0. Even if you don’t have a client registered for any of the print or XML events, work is still done internally to generate some of the information that would have been sent out. Setting watch level 0 avoids this work.
@@ -138,7 +138,7 @@ Set watch level 0. Even if you don’t have a client registered for any of the p
 
 ==When can I safely make changes to the input-link?==
 
-A Soar agent only receives input during the input phase and it does this through an input phase callback while the agent is running. SML (through gSKI--an internal library) allows the environment to change the input-link at other times and those changes are buffered until the next input phase. This means you have several options for handling input:
+A Soar agent only receives input during the input phase and it does this through an input phase callback while the agent is running. SML allows the environment to change the input-link at other times and those changes are buffered until the next input phase. This means you have several options for handling input:
 
   * You can register for smlEVENT_BEFORE_INPUT_PHASE and make changes to the input link at that time. This is very close to the way the kernel naturally handles input but will often be relatively slow if Soar is running a lot faster than the environment is changing (a common situation) as this event needs to be sent each decision cycle for each agent, generating a lot of communications traffic.
   * Another option is to register for an update event (smlEVENT_AFTER_ALL_OUTPUT_PHASES and smlEVENT_AFTER_ALL_GENERATED_OUTPUT), check for output at that time and create new inputs immediately. These events are called after the output phase has completed and the new input link changes will be buffered until the next input phase. This is the most common choice in existing SML environments.
