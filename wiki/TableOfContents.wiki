@@ -10,7 +10,7 @@
     * [SoarDogma Soar Dogma]
     * [Soar7To8 Soar 7 to Soar 8 Conversion]
     * [VSKeyBindings VisualSoar Key Bindings Help]
-  * Developers
+  * Developer For Soar
     * Building Soar
       * [Build Getting the Source Code]
       * [BuildWindows Building Windows]
