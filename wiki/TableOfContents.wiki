@@ -17,7 +17,7 @@
       * [BuildLinux Building Linux]
       * [BuildMac Building MacOS]
       * [ConfigEclipse Configuring Eclipse]
-    * [Soar Technical FAQ]
+    * [FAQ Soar Technical FAQ]
     * [ProjectLayout Project Layout]
     * [SMLQuickStartGuide SML Quick Start Guide]
     * [ThreadsInSML Threads in SML]
