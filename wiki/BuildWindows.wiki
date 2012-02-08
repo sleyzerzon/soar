@@ -3,7 +3,7 @@
 32-bit and 64-bit Windows platforms are supported for Windows XP, Vista, and 7.
 Other versions of 32-bit windows might work but are not officially supported.
 
-== Windows Prerequisites ==
+== Install the Prerequisities ==
 
 Please note that *if some _recommended_ prerequisites are not installed, some build errors will be encountered as unsupported language interfaces fail to build*.  Open the solution and remove the related projects to fix the errors.
 
@@ -71,7 +71,7 @@ Please note that *if some _recommended_ prerequisites are not installed, some bu
 
 *How to install*: Follow the instructions on the download page.
 
-== Windows Environment Variables ==
+== Set Up Your Windows Environment Variables ==
 
 Visual Studio uses Windows environment variables for a number of program locations, depending on what language interfaces you are building.  Windows 7 no longer allows you to set environment variables through your autoexec.bat file, so we recommend setting them through the Windows System Control Panel as follows:
   # Right-click on "My Computer" and choose "Properties"
@@ -87,7 +87,7 @@ Visual Studio uses Windows environment variables for a number of program locatio
     * Full path to Ant's bin folder. This will facilitate command line Java builds.
     * Eclipse users targeting 64-bit should also add SlikSVN's bin folder, usually `C:\Program Files\SlikSvn\bin`.
 
-== Windows Build ==
+== Build Soar ==
 
 We're now finally ready to build Soar!  
 
