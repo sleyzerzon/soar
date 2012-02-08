@@ -2,7 +2,6 @@
   * [Downloads Downloads]
     * [SoarSoftware All Downloads]
     * [ReleaseNotes All Release Notes]
-    * [WordNet WordNet]
   * [Publications]
   * [CommandIndex Command Line Help]
   * Programming Soar
@@ -37,11 +36,12 @@
     * [SoarOniPhone Soar on iOS]
     * [SoarTimers Timers in Soar]
     * [CliDev Command Line Interface Development]
-  * Environments
+  * Projects
     * [Soar2D]
     * [QuickLinkTutorial Quick Link]
     * [SoarTextIO Soar Text IO]
     * [RoboticsNotes Robotics Notes]
+    * [WordNet WordNet]
     * Unsupported Environments
       * [Sps Splinter Soar (old)]
       * [Room Room Environment (old)]
