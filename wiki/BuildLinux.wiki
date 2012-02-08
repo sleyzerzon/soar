@@ -2,7 +2,7 @@
 
 The only officially supported Linux distribution right now is [http://www.ubuntu.com/ Ubuntu], though Soar should work on almost any distribution so long as things are configured correctly.
 
-== Linux Prerequisites ==
+== Install the Prerequisites ==
 
   # Get your system set up
     # Install Ubuntu and use the update manager or similar tool to make sure all packages are up-to-date.
@@ -50,7 +50,7 @@ sudo update-java-alternatives -s java-6-sun
   * Inside Eclipse, visit the Help -> Install new software dialog
   * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
 
-== Linux Environment ==
+== Set Up Your Environment Variables ==
 
 To make these changes permenant, edit your `.bashrc` file and put them at the
 bottom.
@@ -89,7 +89,7 @@ export PATH=$PATH:/home/$USER/sandbox/bin
 export LD_LIBRARY_PATH=/home/$USER/sandbox/lib
 }}}
 
-== Linux Build ==
+== Build Soar ==
 
 Run `make` in the top-level folder, see the [FAQ] for common solutions to
 errors.
