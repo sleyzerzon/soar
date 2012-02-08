@@ -55,7 +55,7 @@ Please note that *if some _recommended_ prerequisites are not installed, some bu
   * Follow the instructions on the download page.
   * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
 
-=== PyDev ===
+=== !PyDev ===
 *Who Needs It*: People who want to write Python code within Eclipse.
 
 *Where is it*:  No manual download necessary.  You can add this component from within Eclipse.
