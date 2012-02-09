@@ -29,14 +29,14 @@
     * [CliDev Command Line Interface Development]
     * [HelloWorld Simple Environment Examples]
     * [MemoryLeaks Memory Leak Debugging]
-    * [SoarJavaDebugger Soar Java Debugger]
     * [SoarTimers Timers in Soar]
     * Possibly Obsolete
       * [EventDrivenEnvironmentsProposal Event Driven Environments Proposal]
       * [MovingFromSGIOToSML Moving from SGIO to SML]
-      * [ReleasePreparation Release Preparation]
+      * [ReleasePreparation UMich Release Preparation]
       * [UsingElementXML Using ElementXML]
       * [Soar7To8 Soar 7 to Soar 8 Conversion]
+      * [SoarJavaDebugger Soar Java Debugger Wishlist]
   * Projects
     * [QuickLinkTutorial Quick Link]
     * [RoboticsNotes Robotics Notes]
