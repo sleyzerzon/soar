@@ -7,7 +7,6 @@
   * Programming In Soar
     * [IntroSoarDebugger Intro to the Soar Debugger]
     * [SoarDogma Soar Dogma]
-    * [Soar7To8 Soar 7 to Soar 8 Conversion]
     * [VSKeyBindings VisualSoar Key Bindings Help]
   * Developing For Soar
     * Building Soar
@@ -37,6 +36,7 @@
       * [MovingFromSGIOToSML Moving from SGIO to SML]
       * [ReleasePreparation Release Preparation]
       * [UsingElementXML Using ElementXML]
+      * [Soar7To8 Soar 7 to Soar 8 Conversion]
   * Projects
     * [QuickLinkTutorial Quick Link]
     * [RoboticsNotes Robotics Notes]
