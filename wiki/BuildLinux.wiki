@@ -14,7 +14,7 @@ The only officially supported Linux distribution right now is [http://www.ubuntu
 {{{
 sudo apt-get install scons swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
 }}}
-    * *A Note about SCons*: Unfortunately, SCons version 2.x does not work, but, fortunately, Linux package managers will probably not change the `scons` default package to 2.x any time soon.  If you have any issues building, you may want to check that you are not running a 2.x version of SCons.
+    would install everything in Ubuntu.
   # Make sure the Sun JDK is in use: 
 {{{
 sudo update-java-alternatives -s java-6-sun
