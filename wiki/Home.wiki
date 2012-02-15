@@ -1,6 +1,6 @@
 #sidebar TableOfContents
 
-This is the Wiki for the *Soar* general cognitive architecture.  It serves as living documentation on 
+This is the Wiki for the *Soar* cognitive architecture.  It serves as living documentation on 
 *Soar* as it evolves with ongoing research. See the sidebar for a table of interesting links.
 
 For more general information about the *Soar* project, please visit the [http://sitemaker.umich.edu/soar Soar home page].
