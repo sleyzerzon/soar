@@ -1,0 +1,20 @@
+= Name =
+
+= Description =
+
+= Soar capabilities =
+
+= External Environment =
+
+= Default Rules =
+
+= Associated Publications =
+
+= Developer =
+
+= Soar Versions =
+
+= Project Type =
+
+= Download Links=
+
