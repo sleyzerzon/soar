@@ -11,7 +11,7 @@
         * [Agent_BW_Hierarchical Hierarchical Agent]
         * [Agent_BW_HierarchicalLookAhead Hierarchical Look-Ahead Agent]
         * [Agent_BW_RL Reinforcement Learning Agent]
-      * [Agent_count-epmem Episodic Memory Counting Agent]
+      * [Agent_countepmem Episodic Memory Counting Agent]
       * [Agent_epmemtutorial Episodic Memory Tutorial Agent]
       * [Agent_helloworld Hello World Agent]
       * [Agent_kb KB Agent]
@@ -40,13 +40,11 @@
     * [DLCategory_AgentDev Agent Development Tools]
       * [AgentDev_SoarEditor SoarEditor]
       * [AgentDev_VisualSoar VisualSoar]
-      ----
       * [AgentDev_EpmemRecorder Episodic Memory Recorder]
       * [AgentDev_EpmemSize Episodic Memory Size Tool]
       * [AgentDev_QuickLink QuickLink I/O Simulator]
       * [AgentDev_SDC Soar Data Collector]
       * [AgentDev_State2Dot State2Dot State Visualization Tool]
-      ----
       * [AgentDev_UltraEdit UltraEdit Soar Syntax Coloring File]
       * [AgentDev_VimPlugin Vim Syntax Coloring File]
     * [DLCategory_Domains Domains]
