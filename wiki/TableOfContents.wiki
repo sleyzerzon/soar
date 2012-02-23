@@ -6,8 +6,8 @@
         * [Agent_BW_Simple Simple]
         * [Agent_BW_LookAhead Look-Ahead]
         * [Agent_BW_LookAheadStateEvaluation Look-Ahead State-Evaluation]
-        * [Agent_BW_Subgoaling Operator Sub-Goaling]
-        * [Agent_BW_SubgoalingRL Operator Sub-Goaling with Reinforcement Learning]
+        * [Agent_BW_Subgoaling Sub-Goaling]
+        * [Agent_BW_SubgoalingRL Sub-Goaling with RL]
         * [Agent_BW_Hierarchical Hierarchical]
         * [Agent_BW_HierarchicalLookAhead Hierarchical Look-Ahead]
         * [Agent_BW_RL Reinforcement Learning]
@@ -16,11 +16,11 @@
       * [Agent_helloworld Hello World Agent]
       * [Agent_kb KB Agent]
       * [Agent_leftright Left-Right Agent]
-      * Missionaries and Cannibals Agents
+      * Missionaries and Cannibals
         * [Agent_Missionary_Simple Simple]
         * [Agent_Missionary_Planning Planning]
       * [Agent_rlunit RL Unit Tests Agent]
-      * [Agent_semmemtutorial Semantic Memory Tutorial Agent]
+      * [Agent_semmemtutorial Semantic Memory Tutorial]
       * [Agent_soar7 Soar 7 Agents]
       * Tile Puzzle Agents
         * [Agent_eightpuzzle Eight-Puzzle]
@@ -40,11 +40,13 @@
     * [DLCategory_AgentDev Agent Development Tools]
       * [AgentDev_SoarEditor SoarEditor]
       * [AgentDev_VisualSoar VisualSoar]
+      * ----
       * [AgentDev_EpmemRecorder Episodic Memory Recorder]
       * [AgentDev_EpmemSize Episodic Memory Sizer]
       * [AgentDev_QuickLink QuickLink I/O Simulator]
       * [AgentDev_SDC Soar Data Collector]
       * [AgentDev_State2Dot State2Dot Visualization Tool]
+      * ----
       * [AgentDev_UltraEdit UltraEdit Syntax Coloring]
       * [AgentDev_VimPlugin Vim Syntax Coloring]
     * [DLCategory_Domains Domains]
@@ -65,8 +67,6 @@
       * [DomainGenPDDL PDDL Translator]
     * [DLCategory_SoarExperimental Soar Experimental Modules]
       * [SoarExperimentalSVS Soar Visual System]
-    * [SoarSoftware SoarSuite Archives]
-    * [ReleaseNotes Release Note Archives]
     * [DLCategory_ExampleCode Domain Development Code]
       * [ExampleCode_CSharp CSharp]
       * [ExampleCode_PhP PhP]
@@ -82,7 +82,10 @@
       * [Unsupported_RlCli RL Command Line]
       * [Unsupported_ToH Towers of Hanoi]
       * [Unsupported_WMA WMA Recorder]
-  * Documentation
+    * ----
+    * [SoarSoftware SoarSuite Archives]
+    * [ReleaseNotes Release Note Archives]
+  * [Documentation]
     * [CommandIndex Command Line Help]
     * [SoarManual Soar Manual]
     * [SoarTutorial Soar Tutorial]
