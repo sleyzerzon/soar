@@ -1,8 +1,8 @@
-= SoarEditor = 
-The SoarEditor is an Eclipse plugin that allows you to use the powerful Eclipse IDE for writing Soar agents.  It provides syntax coloring, auto-indenting, data map construction and generation, attribute/value completion (using the data map) and agent file structure management.
+= !SoarEditor = 
+The !SoarEditor is an Eclipse plugin that allows you to use the powerful Eclipse IDE for writing Soar agents.  It provides syntax coloring, auto-indenting, data map construction and generation, attribute/value completion (using the data map) and agent file structure management.
 
-=== Download Links ===
-The SoarEditor is downloadable via Eclipse itself.
+=== Download ===
+The !SoarEditor is downloadable via Eclipse itself.
   # Install the latest version of Eclipse.
   # In Eclipse, go to _Help_ > _Install New Software..._
   # Click on the _Add..._ button to add a new update site.

@@ -1,4 +1,4 @@
-= SoarText/IO =
+= !SoarText/IO =
 
 The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
 

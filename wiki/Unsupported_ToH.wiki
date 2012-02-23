@@ -1,0 +1,51 @@
+= Towers of Hanoi =
+
+The classic Towers of Hanoi puzzle implemented as an external environment using Java and interfaced with Soar via SML.  To see how the agent performs the task, you must launch the Soar debugger and tell it to connect to a remote Soar agent.
+
+The Towers of Hanoi is a puzzle that consists of three rods and a number of disks of different sizes which can slide onto any rod. The puzzle starts with the disks in a neat stack in ascending order of size on one rod, the smallest at the top, thus making a conical shape. The objective of the puzzle is to move the entire stack to another rod, obeying the following rules:
+  * Only one disk may be moved at a time.
+  * Each move consists of taking the upper disk from one of the rods and sliding it onto another rod, on top of the other disks that may already be present on that rod.
+  * No disk may be placed on top of a smaller disk.
+  
+{{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Towers_of_Hanoi its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
+
+=== Download ===
+Pending
+
+=== Associated Agents ===
+  * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.
+
+*Note*: You cannot run the many Towers of Hanoi agents available in the _Agents_ downloads section with this environment.  Those ones are not designed to be run with an external environment. 
+        
+=== Documentation ===
+  * While there is no explicit documentation, the [IntroSoardebugger Soar Debugger tutorial] does have a section that explains how to hook up the debugger to this type of environment.
+  
+=== IO link Specification ===
+{{{
+(I2 ^disk 1 ^disk 11 ^disk 2 ^disk 10 ^disk 3 ^disk 9 ^disk 4 ^disk 8 ^disk 5
+       ^disk 7 ^disk 6 ^holds H6 ^holds H7 ^holds H5 ^holds H8 ^holds H4
+       ^holds H9 ^holds H3 ^holds H10 ^holds H2 ^holds H11 ^holds H1 ^peg B
+       ^peg A ^peg C)
+  (H6 ^above 7 ^disk 6 ^on A)
+  (H7 ^above 6 ^disk 5 ^on A)
+  (H5 ^above 8 ^disk 7 ^on A)
+  (H8 ^above 5 ^disk 4 ^on A)
+  (H4 ^above 9 ^disk 8 ^on A)
+  (H9 ^above 4 ^disk 3 ^on A)
+  (H3 ^above 10 ^disk 9 ^on A)
+  (H10 ^above 3 ^disk 2 ^on A)
+  (H2 ^above 11 ^disk 10 ^on A)
+  (H11 ^above 2 ^disk 1 ^on A)
+  (H1 ^above none ^disk 11 ^on A)
+
+(I3 ^move-disk M1)
+  (M1 ^destination-peg C ^source-peg A)
+}}}
+=== Developer ===
+Taylor Lafrinere
+
+=== Soar Versions ===
+Soar 8, 9
+
+=== Language ===
+C++
