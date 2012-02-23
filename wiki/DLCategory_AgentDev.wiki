@@ -1,3 +1,3 @@
-= Software Download Category =
+= Agent Development and Debugging Tools =
 
-This category contains blah blah blah
+In this category you'll find tools to help you deveop your Soar agents.  This includes IDEs for developing Soar agents, a variety of both real-time and offline debugging tools and some syntax coloring add-ons for certain text editors.

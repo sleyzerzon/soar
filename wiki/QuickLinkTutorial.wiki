@@ -1,3 +1,0 @@
-#summary Quick Link Tutorial
-
-Please view here: http://soar.googlecode.com/files/QuickLink%20Tutorial.doc

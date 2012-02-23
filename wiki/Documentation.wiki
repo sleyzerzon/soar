@@ -2,12 +2,12 @@
 
 == Soar Manual ==
 
-A handy reference and the authoritative documentation for Soar.
+A handy reference and [SoarManual the authoritative documentation] for Soar.
 
 == Soar Tutorial ==
 
-A step-by-step introduction to all the major aspects of the Soar architecture and how to develop agents for it.
+A [SoarTutorial step-by-step introduction] to all the major aspects of the Soar architecture and how to develop agents for it.
 
 == Command Line Help ==
 
-An online reference of precisely how every command-line command in Soar works.
+An online reference of precisely how [CommandIndex every command-line command] in Soar works.

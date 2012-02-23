@@ -1,3 +1,5 @@
-= Software Download Category =
+= Domain Development Example Code =
 
-This category contains blah blah blah
+This category contains example code and wrapper functions to help you build your own environments in a variety of language, namely C++, PhP, Python, Java and C.  There are two actual external environments among these examples.
+
+*Note*: For meatier examples, you can also study the source code of many of the domains in the _Domains_ section of the downloads by downloading the source from our CVS repository.  Read the _How to Check Out Soar from SVN_ section of the [Build build notes] to learn how to access those files.

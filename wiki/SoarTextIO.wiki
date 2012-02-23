@@ -1,7 +1,0 @@
-#summary Documentation on SoarTextIO
-
-http://soar.googlecode.com/files/CommandSummary.doc
-
-http://soar.googlecode.com/files/InputOutput%20Maps.doc
-
-http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc
