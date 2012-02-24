@@ -1,5 +1,4 @@
   * [Home Soar Wiki Home]
-  ----
   * [Downloads Downloads]
     * [DLCategory_Agents Agents]
       * [Agent_Arithmetic Arithmetic Agent]
@@ -102,7 +101,6 @@
     * ----
     * [SoarSoftware SoarSuite Archives]
     * [ReleaseNotes Release Note Archives]
-  ----
   * [Documentation]
     * [SoarManual Soar Manual]
     * [CommandIndex Command Line Help]
@@ -142,6 +140,5 @@
       * [Soar7To8 Soar 7 to Soar 8 Conversion]
       * [SoarJavaDebugger Soar Java Debugger Wishlist]
       * [UsingElementXML Using ElementXML]
-  ----
   * [Publications]
   * [ConferenceSchedule Conferences]
