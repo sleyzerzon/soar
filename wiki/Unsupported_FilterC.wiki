@@ -1,23 +1,17 @@
-= Name =
+= FilterC =
 
-= Description =
+FilterC demonstrates how to write a client in C++ that intercepts commands to implement a simple command line.
 
-= Environment Properties =
+=== Download Links===
+  * Pending
 
-= Associated Agents =
-
-= Associated Publications =
-
-= Documentation =
-
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
+=== Documentation ===
+  * While there is no explicit documentation, this example code is commented.
+  
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * C++
 
 

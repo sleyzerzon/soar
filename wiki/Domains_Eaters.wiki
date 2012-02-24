@@ -1,60 +1,70 @@
-= SoarText/IO =
+= Eaters =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+Eaters is a Pac-Man like game implemented using Java and interfacing with Soar via SML.
 
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
+In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. The Eaters world consists of a rectangular grid, 15 squares wide by 15 squares high. Walls bound all four sides. Interior wall sections are randomly generated for each new game. No two walls will touch, so there are no corners, except for exterior walls and no “dead ends” anywhere on the board. Each eater starts at a random location. Food pellets are in all other squares of the grid. There are two kinds of food: normal food (blue circles and worth 5 points) and bonus food (red squares and worth 10 points). An eater consumes food by moving into a square. When an eater moves out of a square it will be empty (unless another eater moves into it). An eater can sense the contents of cells (eater, normal food, bonus food, and empty) up to 2 squares away in all directions. On each turn, an eater can move one square north, south, east, or west. An eater can also jump two squares north, south, east, or west. An eater can jump over a wall or another eater. An eater does not consume any food in the space it jumps over. A jump costs the eater 5 points. Whenever two eaters try to occupy the same cell at  the same time, they collide. As a result of the collision, their scores are averaged and they are teleported to new, random locations on the board.
 
 === Environment Properties ===
+Multi-agent
 
 === Download ===
 Pending
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * *[Agent_Eaters_AdvancedMoveBot Advanced Move Bot]*
+  * *[Agent_Eaters_HelloWorldOp Hello World Operator]*
+  * *[Agent_Eaters_HelloWorldRule Hello World Rule]*
+  * *[Agent_Eaters_Jump Jump Bot]*
+  * *[Agent_Eaters_JumpMove Jump and Move Bot]*
+  * *[Agent_Eaters_Move Move Bot]*
+  * *[Agent_Eaters_MoveNorth Move North Bot]*
+  * *[Agent_Eaters_MoveNorth2 Move North 2 Bot]*
+  * *[Agent_Eaters_MoveToFood Move to Food Bot]*
+  * *[Agent_Eaters_SemanticErrors Semantic Errors]*
+  * *[Agent_Eaters_SyntaxErrors Syntax Errors]*
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
-
-*Note*: The above documents are also included in the download.
+  * [SoarTutorial Soar Tutorial]: Chapter 2 in the Soar Tutorial is a great introduction to Eaters.
 
 === IO link Specification ===
 {{{
-^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+^io
+   ^input-link
+      ^eater
+         ^direction east/north/south/west
+         ^name red/blue/yellow/green/purple/black
+         ^score 0-1000
+         ^x 1-15
+         ^y 1-15
+      ^my-location	
+         ^content bonusfood/normalfood/eater/empty/wall
+         ^east
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^north 
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^south
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^west
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+   ^output-link
+      ^move
+         ^direction east/north/south/west
+         ^status complete   - created by Soar as feedback 
+      ^jump
+         ^direction east/north/south/west 
+         ^status complete   - created by Soar as feedback 
 
-^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
 }}}
+
 === Developer ===
-Taylor Lafrinere
+Jonathan Voigt, Scott Wallace
 
 === Soar Versions ===
 Soar 8, 9
 
 === Language ===
-C++
-
-= Associated Publications =
+Java

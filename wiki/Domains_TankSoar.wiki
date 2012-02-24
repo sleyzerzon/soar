@@ -1,60 +1,52 @@
-= SoarText/IO =
+= !TankSoar =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+!TankSoar is a multi-agent tank battle game implemented using Java and interfacing with Soar via SML.
 
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
+The !TankSoar world consists of a rectangular grid, 14 squares wide by 14 squares high. All four sides are bounded by walls made of rock. Interior walls are made of trees. There are a variety of maps that can be used, with different layouts of walls.   Each !TankSoar agent controls one tank. The tank takes up one square in the playing field. A tank has actions it can take, resources it carries, and sensors with which it observes its environment.  In !TankSoar, your tank has many sensors and actions and can interact with other tanks by shooting missiles.
 
 === Environment Properties ===
+Multi-agent
 
 === Download ===
 Pending
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * *[Agent_TankSoar_Simple Simple Bot]*
+  * *[Agent_TankSoar_SimpleSound Simple Sound Bot]*
+  * *[Agent_TankSoar_Obscure Obscure Bot]*
+  * *[Agent_TankSoar_Wander Wander Bot]*
+  * *[Agent_TankSoar_Mapping Mapping Bot]*
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
-
-*Note*: The above documents are also included in the download.
+  * [SoarTutorial Soar Tutorial]: Chapter 3 in the Soar Tutorial is a great introduction to !TankSoar.
 
 === IO link Specification ===
 {{{
 ^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
-
+  (^blocked B1 ^clock 0 ^current-score C3 ^direction north ^energy 1000
+       ^energyrecharger no ^health 1000 ^healthrecharger no ^incoming I4
+       ^missiles 15 ^my-color blue ^radar-distance 0 ^radar-setting 0
+       ^radar-status off ^random 0.07299846410751343 ^resurrect yes ^rwaves R4
+       ^shield-status off ^smell S3 ^sound silent ^x 6 ^y 3)
+  (B1 ^backward no ^forward yes ^left no ^right no)
+  (C3 ^blue 0)
+  (I4 ^backward no ^forward no ^left no ^right no)
+  (R4 ^backward no ^forward no ^left no ^right no)
+  (S3 ^color none ^distance none)
 ^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+  ^move.direction left/right/forward/backward/none
+  ^rotate.direction left/right
+  ^fire.weapon missile
+  ^radar.switch on/off
+  ^radar-power.setting 1-14
+  ^shields.switch on/off
 }}}
+
 === Developer ===
-Taylor Lafrinere
+Jonathan Voigt, Mazin Assanie
 
 === Soar Versions ===
 Soar 8, 9
 
 === Language ===
-C++
-
-= Associated Publications =
+Java

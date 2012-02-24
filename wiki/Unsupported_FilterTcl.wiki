@@ -1,23 +1,19 @@
-= Name =
+= FilterTcl =
 
-= Description =
+FilterTcl demonstrates how to write a client that intercepts commands to allow one to use Tcl from the command line (like earlier versions of Soar).
 
-= Environment Properties =
+To demonstrate its capabilities, it comes packaged with both TclEaters and the TSI (Tcl Soar Interface, i.e. the old Tcl-based Soar debugger.)
 
-= Associated Agents =
+=== Download Links===
+  * Pending
 
-= Associated Publications =
-
-= Documentation =
-
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
+=== Documentation ===
+  * While there is no explicit documentation, this example code is heavily commented.
+  
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * Tcl
 
 

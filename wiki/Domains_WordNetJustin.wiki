@@ -1,60 +1,49 @@
-= SoarText/IO =
+= !WordNet for Soar with Parse Trees =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+This project is a word sense disambiguation task that uses a different approach than [Domains_WordNetNate WordNet for Soar].  While they both use the same corpus, this formulation gives the agent a syntactic parse tree (not a graph) and a word, and the agent is asked to disambiguate the word.  Many structures are repeated within the tree over multiple sentences.
 
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
-
-=== Environment Properties ===
 
 === Download ===
-Pending
+  * Pending
+
+*Note*: The domain requires the soar_exp package above (but will soon be rewritten it so it doesn't). Also necessary are the corpus files, which are included in the download. Each corpus file is a list of triples, which represent the parse tree structure. The script that converts from the SemCor dataset to this format is also included, but it requires other libraries (both publicly available and not).
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * Pending:  The agents included in the tarball check for recognition judgments from long-term memory. There is a core set of rules and agents which use/don't use various memories. The rules should also work on Soar kernels without recognition.
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
+  * See the documentation for [Domains_WordNetNate WordNet for Soar] for more information.
 
-*Note*: The above documents are also included in the download.
-
-=== IO link Specification ===
+=== I/O Link Specification ===
 {{{
-^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
-
-^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+^io
+	^input-link
+		^structure
+			^...            # tree representation of the entire sentence
+		^word               # string representation of the word to be disambiguated
+		^request
+			^path           # recreation of the tree path to the word to be disambiguated
+			^path-direct    # a direct link to the word on the path (NOT to the tree under ^structure)
+		^feedback           # only present if the agent has just disambiguated a word
+			^correct        # yes/no whether the senseid given by the agent is correct
+			^senseid        # the correct senseid of the previous word to be disambiguated
+	^output-link
+		^answer             # the command to use if the agent is disambiguating a word
+			^senseid        # the correct sense of the word ("none" if unknown)
+			^source         # how the agent retrieved the word sense
+			^epmem-recog    # whether the word was recognized by epmem (optional)
+			^smem-recog     # whether the word was recognized by smem (optional)
+		^feedback           # the command to signal that the agent has processed the correct answer
+			^done           # dummy parameter to fit the GSKI output command format
 }}}
+=== Associated Publications ===
+  * Functional Interactions between Memory and Recognition Judgments (submitted AAAI 2012)
+
 === Developer ===
-Taylor Lafrinere
+  * Justin Li
 
 === Soar Versions ===
-Soar 8, 9
+  * Any version with SML. If recognition is required, the branch justin-lti-context needs to be used and recognition be turned on ("epmem/smem --set recognition on")
 
 === Language ===
-C++
-
-= Associated Publications =
+  * Python

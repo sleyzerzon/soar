@@ -18,7 +18,7 @@ Pending
 *Note*: You cannot run the many Towers of Hanoi agents available in the _Agents_ downloads section with this environment.  Those ones are not designed to be run with an external environment. 
         
 === Documentation ===
-  * While there is no explicit documentation, the [IntroSoardebugger Soar Debugger tutorial] does have a section that explains how to hook up the debugger to this type of environment.
+  * While there is no explicit documentation, the [IntroSoarDebugger Soar Debugger tutorial] does have a section that explains how to hook up the debugger to this type of environment.
   
 === IO link Specification ===
 {{{
