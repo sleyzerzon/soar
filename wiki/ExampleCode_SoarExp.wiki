@@ -1,23 +1,23 @@
-= Name =
+= Soar-Exp = 
+A Python library that contains wrappers for SML library calls that can be used for running Python domains and experiments.  
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * None.
+  
+=== Developer ===
+  * Justin Li
 
-= Environment Properties =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * Python
 
-= Associated Agents =
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

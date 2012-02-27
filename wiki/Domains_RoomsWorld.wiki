@@ -1,60 +1,30 @@
-= SoarText/IO =
+= RoomsWorld =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
-
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
+Rooms World is  composed of a set of connected rooms, some of which contain blocks. One of the rooms is designated the storage room. The agent’s task is to collect the blocks and move them to the storage room. The  agent can turn and move forward, and pick up and put down a block. The agent can only carry one block at a time. The agent’s movement is continuous and takes time (it turns and moves at a fixed rate). The agent’s perception is limited by a vision cone.
 
 === Environment Properties ===
+  * Deterministic, dynamic with respect to the agent’s actions, continuous
 
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * Pending
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
-
-*Note*: The above documents are also included in the download.
+  * Pending
 
 === IO link Specification ===
 {{{
-^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
-
-^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
 }}}
 === Developer ===
-Taylor Lafrinere
+  * 
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 8, 9
 
 === Language ===
-C++
+  * C++
 
 = Associated Publications =
+  * 

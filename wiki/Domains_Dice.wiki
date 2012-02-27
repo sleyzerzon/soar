@@ -1,60 +1,89 @@
-= SoarText/IO =
+= Dice =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+Dice is a java implementation of a game often called _Liar's Dice_.
 
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
+Each player gets five six-sided dice and a cup to conceal their dice from other players.
+
+To begin each round, all players roll their dice under their cups and look at their new 'hand' while keeping it concealed from the other players. The first player begins bidding, picking a quantity of a face number. The quantity states the player's opinion on how many of the chosen face have been rolled in total on the table. The 1s ("aces") are wild and count as two in a bid, for example to outbid a bid of _2 one's_, you must bid at least 5 of a non-wild face.
+
+Each player has two choices during his turn: make a higher bid, or challenge the previous bid as being wrong. Raising the bid means either increasing the quantity, or the face value, or both, according to the specific bidding rules used. 
+
+If the current player thinks the previous player's bid is wrong, he challenges it, and then all dice are revealed to determine whether the bid was valid. If the number of the relevant face revealed is at least as high as the bid, then the bid is valid, in which case the bidder wins. Otherwise, the challenger wins.
+
+{{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Liar's_dice its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
 === Environment Properties ===
+  * Uncertainty, incomplete knowledge, multi-player
 
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * Pending
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
+  * Requires these jars on the classpath:
+    * sml.jar
+    * soar-qna-9.3.1.jar
+    * soar-smljava-9.3.1.jar
 
-*Note*: The above documents are also included in the download.
+  * Also needs the environment variables SOAR_HOME set and LD_LIBRARY_PATH on Linux (DYLD_LIBRARY_PATH on OSX, PATH on Windows) set to $SOAR_HOME/lib.
 
+  * To import into Eclipse, go to File > New > Java Project, un-check "Use Default Location" and under "Location" select the root directory of the project. All other default settings should be fine.
+
+  * To run, right-click on the SoarMatch.java file and select Run As > Java Application.
+  
 === IO link Specification ===
 {{{
-^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+input-link
+	dice-probability
+		id (any) copied from request
+		probability (float) (0..1)
+		
+output-link
+	compute-dice-probability
+		id (any) user-data to be copied to input-link to correlate result
+		number-of-dice (int) (1..)
+		number-of-faces (int) (1..) usually 3 (normal, ones wild) or 6 (ones or special rules)
+		count (int) (1..number-of-dice) Target number
+		predicate (string) (eq ne ge gt le lt)
 
-^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+Predicate shorthand:
+	eq: equal ==
+	ne: not equal !=
+	ge: greater than or equal >=
+	gt: greater than >
+	le: less than or equal <=
+	lt: less than <
+
+Examples:
+
+id: 1, number-of-dice: 3, number-of-faces: 6, count: 2, predicate: eq
+yields: id: 1, probability: 0.06944
+
+id: 2.0, number-of-dice: 5, number-of-faces: 3, count: 3, predicate: ge
+yields: id: 2.0, probability: 0.20988
+
+id: charlie, number-of-dice: 24, number-of-faces: 6, count: 6, predicate lt
+yields: id: charlie, probability: 0.80047
+
+Quick test using add-wme on empty agent:
+aw i3 compute-dice-probability *
+aw i4 id 1
+aw i4 number-of-dice 5
+aw i4 number-of-faces 3
+aw i4 count 3
+aw i4 predicate ge
+
 }}}
 === Developer ===
-Taylor Lafrinere
+  * Miller Tinkerhess
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 9
 
 === Language ===
-C++
+  * Java
 
 = Associated Publications =
+  * Pending

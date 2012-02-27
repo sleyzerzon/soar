@@ -1,15 +1,31 @@
-= Soar Debugger = 
+= Vim Soar Plug-In  = 
+
+This package allows you to edit your Soar files in vim more easily by providing the following capabilities:
+  * Syntax highlighting
+  * Auto-indenting
+  * Moving around by productions
+  * Toggling comment/uncomment productions
+  * Code folding (You can fold a production into a single line)
+  * Taglist support
 
 === Download Links ===
-
+  * Pending
+  
 === Documentation ===
+  * Untar in $HOME/.vim (C:\Documents and Settings\user\vimfiles for Windows users) to install.
+  * You need to perform a second step to enable taglists.  This allows you to open a window that lists all the productions in a Soar file. You can then jump to any production, even across different files, by navigating this list. This is quite useful when your productions are distributed across many files, for example if you created them with Visual Soar.
+    # First download the taglist plugin [http://www.vim.org/scripts/script.php?script_id=273 here]. 
+    # Next, generate a tags file with ctags. This will allow the taglist window to correctly list Soar productions.  
+    # To get ctags to recognize Soar source code, add these lines into your $HOME/.ctags file (or C:\Documents and Settings\user\ctags.cnf for Windows users):
+{{{
+--langdef=soar
+--langmap=soar:.soar
+--regex-soar=/^[ \t]*sp[ \t]*{[ \t]*([-a-zA-Z0-9_\*\|]*)/\1/p,production/
+}}}  
 
 === Developer ===
+Joseph Xu
 
-=== Soar Versions ===
-
-=== Language ===
-Java
 
 
 

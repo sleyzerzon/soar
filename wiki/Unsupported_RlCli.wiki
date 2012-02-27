@@ -1,23 +1,25 @@
-= Name =
+= RlCli = 
+This project contains an example of a C++ program that interfaces with Soar.
 
-= Description =
+This application proved a command line interface to collect reinforcement learning data. It is a good example of a minimal command line interface application. 
 
-= Environment Properties =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * None.
+  
+=== Developer ===
+  * Jon Voigt
 
-= Associated Agents =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * C++
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
 
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

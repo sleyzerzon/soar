@@ -1,23 +1,23 @@
-= Name =
+= Soar Scratch Pad = 
+This download contains the minimal C++ code needed to launch a Soar kernel using SML.
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * None, but the code is pretty self-explanatory.
+  
+=== Developer ===
+  * Jon Voigt
 
-= Environment Properties =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * C++
 
-= Associated Agents =
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

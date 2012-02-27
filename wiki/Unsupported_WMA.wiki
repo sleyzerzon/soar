@@ -1,23 +1,23 @@
-= Name =
+= Working Memory Activation Recorder = 
+This is a script that captures base-level activations of WME’s in an agent.  
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * pending
+  
+=== Developer ===
+  * Nate Derbinsky
 
-= Environment Properties =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * PhP?
 
-= Associated Agents =
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

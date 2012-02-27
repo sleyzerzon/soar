@@ -1,3 +1,12 @@
-= Software Download Category =
+= Soar Tutorial =
 
-This category contains blah blah blah
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%201.pdf Introduction]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%202.pdf Simple External Interaction]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%203.pdf Subgoals]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%204.pdf More Simple Problem Solving]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%205.pdf Planning and Learning]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%206.pdf Quakebot]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%207%20-%20RL.pdf Reinforcement Learning Tutorial]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%208%20-%20SMem.pdf Semantic Memory Tutorial]
+  # [http://code.google.com/p/soar/source/browse/trunk/Documentation/pdf/Soar%20Tutorial%20Part%208%20-%20EpMem.pdf Episodic Memory Tutorial]
+  

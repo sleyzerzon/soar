@@ -1,60 +1,75 @@
-= SoarText/IO =
+= Taxi =
 
-The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
-
-Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
 
 === Environment Properties ===
-
+  * Pending
+  
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
-
-*SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * Pending
 
 === Documentation ===
-  * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]
-  * [http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc SoarTextIO Tutorial]
-
-*Note*: The above documents are also included in the download.
+  * Pending
 
 === IO link Specification ===
 {{{
 ^input-link
-	^text
-		^text-input-number <num>
-		^length <num-words>
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
-
+    ^self
+        ^position
+            ^x <int> current grid column
+            ^y <int> current grid row, flipped
+        ^reward <int> result of last action
+        ^random <float> a random number, just like eaters and tanksoar, [0..1)
+        ^passenger [true false] true if a passenger is carried
+        ?^destination [red blue green yellow]
+        ^fuel <int> fuel remaining
+        ^former-destination [red blue green yellow none] what destination the passenger was recently on
+    ^view
+        ^north
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^south
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^east
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^west
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+    ^cell current cell agent is at
+        ^type [normal red blue green yellow fuel]
+        ^passenger [true false] passenger is hailing cab        
+                
+# Error status only happens when there's an architectural error.
+# Do not use "status" to determine if your command was successful or not.               
 ^output-link
-	^text
-		^text-input-number 1 # Optional
-		^length 5		   # Optional
-		^get next-line	   # Optional - used for loading from files
-		^next
-			^value <word-one>
-			^next
-				^value <word-two>
-				^next 
-					^value <word-three>
-					^next
-						^value nil
+        ^move
+                ^direction [north south east west]
+                ^status [complete error]
+        ^pickup
+                ^status [complete error]
+        ^putdown
+                ^status [complete error]
+        ^fillup
+                ^status [complete error]
+        ^stop-sim
+                ^status [complete error]
 }}}
 === Developer ===
-Taylor Lafrinere
+  * Mitchell Bloch
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 8, 9
 
 === Language ===
-C++
+  * C++
 
 = Associated Publications =
+  * 

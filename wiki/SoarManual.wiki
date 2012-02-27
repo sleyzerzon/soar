@@ -1,3 +1,18 @@
-= Software Download Category =
+= Soar Manual =
 
-This category contains blah blah blah
+  # Introduction
+  # The Soar Architecture
+  # The Syntax of Soar Programs
+  # Chunking
+  # Reinforcement Learning
+  # Semantic Memory
+  # Episodic Memory
+  # The Soar User Interface
+  * Appendices
+    # The Blocks-World Program
+    # Grammars for Production Syntax
+    # The Calculation of O-Support
+    # The Resolution of Operator Preferences
+    # A Goal Dependency Set Primary
+  * Index
+  * Summary of Soar Aliases, Variables, and Functions

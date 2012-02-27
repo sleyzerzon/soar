@@ -1,23 +1,23 @@
-= Name =
+= Tower of Hanoi SML = 
+This project contains an example of a C++ based environment that interfaces with Soar. It implements a graphical version of the Towers of Hanoi.
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * None, but the code does have some comments.
+  
+=== Developer ===
+  * Mitchell Bloch
 
-= Environment Properties =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * C++
 
-= Associated Agents =
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

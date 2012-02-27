@@ -1,23 +1,23 @@
-= Name =
+= Planning Domain Definition Language Translator = 
+This tool will dynamically generate a domain based on the [http://en.wikipedia.org/wiki/Planning_Domain_Definition_Language Planning Domain Definition Language].  
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+  * None.
+  
+=== Developer ===
+  * Joseph Xu
 
-= Environment Properties =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * Python
 
-= Associated Agents =
 
-= Associated Publications =
 
-= Documentation =
 
-= IO link Specification =
-
-= Developer =
-
-= Soar Versions =
-
-= Language =
-
-= Download Links=
 
 

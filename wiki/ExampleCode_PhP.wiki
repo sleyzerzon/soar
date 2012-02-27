@@ -1,23 +1,38 @@
-= Name =
+= PhP Example Project = 
+This project contains an example PhP project that interfaces with Soar. 
 
-= Description =
+=== Download Links ===
+  * pending
+  
+=== Documentation ===
+For the PHP bindings to build correctly, SWIG Version 1.3.40 is required.
 
-= Environment Properties =
+For Soar to interact with PHP, there are a couple manual steps:
 
-= Associated Agents =
+1. Open php.ini and set the enable_dl = On
+2. Copy (or, preferably, create a symbolic link) of libPHP_sml_ClientInterface.so (in lib) to the PHP extension_dir (sans the lib prefix).
+   This is visible via phpInfo() (search for extension_dir) or `php-config --extension-dir`.
 
-= Associated Publications =
 
-= Documentation =
+For Soar to work with Apache via PHP, there are another couple steps:
 
-= IO link Specification =
+1. The module needs to be loaded by default.
+   Open php.ini, add extension=PHP_sml_ClientInterface.so (at the end of the list of extensions).
 
-= Developer =
+2. The SML shared library (i.e. libSoarKernelSML) needs to be accessible to Apache.
+   Easiest way: copy the library to system library path (like /usr/local/lib).
+  
+=== Developer ===
+  * Nate Derbinsky
 
-= Soar Versions =
+=== Soar Versions ===
+  * Soar 8, 9
+  
+=== Language ===
+  * PhP
 
-= Language =
 
-= Download Links=
+
+
 
 

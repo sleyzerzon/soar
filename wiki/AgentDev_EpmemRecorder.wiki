@@ -1,15 +1,16 @@
-= Soar Debugger = 
+= Episodic Memory Recorder = 
+Records episodic memory.
 
 === Download Links ===
-
+  * pending
 === Documentation ===
-
+  * pending
 === Developer ===
-
+  * Joseph Xu
 === Soar Versions ===
-
+  * Soar 8,9
 === Language ===
-Java
+  * Python
 
 
 

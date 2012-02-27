@@ -1,15 +1,20 @@
-= Soar Debugger = 
+= Soar Data Collector = 
+A Java library that can be used to collect data from a running Soar environment. 
 
 === Download Links ===
-
+  * You can download the SDC [https://github.com/voigtjr/soar-datacollector here].
+  
 === Documentation ===
-
+  * A commented example can be found [https://github.com/voigtjr/soar-datacollector/blob/master/src/main/java/edu/umich/soar/DataCollectorExample.java here].
+  
 === Developer ===
+  * Jonathan Voigt  <voigtjr@gmail.com>
 
 === Soar Versions ===
-
+  * Latest version of Soar
+  
 === Language ===
-Java
+  * Java
 
 
 
