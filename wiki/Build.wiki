@@ -1,6 +1,6 @@
 = Building Soar =
 
-If you wish to manually build Soar rather than downloading [Download pre-compiled binaries], for example if you want to make modification or extensions to the architecture, you can perform the following steps:
+If you wish to manually build Soar rather than downloading [Download pre-compiled !binaries], for example if you want to make modification or extensions to the architecture, you can perform the following steps:
 
   * *Step 1*: Get the source code for !SoarSuite by either downloading it or checking it out from our version control repository.
     * [BuildGetSource Instructions for getting the source code]

@@ -6,7 +6,7 @@ This project is a word sense disambiguation task that uses a different approach 
 === Download ===
   * Pending
 
-*Note*: The domain requires the soar_exp package above (but will soon be rewritten it so it doesn't). Also necessary are the corpus files, which are included in the download. Each corpus file is a list of triples, which represent the parse tree structure. The script that converts from the SemCor dataset to this format is also included, but it requires other libraries (both publicly available and not).
+*Note*: The domain requires the soar_exp package above (but will soon be rewritten it so it doesn't). Also necessary are the corpus files, which are included in the download. Each corpus file is a list of triples, which represent the parse tree structure. The script that converts from the !SemCor dataset to this format is also included, but it requires other libraries (both publicly available and not).
 
 === Associated Agents ===
   * Pending:  The agents included in the tarball check for recognition judgments from long-term memory. There is a core set of rules and agents which use/don't use various memories. The rules should also work on Soar kernels without recognition.

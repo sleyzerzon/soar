@@ -1,14 +1,14 @@
 = !TankSoar =
 
-!TankSoar is a multi-agent tank battle game implemented using Java and interfacing with Soar via SML.
+!TankSoar is a multi-agent tank battle game implemented using Java and interfaced with Soar via SML.
 
 The !TankSoar world consists of a rectangular grid, 14 squares wide by 14 squares high. All four sides are bounded by walls made of rock. Interior walls are made of trees. There are a variety of maps that can be used, with different layouts of walls.   Each !TankSoar agent controls one tank. The tank takes up one square in the playing field. A tank has actions it can take, resources it carries, and sensors with which it observes its environment.  In !TankSoar, your tank has many sensors and actions and can interact with other tanks by shooting missiles.
 
 === Environment Properties ===
-Multi-agent
+  * Multi-agent, incomplete information
 
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
   * *[Agent_TankSoar_Simple Simple Bot]*
@@ -43,10 +43,10 @@ Pending
 }}}
 
 === Developer ===
-Jonathan Voigt, Mazin Assanie
+  * Jonathan Voigt, Mazin Assanie
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 8, 9
 
 === Language ===
-Java
+  * Java

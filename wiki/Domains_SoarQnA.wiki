@@ -1,6 +1,6 @@
 = Soar QnA =
 
-SoarQnA facilitates agent access to external knowledge stores via the io system.  It is an efficient, unified agent interface that allows your system to access arbitrary external data sources.  Examples include Google Maps, GIS, GPS/WiFi, weather data, rhyming databases, diet databases, and language translation engines.
+SoarQnA facilitates agent access to external knowledge stores via the io system.  It is an efficient, unified agent interface that allows your system to access arbitrary external data sources.  Examples include Google Maps, GIS, GPS/!WiFi, weather data, rhyming databases, diet databases, and language translation engines.
 
 === Environment Properties ===
   * Pending
@@ -34,9 +34,9 @@ A SQLite JDBC driver has been included in the lib directory for demonstration/de
 ====Developing Data Source Drivers====
 If you wish to develop custom data source drivers, see included demos for guidance. The big picture is as simple as implementing a set of interfaces:
 
-  * *DataSourceDriver*: creates instance connections to a data source.
-  * *DataSourceConnection*: creates QueryState instances given query parameters and disconnects an instance connection when appropriate.
-  * *QueryState*: maintains all necessary state for an executed query and allows for incremental access to results.
+  * *!DataSourceDriver*: creates instance connections to a data source.
+  * *!DataSourceConnection*: creates !QueryState instances given query parameters and disconnects an instance connection when appropriate.
+  * *!QueryState*: maintains all necessary state for an executed query and allows for incremental access to results.
  
  
 ====Data Source Instance Configuration====

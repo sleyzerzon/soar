@@ -1,6 +1,6 @@
-= Infinite mario =
+= Infinite Mario =
 
-This environment is derived from Infinite Mario domain from RLCompetition2009 (based on RL-Glue) and uses SML to connect to Soar.
+This environment is derived from the Infinite Mario domain from RLCompetition2009 (based on RL-Glue) and uses SML to connect to Soar.
 
 Agents play a variant of Super Mario, a complete side-scrolling video game with destructible blocks, enemies, fireballs, coins, chasms, platforms, etc. The state space is complicated, but factored in an object-oriented way, which captures many aspects of the real world. Challenges include:
 
@@ -11,7 +11,7 @@ Agents play a variant of Super Mario, a complete side-scrolling video game with 
 Get more details on the mario domain [http://2009.rl-competition.org/mario.php here].
 
 === Environment Properties ===
-  * Continuous, single-agent, episodic, RL, nknown, complete information.
+  * Continuous, single-agent, episodic, RL, uncertainty, complete information.
 
 === Download ===
   * Pending

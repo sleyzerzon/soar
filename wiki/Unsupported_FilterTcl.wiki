@@ -1,8 +1,8 @@
-= FilterTcl =
+= !FilterTcl =
 
-FilterTcl demonstrates how to write a client that intercepts commands to allow one to use Tcl from the command line (like earlier versions of Soar).
+!FilterTcl demonstrates how to write a client that intercepts commands to allow one to use Tcl from the command line (like earlier versions of Soar).
 
-To demonstrate its capabilities, it comes packaged with both TclEaters and the TSI (Tcl Soar Interface, i.e. the old Tcl-based Soar debugger.)
+To demonstrate its capabilities, it comes packaged with both !TclEaters and the TSI (Tcl Soar Interface, i.e. the old Tcl-based Soar debugger.)
 
 === Download Links===
   * Pending

@@ -1,9 +1,9 @@
-= RoomsWorld =
+= !RoomsWorld =
 
-Rooms World is  composed of a set of connected rooms, some of which contain blocks. One of the rooms is designated the storage room. The agent’s task is to collect the blocks and move them to the storage room. The  agent can turn and move forward, and pick up and put down a block. The agent can only carry one block at a time. The agent’s movement is continuous and takes time (it turns and moves at a fixed rate). The agent’s perception is limited by a vision cone.
+!RoomsWorld is composed of a set of connected rooms, some of which contain blocks. One of the rooms is designated the storage room. The agent's task is to collect the blocks and move them to the storage room. The  agent can turn and move forward, and pick up and put down a block. The agent can only carry one block at a time. The agent's movement is continuous and takes time (it turns and moves at a fixed rate). The agent's perception is limited by a vision cone.
 
 === Environment Properties ===
-  * Deterministic, dynamic with respect to the agent’s actions, continuous
+  * Deterministic, dynamic with respect to the agent's actions, continuous
 
 === Download ===
   * Pending
@@ -16,9 +16,16 @@ Rooms World is  composed of a set of connected rooms, some of which contain bloc
 
 === IO link Specification ===
 {{{
+pending
 }}}
+
+=== Associated Publications ===
+  * pending
+
 === Developer ===
-  * 
+  * Jon Voigt
+  * Miller Tinkerhess
+  * Various others (project previously known as Soar Robot World and Sproom)
 
 === Soar Versions ===
   * Soar 8, 9
@@ -26,5 +33,3 @@ Rooms World is  composed of a set of connected rooms, some of which contain bloc
 === Language ===
   * C++
 
-= Associated Publications =
-  * 

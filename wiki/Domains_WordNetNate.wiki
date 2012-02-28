@@ -1,6 +1,6 @@
 = !WordNet for Soar =
 
-This project is a word sense disambiguation task that involves some preliminary work importing a [http://wordnet.princeton.edu WordNet] translation into Soar's Semantic Memory.  It contains a set of PhP scripts that does various conversions to a format that Soar can use and an agent that uses that knowledge to disambiguate words in various sentences.
+This project is a word sense disambiguation task that involves some preliminary work importing a [http://wordnet.princeton.edu WordNet] database into Soar's Semantic Memory.  It contains a set of PhP scripts that does various conversions to a format that Soar can use and an agent that uses that knowledge to disambiguate words in various sentences.
 
 === Download ===
   * Pending
@@ -74,6 +74,8 @@ The output will contain four tables:
   * c_id, w_pos = from wsd_sentences
   * ambig = (# rows in wsd_assignments)/(# rows in wsd_options)
   * ambig_prop = proportion of w_pos in c_id with this ambig value
+
+=== Associated Publications ===
 
 === Developer ===
 Nate Derbinsky

@@ -1,12 +1,12 @@
-= Ultra-Edit Syntax Coloring Wordfile = 
+= !UltraEdit Syntax Coloring Wordfile = 
 
-This file allows UltraEdit to properly indent and color the syntax of your Soar files.
+This file allows !UltraEdit to properly indent and color the syntax of your Soar files.
 
 === Download Links ===
   * Pending
   
 === Documentation ===
-  * Version 15.00 and later: Download and save it into your "wordfile" directory which by default is %appdata%\IDMComp\UltraEdit\wordfiles, unless you have specified a different directory. Further help and documentation is available [http://www.ultraedit.com/support/tutorials_power_tips/ultraedit/add_a_wordfile.html here].
+  * Version 15.00 and later: Download and save it into your "wordfile" directory which by default is %appdata%\IDMComp\!UltraEdit\wordfiles, unless you have specified a different directory. Further help and documentation is available [http://www.ultraedit.com/support/tutorials_power_tips/ultraedit/add_a_wordfile.html here].
 
   * Version 14.20 and previous: Visit this [http://www.ultraedit.com/support/tutorials_power_tips/ultraedit/add_a_wordfile_pre_v15.html page] for instructions.
   

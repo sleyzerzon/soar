@@ -1,6 +1,6 @@
 = Missionaries and Cannibals =
 
-The classic missionaries and cannibals puzzle implemented as an external environment using Java and interfaced with Soar via SML.  To see how the agent performs the task, you must launch the Soar debugger and tell it to connect to a remote Soar agent.
+The classic missionaries and cannibals puzzle implemented as an external, graphical environment using Java and interfaced with Soar via SML.  To see how the agent performs the task, you must launch the Soar debugger and tell it to connect to a remote Soar agent.
 
 In the missionaries and cannibals problem, three missionaries and three cannibals must cross a river using a boat which can carry at most two people, under the constraint that, for both banks, if there are missionaries present on the bank, they cannot be outnumbered by cannibals (if they were, the cannibals would eat the missionaries.) The boat cannot cross the river by itself with no people on board.
 
@@ -12,7 +12,7 @@ Pending
 === Associated Agents ===
   * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.
 
-*Note*: You cannot run the many Missionary and Cannibals agents available in the _Agents_ downloads section with this environment.  Those ones are not designed to be run with an external environment. 
+*Note*: You cannot run the many Missionary and Cannibals agents available in the _Agents_ downloads section with this environment.  Those ones are not designed to be run with this external environment. 
         
 === Documentation ===
   * While there is no explicit documentation, the [IntroSoarDebugger Soar Debugger tutorial] does have a section that explains how to hook up the debugger to this type of environment.

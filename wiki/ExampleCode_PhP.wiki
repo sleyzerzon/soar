@@ -17,7 +17,7 @@ For Soar to interact with PHP, there are a couple manual steps:
 For Soar to work with Apache via PHP, there are another couple steps:
 
 1. The module needs to be loaded by default.
-   Open php.ini, add extension=PHP_sml_ClientInterface.so (at the end of the list of extensions).
+   Open php.ini, add extension=PHP_sml_!ClientInterface.so (at the end of the list of extensions).
 
 2. The SML shared library (i.e. libSoarKernelSML) needs to be accessible to Apache.
    Easiest way: copy the library to system library path (like /usr/local/lib).

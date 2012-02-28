@@ -1,5 +1,5 @@
 = Working Memory Activation Recorder = 
-This is a script that captures base-level activations of WME’s in an agent.  
+This is a script that captures base-level activations of WME's in an agent.  
 
 === Download Links ===
   * pending

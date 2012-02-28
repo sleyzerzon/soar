@@ -4,10 +4,19 @@
 
 A handy reference and [SoarManual the authoritative documentation] for Soar.
 
-== Soar Tutorial ==
-
-A [SoarTutorial step-by-step introduction] to all the major aspects of the Soar architecture and how to develop agents for it.
-
 == Command Line Help ==
 
 An online reference of precisely how [CommandIndex every command-line command] in Soar works.
+
+== Soar FAQ ==
+
+[http://acs.ist.psu.edu/soar-faq/soar-faq.html Frequently asked questions] that focus on the theoretical underpinnings of Soar.  There is some technical information on Soar contained in this FAQ.  This FAQ is maintained by Frank Ritter at Penn State University.
+
+== Soar Technical FAQ ==
+
+[FAQ Frequently asked questions] that focus on running and developing for Soar.  This FAQ is maintained by the University of Michigan Soar group.
+
+== !VisualSoar Key Bindings ==
+
+A listing of all the [VSKeyBindings key binding shortcuts] used in the [AgentDev_VisualSoar VisualSoar IDE].
+

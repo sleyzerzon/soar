@@ -1,0 +1,13 @@
+= Programming Soar Agents =
+
+== Soar Tutorial ==
+
+A [SoarTutorial step-by-step introduction] to all the major aspects of the Soar architecture and how to develop agents for it.
+
+== Intro to the Soar Debugger ==
+
+An [IntroSoarDebugger overview and tutorial] covering all the basic functions of the Soar agent debugger.
+
+== Soar Dogma ==
+
+A [SoarDogma document contains a collection of suggestions] that may help when first learning how to program Soar agents.
