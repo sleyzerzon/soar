@@ -1,0 +1,26 @@
+= Graph Search Agent =
+An agent that performs graph search using the selection-astar default rules.  This approach can be modified to use any of the different selection approaches.
+
+=== Soar capabilities ===
+  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Semantic Memory
+
+=== Download Links===
+  * pending
+  
+=== External Environment ===
+  * None.
+
+=== Default Rules ===
+  * selection-astar
+
+=== Associated Publications ===
+  * None.
+
+=== Developer ===
+  * John Laird
+
+=== Soar Versions ===
+  * Soar 8,9
+
+=== Project Type ===
+  * VisualSoar

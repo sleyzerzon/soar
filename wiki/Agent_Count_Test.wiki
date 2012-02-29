@@ -1,5 +1,5 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks. Uses two operator evaluation rules to eliminate all search.
+= Counting Agent =
+Agents that can count in nine different ways.
 
 === Soar capabilities ===
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
@@ -14,7 +14,7 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
   * John Laird

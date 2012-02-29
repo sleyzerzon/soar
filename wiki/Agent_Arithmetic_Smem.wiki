@@ -1,0 +1,26 @@
+= Arithmetic Semantic Memory Agent =
+Multicolumn addition and subtraction with borrowing and carrying, all the way down to counting – no math functions are used. Works with chunking. All search control is handcoded. Unlike the other arithmetic agent, this agent stores the results of counting and columns in semantic memory.
+
+=== Soar capabilities ===
+  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Semantic Memory
+
+=== Download Links===
+  * pending
+  
+=== External Environment ===
+  * None.
+
+=== Default Rules ===
+  * None.
+
+=== Associated Publications ===
+  * The Soar Cognitive Architecture: Chapter 
+
+=== Developer ===
+  * John Laird
+
+=== Soar Versions ===
+  * Soar 8,9
+
+=== Project Type ===
+  * VisualSoar

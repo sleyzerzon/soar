@@ -1,0 +1,39 @@
+= Soar Downloads =
+
+== Soar Suite ==
+[Downloads This category] contains pre-compiled binaries of the Soar Suite.  This is the most common form of Soar that people will download.
+
+== Agents ==
+[DLCategory_Agents This category] contains a variety of agents developed for a wide range of different tasks and environments.  You will find a full description of the agent, its capabilities and problem solving approach as well, as a download link.  If the agent requires an environment, a link will be provided.
+
+== Agent Development Tools ==
+[DLCategory_AgentDev This category] contains tools to help you deveop your Soar agents.  This includes IDEs for developing Soar agents, a variety of both real-time and offline debugging tools and some syntax coloring add-ons for certain text editors.
+
+== Domains ===
+[DLCategory_Domains This category] contains an extensive list of domains you can develop agents in.  Some are game-like environment simulators while other provide access to an external knowledge source for your agent to process and manipulate, for example !WordNet or SoarQnA.
+
+All of these domains are fully interfaced with Soar already.
+
+== Agent Generation Tools ==
+[DLCategory_AgentGen This category] contains programs that will dynamically generate an agent based on some sort of declarative representation, for example the _Game Description Language_ used by the General Game Playing project.
+
+== Domain Generation Tools ==
+[DLCategory_DomainGen This category] contains programs that will dynamically generate a domain for your agents based on some sort of declarative representation, for example the Planning Domain Definition Language.
+
+== Soar Experimental Modules ==
+[DLCategory_SoarExperimental This category] contains possible extensions to Soar that are not yet ready to be included in the release version of Soar.
+
+== Domain Development Code ==
+[DLCategory_ExampleCode This category] contains example code and wrapper functions to help you build your own environments in a variety of language, namely C++, PhP, Python, Java and C.  There are two actual external environments among these examples.
+
+== Unsupported Example Code ==
+[DLCategory_Unsupported This category] contains a variety of small projects that you can use to learn more about how to interface to Soar.  While we no longer actively support these projects, they should still work.
+
+== Deprecated Projects ==
+[DLCategory_Deprecated This category] contains projects that are now considered completely deprecated.  These projects are not supported in any way.  Any source code you may find in their wiki pages may or may not still work.  They are included here for historical/research purposes and as a possible source of example code.
+
+== Soar Suite Archives ==
+[SoarSoftware This category] contains an archive of all previous releases of Soar.
+
+== Release Note Archives ==
+[ReleaseNotes This category] contains release notes for all previous releases of Soar.

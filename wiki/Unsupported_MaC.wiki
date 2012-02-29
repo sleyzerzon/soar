@@ -7,7 +7,7 @@ In the missionaries and cannibals problem, three missionaries and three cannibal
 {{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
   * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.
@@ -27,10 +27,10 @@ Pending
   (M1 ^boat 1 ^cannibals 2 ^from-bank L1)
 }}}
 === Developer ===
-Taylor Lafrinere
+  * Taylor Lafrinere
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 8, 9
 
 === Language ===
-C++
+  * C++

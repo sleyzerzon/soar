@@ -22,7 +22,7 @@ Here is an abbreviated description of the rules used in our implementation of th
   * Pending
 
 === Associated Agents ===
-  * Pending
+  * [Agent_Dice John Lair'd Dice Agent]
 
 === Documentation ===
   * Requires these jars on the classpath:

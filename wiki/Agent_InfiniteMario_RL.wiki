@@ -1,6 +1,6 @@
 = Infinite Mario Soar-RL Agent =
 
-Various agents for learning and playing InfiniteMario domain from RLCompetition 2009. They encode different state representations and learning strategies.
+Various agents for learning and playing Infinite Mario domain from RLCompetition 2009. They encode different state representations and learning strategies.
 
 === Soar capabilities ===
   * Reinforcement learning

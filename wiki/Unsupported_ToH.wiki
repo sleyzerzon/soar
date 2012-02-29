@@ -10,7 +10,7 @@ The Towers of Hanoi is a puzzle that consists of three rods and a number of disk
 {{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Towers_of_Hanoi its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
 === Download ===
-Pending
+  * Pending
 
 === Associated Agents ===
   * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.
@@ -42,10 +42,10 @@ Pending
   (M1 ^destination-peg C ^source-peg A)
 }}}
 === Developer ===
-Taylor Lafrinere
+  * Taylor Lafrinere
 
 === Soar Versions ===
-Soar 8, 9
+  * Soar 8, 9
 
 === Language ===
-C++
+  * C++

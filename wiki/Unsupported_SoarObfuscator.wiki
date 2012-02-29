@@ -1,5 +1,5 @@
 = Soar Obfuscator = 
-This is a python script that does simple find and replaces to quickly (but weakly) obfuscate Soar code. It was originally developed to hide the workings of TankSoar agents developed for a TankSoar competition.
+This is a python script that does simple find and replaces to quickly (but weakly) obfuscate Soar code. It was originally developed to hide the workings of !TankSoar agents developed for a !TankSoar competition.
 
 === Download Links ===
   * pending
@@ -8,7 +8,7 @@ This is a python script that does simple find and replaces to quickly (but weakl
   * None.
   
 === Developer ===
-  * ?
+  * Jon Voigt
 
 === Soar Versions ===
   * Soar 8, 9

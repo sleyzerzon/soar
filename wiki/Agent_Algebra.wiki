@@ -1,0 +1,26 @@
+= Algebra Agent =
+Agent that can solve algebra problems. Uses a tree structure to represent an algebra problem. As of 2/2012, can only solve simple problems.
+
+=== Soar capabilities ===
+  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Semantic Memory
+
+=== Download Links===
+  * pending
+  
+=== External Environment ===
+  * None.
+
+=== Default Rules ===
+  * None.
+
+=== Associated Publications ===
+  * None.
+
+=== Developer ===
+  * John Laird
+
+=== Soar Versions ===
+  * Soar 8,9
+
+=== Project Type ===
+  * VisualSoar

@@ -1,20 +1,26 @@
-= Name =
+= Blocks-World Simple Agent =
+A very simple instance of an internally-simulated blocks world with three blocks.
 
-= Description =
+=== Soar capabilities ===
+  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
 
-= Soar capabilities =
+=== Download Links===
+  * pending
+  
+=== External Environment ===
+  * None.
 
-= External Environment =
+=== Default Rules ===
+  * None.
 
-= Default Rules =
+=== Associated Publications ===
+  * The Soar Cognitive Architecture: Chapter 4
 
-= Associated Publications =
+=== Developer ===
+  * John Laird
 
-= Developer =
+=== Soar Versions ===
+  * Soar 8,9
 
-= Soar Versions =
-
-= Project Type =
-
-= Download Links=
-
+=== Project Type ===
+  * VisualSoar

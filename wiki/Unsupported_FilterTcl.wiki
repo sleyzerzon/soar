@@ -10,6 +10,9 @@ To demonstrate its capabilities, it comes packaged with both !TclEaters and the 
 === Documentation ===
   * While there is no explicit documentation, this example code is heavily commented.
   
+=== Developer ===
+  * Douglas Pearson
+
 === Soar Versions ===
   * Soar 8, 9
   
