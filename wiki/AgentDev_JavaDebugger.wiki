@@ -6,6 +6,7 @@ A powerful Soar debugger implemented in Java that interfaces with Soar via SML. 
 
 === Documentation ===
   * An introductory tutorial to the Soar debugger can be found at [IntroSoarDebugger this page] on the wiki.
+  * [SoarJavaDebugger Soar Java Debugger Wishlist] (some items may be outdated)
 
 === Developers ===
   * Douglas Pearson

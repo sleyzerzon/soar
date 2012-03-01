@@ -1,4 +1,0 @@
-#summary Environment integration proposal from May 2005
-
-Please view here: 
-http://soar.googlecode.com/files/Event-Driven%20Environments%20Proposal.doc

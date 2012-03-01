@@ -1,9 +1,6 @@
-#summary Soar2D general help
-#labels Phase-Support
+= Tank Soar and Eaters Configuration Files =
 
-= Soar2D =
-
-Soar2D includes the Eaters, !TankSoar, Taxi and [Room] environments.
+Soar2D is a general framework that includes both Eaters and !TankSoar.  This document describes how to modify these environments using the configuration settings files.
 
 <wiki:toc max_depth="2"/>
 

@@ -1,4 +1,0 @@
-#summary Moving to SML
-
-Please view here:
-http://soar.googlecode.com/files/Moving%20from%20SGIO%20to%20SML.doc
