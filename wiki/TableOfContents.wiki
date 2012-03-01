@@ -155,7 +155,7 @@
     * [Soar2D TankSoar and Eaters Configuration Files]
     * [SoarTimers Timers in Soar]
   * [Publications]
-  * [UMich University of Michigan Related]
+  * [Umich University of Michigan Related]
       * [ConferenceSchedule Conferences]
       * [RoboticsNotes Robotics Notes]
       * [ReleasePreparation UMich Release Preparation]
