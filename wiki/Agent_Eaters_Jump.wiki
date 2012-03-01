@@ -1,5 +1,5 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Eaters Jump Agent =
+A very simple eaters agent that will jump in the direction of a cell two steps away in a direction if the location does not contain a wall.
 
 === Soar capabilities ===
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
@@ -14,7 +14,7 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * The Soar Tutorial: Chapter 2
 
 === Developer ===
   * John Laird
@@ -23,4 +23,4 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * Plain text

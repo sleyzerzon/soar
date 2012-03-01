@@ -1,5 +1,5 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Eaters Move Agent =
+An eaters agent that implements a generalized move operator that proposes moves to any adjacent position that is empty, has food or contains another eater.  It prefers operators that move towards bonus food and avoids operators that move to empy spots or ones with an eater in them.
 
 === Soar capabilities ===
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
@@ -14,7 +14,7 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * The Soar Tutorial: Chapter 2
 
 === Developer ===
   * John Laird
@@ -23,4 +23,4 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * Plain text

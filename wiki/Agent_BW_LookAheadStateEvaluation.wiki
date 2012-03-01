@@ -1,8 +1,10 @@
 = Blocks-World Look-Ahead Agent with Reinforcement Learning =
-This agent contains a version of blocks-world that involves one level of problem spaces and look-ahead but with two important extensions (based on the blocks-world-lookahead agent). It demonstrates how RL-rules can be learned by chunking and then updated in the future. The advantage over simple lookahead is that it doesn't lock on to the one path found during look-ahead after chunking. It will still do some exploration.
+This agent contains a version of blocks-world that involves one level of problem spaces and look-ahead but with two important extensions. It demonstrates how RL-rules can be learned by chunking and then updated in the future. The advantage over simple lookahead is that it doesn't lock on to the one path found during look-ahead after chunking. It will still do some exploration.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Reinforcement Learning, Chunking, Subgoaling
+  * Reinforcement Learning
+  * Chunking
+  * Look-ahead Subgoaling
 
 === Download Links===
   * pending

@@ -2,7 +2,7 @@
 This agent contains a version of blocks-world that uses reinforcement learning for move-block, which moves a block to a destination.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Reinforcement Learning
+  * Reinforcement Learning
 
 === Download Links===
   * pending

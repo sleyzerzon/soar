@@ -1,8 +1,10 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Soar QnA Test Agent =
+An example agent that runs and validates a non-comprehensive set of unit tests based upon available sample data source instances/queries.
+
+SoarQnA facilitates agent access to external knowledge stores via the io system. It is an efficient, unified agent interface that allows your system to access arbitrary external data sources. Examples include Google Maps, GIS, GPS/WiFi, weather data, rhyming databases, diet databases, and language translation engines.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Demonstrates how an agent can use Soar QnA
 
 === Download Links===
   * pending
@@ -14,13 +16,13 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
-  * John Laird
+  * Nate Derbinsky
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
   * VisualSoar

@@ -12,7 +12,7 @@ Includes gripper status to state.  Execution is done through top-state rules tha
 Works with chunking, which compiles the actions in the substates into rules that apply at the top-state.  Use the command "learn -e" to turn on chunking, run the agent once, init-soar  then run the agent again to see how the learned productions eliminate the need to subgoal in the second run.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Subgoaling
+  * Hierarchical task composition via subgoaling
   * Internally simulates external environment including an i/o link
 
 === Download Links===

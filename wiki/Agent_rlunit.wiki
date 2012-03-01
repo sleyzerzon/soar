@@ -1,8 +1,8 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Reinforcement Learning Unit Test Agent =
+An agent that tests four rl-rule sequence cases to behaviorally test the Soar reinforcement learning update mechanism.  Learning/discount-rate are set to known values and other parameters can be tweaked.  Some of the expected behavior is documented in the README file included.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Reinforcement learning
 
 === Download Links===
   * pending
@@ -14,13 +14,13 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
   * John Laird
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
   * VisualSoar

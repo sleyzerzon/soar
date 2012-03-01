@@ -1,8 +1,9 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Eight-Puzzle Agent =
+This agent is a straightforward implementation of an eight-puzzle.  It uses look-ahead search to solve the puzzle with a simple evaluation function. This agent also demonstrates chunking. 
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Look-ahead subgoaling
+  * Chunking
 
 === Download Links===
   * pending
@@ -11,10 +12,10 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Default Rules ===
-  * None.
+  * selection.soar
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
   * John Laird

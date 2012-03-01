@@ -1,4 +1,4 @@
-= Blocks-World Simple Agent =
+= Water Jug Look-Ahead Agent with State Evaluation =
 A very simple instance of an internally-simulated blocks world with three blocks.
 
 === Soar capabilities ===

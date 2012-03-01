@@ -1,9 +1,8 @@
-= Eaters Move North Agent =
-A very simple eaters agent that moves the eater north once.
+= Eaters Hello World Operator Example Agent =
+A very simple agent (2 productions) that prints out "Hello World" and halts.  This agent differs from the previous hello world agent insofar as proposes an operator and then prints its output in the operator's application.
 
 === Soar capabilities ===
   * Basic PSCM functions: Operator Proposal, Internal Operator Application
-  * Using the output-link to perform an action in the environment
 
 === Download Links===
   * pending

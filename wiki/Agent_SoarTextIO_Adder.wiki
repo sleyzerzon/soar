@@ -1,23 +1,23 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= !SoarTextIO Adder Example Agent =
+A simple agent that computes the sum of two numbers recieved via !SoarTextIO. This agent is used in the !SoarTextIO tutorial. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Demonstrates how !SoarTextIO can be used.
 
 === Download Links===
-  * pending
+  * The agent is included with the !SoarTextIO system under the Agents directory.
   
 === External Environment ===
-  * None.
+  * [Domains_SoarTextIO !SoarTextIO]
 
 === Default Rules ===
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
-  * John Laird
+  * Taylor Lafrinere
 
 === Soar Versions ===
   * Soar 8,9

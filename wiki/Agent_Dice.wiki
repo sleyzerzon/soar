@@ -2,7 +2,7 @@
 Agents that plays the Dice game.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Semantic Memory
+  * ?
 
 === Download Links===
   * pending
@@ -20,7 +20,7 @@ Agents that plays the Dice game.
   * John Laird
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
   * VisualSoar

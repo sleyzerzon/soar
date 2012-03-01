@@ -1,8 +1,8 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Knowledge Base Agent =
+A unit test for episodic memory.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Episodic memory
 
 === Download Links===
   * pending
@@ -14,13 +14,13 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * None.
 
 === Developer ===
-  * John Laird
+  * Nate Derbinsky
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
   * VisualSoar

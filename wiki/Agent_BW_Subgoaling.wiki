@@ -6,7 +6,7 @@ Means-ends analysis involves proposing operators that can achieve part of the go
 Involves removing the original operator evaluation rules, changing the operator proposal rules, and modifying the application rules so they apply only when they should. Also includes the addition of the operator no-change subset under move-block and the inclusion of the desired state.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Sub-Goaling
+  * Subgoaling with means-ends analysis
 
 === Download Links===
   * pending

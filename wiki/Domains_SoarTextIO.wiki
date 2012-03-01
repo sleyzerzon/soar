@@ -13,7 +13,7 @@ Why is this useful? Imagine you have written a Soar agent that solves algebra pr
 
 === Associated Agents ===
 
-  * *SoarTextIO Adder Demo Agent*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial.  You can find an agent description entry in the wiki [Agent_SoarTextIO_Adder here].  The agent itself is included with the SoarTextIO system.
+  * *[Agent_SoarTextIO_Adder SoarTextIO Adder Demo Agent]*: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial. The files for the agent are included with the SoarTextIO system.
 
 === Documentation ===
   * [http://soar.googlecode.com/files/CommandSummary.doc SoarTextIO Command Summary]

@@ -2,7 +2,7 @@
 Agents that can count in nine different ways.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * ?
 
 === Download Links===
   * pending

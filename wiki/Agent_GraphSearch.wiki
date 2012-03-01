@@ -2,7 +2,7 @@
 An agent that performs graph search using the selection-astar default rules.  This approach can be modified to use any of the different selection approaches.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application, Semantic Memory
+  * ?
 
 === Download Links===
   * pending
@@ -11,7 +11,7 @@ An agent that performs graph search using the selection-astar default rules.  Th
   * None.
 
 === Default Rules ===
-  * selection-astar
+  * selection-astar.soar
 
 === Associated Publications ===
   * None.
@@ -23,4 +23,4 @@ An agent that performs graph search using the selection-astar default rules.  Th
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * Simple text

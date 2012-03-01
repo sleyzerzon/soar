@@ -1,8 +1,8 @@
-= Blocks-World Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+= Episodic Memory Tutorial Agent =
+A very simple agent that shows how structures are stored in episodic memory and then retrieved.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Episodic memory
 
 === Download Links===
   * pending
@@ -14,13 +14,13 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * Soar Episodic Memory Tutorial
 
 === Developer ===
   * John Laird
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
-  * VisualSoar
+  * Plain text
