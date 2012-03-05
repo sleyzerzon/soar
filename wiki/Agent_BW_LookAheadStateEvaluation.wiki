@@ -26,4 +26,4 @@ This agent contains a version of blocks-world that involves one level of problem
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

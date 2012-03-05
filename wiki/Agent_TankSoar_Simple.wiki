@@ -1,20 +1,22 @@
 = !TankSoar Simple Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+This agent implements a tank that wanders around the board looking for objects. It is also able to chase and attack other agents, as well as retreat.
+
+The agent uses abstract operators that it decomposes into complex combinations of low-level actions. The tank uses its knowledge to select between these activities based on the current situation, just as it selects between different operators. Both of these problems are handled in Soar by allowing abstract high-level operators to be implemented in subgoals where a new state is created that allows low-level operators to be selected in pursuit of the high-level operators.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Hierarchical task decomposition
 
 === Download Links===
   * pending
   
 === External Environment ===
-  * None.
+  * [Domains_TankSoar TankSoar]
 
 === Default Rules ===
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * The Soar Tutorial: Chapter 3
 
 === Developer ===
   * John Laird
@@ -23,4 +25,4 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

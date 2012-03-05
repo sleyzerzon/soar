@@ -34,4 +34,4 @@ Works with chunking, which compiles the actions in the substates into rules that
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

@@ -23,4 +23,4 @@ A very simple agent that demonstrates reinforcement learning.  Agent chooses bet
   * Soar 9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

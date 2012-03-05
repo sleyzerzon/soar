@@ -42,4 +42,4 @@ Works with chunking (learn --on).
   * Soar 9.2+
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

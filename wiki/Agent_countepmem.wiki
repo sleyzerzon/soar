@@ -42,4 +42,4 @@ Retrieving a low numbered episode will cause !EpMem surface match to traverse a 
   * Any version of Soar with both episodic and semantic memory.
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

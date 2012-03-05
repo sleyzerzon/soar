@@ -24,4 +24,4 @@ This agent incorporates both operator subgoaling/means ends analysis with reinfo
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

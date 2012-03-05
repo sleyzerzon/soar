@@ -1,20 +1,21 @@
 = !TankSoar Simple Sound Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+This agent extends the capabilities of the !TankSoar simple agent (described [Agent_TankSoar_Simple here]) with the ability to remember hearing where another tank is.  The agent can then continue to try to chase the other tank even if it can no longer sense it.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Hierarchical task composition
+  * Creating persistent working memory structures to remember past state
 
 === Download Links===
   * pending
   
 === External Environment ===
-  * None.
+  * [Domains_TankSoar TankSoar]
 
 === Default Rules ===
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * The Soar Tutorial: Chapter 3
 
 === Developer ===
   * John Laird
@@ -23,4 +24,4 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

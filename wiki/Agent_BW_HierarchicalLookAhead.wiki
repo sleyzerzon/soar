@@ -34,4 +34,4 @@ The bottom level has a variety of operators: open-gripper, close-gripper, move-g
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

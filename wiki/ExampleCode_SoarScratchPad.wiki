@@ -8,7 +8,7 @@ This download contains the minimal C++ code needed to launch a Soar kernel using
   * None, but the code is pretty self-explanatory.
   
 === Developer ===
-  * Jon Voigt
+  * Jon Voigt <voigtjr@gmail.com>
 
 === Soar Versions ===
   * Soar 8, 9

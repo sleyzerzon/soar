@@ -1,5 +1,5 @@
-= PhP Example Project = 
-This project contains an example PhP project that interfaces with Soar. 
+= PHP Example Project = 
+This project contains an example PHP project that interfaces with Soar. It includes a sample agent that is a slight modification of the water-jug-rl demo agent included with Soar.  The main difference is that the initialization application and the goal-detection elaboration rules condition upon server-side input-link structures to dynamically generate water-jug problem instances.
 
 === Download Links ===
   * pending
@@ -29,7 +29,7 @@ For Soar to work with Apache via PHP, there are another couple steps:
   * Soar 8, 9
   
 === Language ===
-  * PhP
+  * PHP
 
 
 

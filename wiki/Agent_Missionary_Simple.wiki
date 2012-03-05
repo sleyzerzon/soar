@@ -27,7 +27,7 @@ Simple state representation where the state has two objects: one for each bank o
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

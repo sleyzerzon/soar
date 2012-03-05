@@ -25,4 +25,4 @@ SoarQnA facilitates agent access to external knowledge stores via the io system.
   * Soar 9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar

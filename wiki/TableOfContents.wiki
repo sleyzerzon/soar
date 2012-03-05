@@ -46,11 +46,11 @@
       * [Agent_soar7 Soar 7 Agents]
       * [Agent_SoarTextIO_Adder SoarTextIO Adder Demo Agent]
       * !TankSoar Agents
+        * [Agent_TankSoar_Wander Wander Bot]
         * [Agent_TankSoar_Simple Simple Bot]
         * [Agent_TankSoar_SimpleSound Simple Sound Bot]
-        * [Agent_TankSoar_Obscure Obscure Bot]
-        * [Agent_TankSoar_Wander Wander Bot]
         * [Agent_TankSoar_Mapping Mapping Bot]      
+        * [Agent_TankSoar_Obscure Obscure Bot]
       * Tile Puzzle Agents
         * [Agent_eightpuzzle Eight-Puzzle]
         * [Agent_fifteenpuzzle Fifteen-Puzzle]
@@ -113,7 +113,7 @@
       * [Unsupported_RlCli RL Command Line]
       * [Unsupported_SoarObfuscator Soar Obfuscator]
       * [Unsupported_ToH Towers of Hanoi]
-      * [Unsupported_WMA WMA Recorder]
+      * [Unsupported_WMA WMA Tracker]
     * [DLCategory_Deprecated Deprecated Projects]
       * [MissionLab Mission Lab]
       * [Msrs Microsoft Robotics Studio]

@@ -27,4 +27,4 @@ Involves removing the original operator evaluation rules, changing the operator 
   * Soar 8,9
 
 === Project Type ===
-  * VisualSoar
+  * !VisualSoar
