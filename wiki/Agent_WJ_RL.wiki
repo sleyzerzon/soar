@@ -1,8 +1,8 @@
 = Water Jug Reinforcement Learning Agent =
-A very simple instance of an internally-simulated blocks world with three blocks.
+This agent demonstrates how to solve the water jug problem using reinforcement learning.  It is a modification of the [Agent_WJ_Simple Simple Water Jug Agent].  Two main changes are made:  templates are used to generate the full space of possible moves that the agent can perform and rewards are set based on the problem solution.
 
 === Soar capabilities ===
-  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+  * Reinforcement learning
 
 === Download Links===
   * pending
@@ -14,13 +14,13 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * The Soar RL Tuturial
 
 === Developer ===
   * John Laird
 
 === Soar Versions ===
-  * Soar 8,9
+  * Soar 9
 
 === Project Type ===
   * !VisualSoar

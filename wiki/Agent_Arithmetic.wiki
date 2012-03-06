@@ -1,9 +1,9 @@
 = Arithmetic Agent =
-Multicolumn addition and subtraction with borrowing and carrying, all the way down to counting – no math functions are used.
+Multicolumn addition and subtraction with borrowing and carrying, all the way down to counting. No math functions are used.
 
 This program supports arithmetic ands subtraction between two multi-digit numbers. It formulates the problem in multiple columns. It does not use any math functions. As currently formulated, it uses a table of all single digit addition facts (for addition and one subtraction strategy) and tables of simple subtraction facts and addition by ten to single digits (for a second subtraction strategy). These facts can be converted to a semantic memory access (in the application of compute-result).
 
-Each primitive operator is relatively simple: without complex proposal conditions, control rules, lots of control flags or complex conditional operator applications. The actual execution trace is sometimes a bit tricky – especially for subtraction.
+Each primitive operator is relatively simple: without complex proposal conditions, control rules, lots of control flags or complex conditional operator applications. The actual execution trace is sometimes a bit tricky, especially for subtraction.
 
 The project supports the automatic generation of random 3 column addition and subtraction problems which are created in generate-problem. The project will execute N of these (set as the value of ^count in initialize-arithmetic).
 
@@ -20,8 +20,9 @@ The only differences between the two strategies are the available facts and a si
 Works with chunking (learn --on). 
 
 === Soar capabilities ===
-  * Semantic Memory
+  * Hierarchical task decomposition
   * Chunking
+  * Doing math with just symbol manipulation
 
 === Download Links===
   * pending
@@ -33,7 +34,7 @@ Works with chunking (learn --on).
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 
+  * None. 
 
 === Developer ===
   * John Laird

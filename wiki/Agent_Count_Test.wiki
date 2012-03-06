@@ -1,8 +1,17 @@
 = Counting Agent =
-Agents that can count in nine different ways.
+Agents that can count in nine different ways.  
+
+The real purpose of this agent is to provide various test of Soar's execution:
+  # Long runs
+  # Lots of working memory
+  # Various subgoals/impasses and results with chunking
+  # Lots of chunks/results
+  # Nasty conditions for chunking
+  # Should find any memory leaks.
 
 === Soar capabilities ===
-  * ?
+  * Subgoaling
+  * Chunking
 
 === Download Links===
   * pending

@@ -1,14 +1,15 @@
 = Algebra Agent =
-Agent that can solve algebra problems. Uses a tree structure to represent an algebra problem. As of 2/2012, can only solve simple problems.
+This is an agent that can solve simple algebra problems with one variable. It parses raw text input from [Domains_SoarTextIO Soar Text I/O] into a tree structure, solves the problem in that representation and then prints out the answer.
 
 === Soar capabilities ===
-  * ?
+  * Hierarchical task decomposition
+  * Chunking
 
 === Download Links===
   * pending
   
 === External Environment ===
-  * None.
+  * [Domains_SoarTextIO Soar Text I/O]
 
 === Default Rules ===
   * None.

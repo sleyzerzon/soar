@@ -1,8 +1,8 @@
-= Water Jug Look-Ahead Agent =
+= Water Jug Tie Agent (Look-Ahead with State Evaluation) =
 
 This agent is a modification of the [Agent_WJ_Simple Water Jug Simple Agent] that demonstrates using a tie impasse to subgoal and evaluate operators.  This is an excellent demonstration of look-ahead search and how the selection default rules work.
 
-Unlike the [Agent_WJ_Tie Water Jug Tie Agent], the look-ahead agent has no knowledge that prefers certain moves over others, so it does exhaustive search which takes far more decision cycles.
+Unlike the [Agent_WJ_LookAhead Water Jug Look-Ahead Agent], the tie agent has knowledge that prefers certain moves over others, for example preferring a pour after a fill operator, so it is able to solve the problem much more efficiently.
 
 === Soar capabilities ===
   * Look-ahead subgoaling
