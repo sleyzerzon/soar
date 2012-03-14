@@ -14,7 +14,7 @@ This is a collection of all the demo agents that were distributed with Soar 7.  
   * Various
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Soar7_Agent_Collection.zip Soar7_Agent_Collection.zip]
   
 === External Environment ===
   * None.

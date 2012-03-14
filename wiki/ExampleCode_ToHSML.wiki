@@ -9,8 +9,8 @@ The Towers of Hanoi is a puzzle that consists of three rods and a number of disk
 {{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Towers_of_Hanoi its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
 === Download Links ===
-  * pending
-  
+  * [http://web.eecs.umich.edu/~soar/downloads/ExampleDomainDevelopmentCode/Tower_Of_Hanoi_SML_Example.zip Tower_Of_Hanoi_SML_Example.zip]
+    
 === Documentation ===
   * None, but the code does have some comments.
   

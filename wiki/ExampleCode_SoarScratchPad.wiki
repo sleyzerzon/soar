@@ -2,8 +2,8 @@
 This download contains the minimal C++ code needed to launch a Soar kernel using SML.
 
 === Download Links ===
-  * pending
-  
+  * [http://web.eecs.umich.edu/~soar/downloads/ExampleDomainDevelopmentCode/Soar_Scratch_Pad_Example.zip Soar_Scratch_Pad_Example.zip]
+    
 === Documentation ===
   * None, but the code is pretty self-explanatory.
   

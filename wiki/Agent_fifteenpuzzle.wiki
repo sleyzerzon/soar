@@ -8,7 +8,7 @@ The puzzle consists of fifteen sliding tiles, numbered by digits from 1 to 15 ar
   * Chunking
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Fifteen_Puzzle_Agent.zip Fifteen_Puzzle_Agent.zip]
   
 === External Environment ===
   * None.

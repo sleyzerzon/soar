@@ -2,8 +2,8 @@
 This project contains an example PHP project that interfaces with Soar. It includes a sample agent that is a slight modification of the water-jug-rl demo agent included with Soar.  The main difference is that the initialization application and the goal-detection elaboration rules condition upon server-side input-link structures to dynamically generate water-jug problem instances.
 
 === Download Links ===
-  * pending
-  
+  * [http://web.eecs.umich.edu/~soar/downloads/ExampleDomainDevelopmentCode/PHP_Interface_Example.zip PHP_Interface_Example.zip]
+    
 === Documentation ===
 For the PHP bindings to build correctly, SWIG Version 1.3.40 is required.
 

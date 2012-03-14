@@ -24,7 +24,7 @@ Retrieving a low numbered episode will cause !EpMem surface match to traverse a 
   * Episodic memory
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Episodic_Memory_Counting_Agent.zip Episodic_Memory_Counting_Agent.zip]
   
 === External Environment ===
   * None.

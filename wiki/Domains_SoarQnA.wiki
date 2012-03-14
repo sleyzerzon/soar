@@ -5,8 +5,8 @@ SoarQnA facilitates agent access to external knowledge stores via the io system.
 === Environment Properties ===
   * N/A
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarQnA.zip SoarQnA.zip]
 
 === Associated Agents ===
   * [Agent_qna_test QnA Test Agent]: An example agent is provided which runs and validates a non-comprehensive set of unit tests based upon available sample data source instances/queries.

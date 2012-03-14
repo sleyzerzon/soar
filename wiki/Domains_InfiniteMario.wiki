@@ -13,8 +13,8 @@ Get more details on the mario domain [http://2009.rl-competition.org/mario.php h
 === Environment Properties ===
   * Continuous, single-agent, episodic, RL, uncertainty, complete information.
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/Water_Jug_Tie_Agent.zip Pending]
 
 === Associated Agents ===
   * [Agent_InfiniteMario_RL Infinite Mario Soar-RL Agent]

@@ -2,13 +2,17 @@
 Records episodic memory.
 
 === Download Links ===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Episodic_Memory_Sizer.zip pending]
+
 === Documentation ===
   * pending
+
 === Developer ===
   * Joseph Xu
+
 === Soar Versions ===
   * Soar 8,9
+
 === Language ===
   * Python
 

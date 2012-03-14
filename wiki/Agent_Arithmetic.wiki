@@ -25,7 +25,7 @@ Works with chunking (learn --on).
   * Doing math with just symbol manipulation
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Arithmetic_Agent.zip Arithmetic_Agent.zip]
   
 === External Environment ===
   * None.

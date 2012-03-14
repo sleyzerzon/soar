@@ -7,8 +7,8 @@ Unlike the [Agent_WJ_LookAhead Water Jug Look-Ahead Agent], the tie agent has kn
 === Soar capabilities ===
   * Look-ahead subgoaling
 
-=== Download Links===
-  * pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Water_Jug_Tie_Agent.zip Water_Jug_Tie_Agent.zip]
   
 === External Environment ===
   * None.

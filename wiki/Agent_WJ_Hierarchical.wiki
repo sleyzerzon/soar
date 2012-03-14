@@ -9,7 +9,7 @@ The top level has three operators: fill, empty or pour.  The next level consists
   * Hierarchical task composition via subgoaling
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Water_Jug_Hierarchical_Agent.zip Water_Jug_Hierarchical_Agent.zip]
   
 === External Environment ===
   * None.

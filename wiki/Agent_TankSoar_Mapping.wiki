@@ -6,7 +6,7 @@ This agent extends the capabilities of both the !TankSoar simple agent (describe
   * Creating persistent working memory structures to remember past state
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]

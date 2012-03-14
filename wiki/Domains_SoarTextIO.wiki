@@ -8,8 +8,8 @@ Why is this useful? Imagine you have written a Soar agent that solves algebra pr
 
   * Provides a new type of input modality for an agent.
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTextIO.zip SoarTextIO.zip]
 
 === Associated Agents ===
 

@@ -9,7 +9,7 @@ Simple state representation where the state has two objects: one for each bank o
   * Subgoaling
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Missionaries_And_Cannibals_Simple_Agent.zip Missionaries_And_Cannibals_Simple_Agent.zip]
   
 === External Environment ===
   * None.

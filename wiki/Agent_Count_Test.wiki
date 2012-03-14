@@ -14,7 +14,7 @@ The real purpose of this agent is to provide various test of Soar's execution:
   * Chunking
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Counting_Agent.zip Counting_Agent.zip]
   
 === External Environment ===
   * None.

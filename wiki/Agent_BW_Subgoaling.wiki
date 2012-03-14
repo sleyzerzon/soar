@@ -9,7 +9,7 @@ Involves removing the original operator evaluation rules, changing the operator 
   * Subgoaling with means-ends analysis
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Subgoaling_Agent.zip BlocksWorld_Subgoaling_Agent.zip]
   
 === External Environment ===
   * None.

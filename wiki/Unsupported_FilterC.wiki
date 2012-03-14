@@ -3,7 +3,7 @@
 FilterC demonstrates how to write a client in C++ that intercepts commands to implement a simple command line.
 
 === Download Links===
-  * Pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/Soar_Filter_C_Example.zip Soar_Filter_C_Example.zip]
 
 === Documentation ===
   * While there is no explicit documentation, this example code is commented.

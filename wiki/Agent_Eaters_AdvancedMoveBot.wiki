@@ -6,7 +6,7 @@ An eaters agent that implements a generalized move operator that proposes moves 
   * Demonstrates creating persistent structures in memory
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * None.

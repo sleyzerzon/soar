@@ -7,7 +7,7 @@ This agent contains a version of blocks-world that involves one level of problem
   * Look-ahead Subgoaling
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Hierarchical_State_Evaluation_Agent.zip BlocksWorld_Hierarchical_State_Evaluation_Agent.zip]
   
 === External Environment ===
   * None.

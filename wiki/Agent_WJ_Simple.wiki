@@ -17,7 +17,7 @@ This agent contains a set of commented-out record productions for recording its 
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Water_Jug_Simple_Agent.zip Water_Jug_Simple_Agent.zip]
   
 === External Environment ===
   * None.

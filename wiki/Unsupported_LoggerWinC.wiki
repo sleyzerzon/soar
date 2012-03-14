@@ -6,7 +6,7 @@ This application shows an example of how to build a simple logging tool.  To use
 The idea is that you could take this simple app and modify it to log what you need for your specific application, outputing the data in whatever format you want.
 
 === Download Links ===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/LoggerWinC_Example.zip LoggerWinC_Example.zip]
   
 === Documentation ===
   * None, but the code does have a good deal of comments.

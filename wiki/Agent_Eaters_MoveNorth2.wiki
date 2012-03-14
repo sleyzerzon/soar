@@ -6,7 +6,7 @@ A very simple eaters agent that repeatedly moves the eater north.
   * Using the output-link to perform an action in the environment
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * None.

@@ -7,7 +7,7 @@ A very simple agent (1 production) that prints out "Hello World" and halts.
   * Halting agent run from a production
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Hello_World_Rule_Agent.zip Hello_World_Rule_Agent.zip]
   
 === External Environment ===
   * None.

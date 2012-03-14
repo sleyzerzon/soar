@@ -5,7 +5,7 @@ This agent contains a version of blocks-world that uses reinforcement learning f
   * Reinforcement Learning
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_RL_Agent.zip BlocksWorld_RL_Agent.zip]
   
 === External Environment ===
   * None.

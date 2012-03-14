@@ -5,7 +5,7 @@ This agent contains a version of blocks-world that involves one level of problem
   * Look-ahead subgoaling
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Lookahead_Agent.zip BlocksWorld_Lookahead_Agent.zip]
   
 === External Environment ===
   * None.

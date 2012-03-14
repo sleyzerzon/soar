@@ -5,7 +5,7 @@ This agent uses an even more specific representation that results in even faster
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Tower_Of_Hanoi_Faster_Agent.zip Tower_Of_Hanoi_Faster_Agent.zip]
   
 === External Environment ===
   * None.

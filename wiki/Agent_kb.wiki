@@ -7,7 +7,7 @@ This agent was designed primarily for unit-testing changes to the kernel. Howeve
   * Episodic memory
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/KB_Agent.zip KB_Agent.zip]
   
 === External Environment ===
   * None.

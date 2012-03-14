@@ -1,5 +1,8 @@
 = Soar Manual =
 
+The official Soar Manual can be found [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarManual.pdf here].
+
+=== Table of Contents ===
   # Introduction
   # The Soar Architecture
   # The Syntax of Soar Programs

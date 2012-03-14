@@ -7,8 +7,8 @@ The !TankSoar world consists of a rectangular grid, 14 squares wide by 14 square
 === Environment Properties ===
   * Multi-agent, incomplete information
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar.zip TankSoar.zip]
 
 === Associated Agents ===
   * *[Agent_TankSoar_Simple Simple Bot]*

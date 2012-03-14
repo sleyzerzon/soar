@@ -5,7 +5,7 @@ An agent that tests four rl-rule sequence cases to behaviorally test the Soar re
   * Reinforcement learning
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Reinforcement_Learning_Unit_Test_Agent.zip Reinforcement_Learning_Unit_Test_Agent.zip]
   
 === External Environment ===
   * None.

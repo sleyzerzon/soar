@@ -14,7 +14,7 @@ This agent uses four operators and one search control rule:
   * Basic PSCM functions: operator proposal, operator evaluation, internal operator application
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]

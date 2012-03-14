@@ -5,26 +5,26 @@ Eaters is a Pac-Man like game implemented using Java and interfaced with Soar vi
 In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. The Eaters world consists of a rectangular grid, 15 squares wide by 15 squares high. Walls bound all four sides. Interior wall sections are randomly generated for each new game. No two walls will touch, so there are no corners, except for exterior walls, and no dead-ends anywhere on the board. Each eater starts at a random location. Food pellets are in all other squares of the grid. There are two kinds of food: normal food (blue circles and worth 5 points) and bonus food (red squares and worth 10 points). An eater consumes food by moving into a square. When an eater moves out of a square it will be empty (unless another eater moves into it). An eater can sense the contents of cells (eater, normal food, bonus food, and empty) up to 2 squares away in all directions. On each turn, an eater can move one square north, south, east, or west. An eater can also jump two squares north, south, east, or west. An eater can jump over a wall or another eater. An eater does not consume any food in the space it jumps over. A jump costs the eater 5 points. Whenever two eaters try to occupy the same cell at  the same time, they collide. As a result of the collision, their scores are averaged and they are teleported to new, random locations on the board.
 
 === Environment Properties ===
-Multi-agent
+    * Multi-agent
 
-=== Download ===
-Pending
+=== Download Links ===
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters.zip Eaters.zip]
 
 === Associated Agents ===
-  * *[Agent_Eaters_AdvancedMoveBot Advanced Move Bot]*
-  * *[Agent_Eaters_HelloWorldOp Hello World Operator]*
-  * *[Agent_Eaters_HelloWorldRule Hello World Rule]*
-  * *[Agent_Eaters_Jump Jump Bot]*
-  * *[Agent_Eaters_JumpMove Jump and Move Bot]*
-  * *[Agent_Eaters_Move Move Bot]*
-  * *[Agent_Eaters_MoveNorth Move North Bot]*
-  * *[Agent_Eaters_MoveNorth2 Move North 2 Bot]*
-  * *[Agent_Eaters_MoveToFood Move to Food Bot]*
-  * *[Agent_Eaters_SemanticErrors Semantic Errors]*
-  * *[Agent_Eaters_SyntaxErrors Syntax Errors]*
+    * *[Agent_Eaters_AdvancedMoveBot Advanced Move Bot]*
+    * *[Agent_Eaters_HelloWorldOp Hello World Operator]*
+    * *[Agent_Eaters_HelloWorldRule Hello World Rule]*
+    * *[Agent_Eaters_Jump Jump Bot]*
+    * *[Agent_Eaters_JumpMove Jump and Move Bot]*
+    * *[Agent_Eaters_Move Move Bot]*
+    * *[Agent_Eaters_MoveNorth Move North Bot]*
+    * *[Agent_Eaters_MoveNorth2 Move North 2 Bot]*
+    * *[Agent_Eaters_MoveToFood Move to Food Bot]*
+    * *[Agent_Eaters_SemanticErrors Semantic Errors]*
+    * *[Agent_Eaters_SyntaxErrors Syntax Errors]*
 
 === Documentation ===
-  * [SoarTutorial Soar Tutorial]: Chapter 2 in the Soar Tutorial is a great introduction to Eaters.
+    * [SoarTutorial Soar Tutorial]: Chapter 2 in the Soar Tutorial is a great introduction to Eaters.
 
 === IO link Specification ===
 {{{
@@ -61,10 +61,10 @@ Pending
 }}}
 
 === Developer ===
-Jonathan Voigt, Scott Wallace
+    * Jonathan Voigt, Scott Wallace
 
 === Soar Versions ===
-Soar 8, 9
+    * Soar 8, 9
 
 === Language ===
-Java
+    * Java

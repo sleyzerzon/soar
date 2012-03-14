@@ -8,8 +8,8 @@ This file allows you to edit Soar files in !UltraEdit more easily.  This file pr
   * Code folding (click on the plus sign next to a production and it will hide all of its contents except the first line)
 
 === Download Links ===
-  * Pending
-  
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/UltraEdit_Soar_Formatting_Wordfile.zip UltraEdit_Soar_Formatting_Wordfile.zip]
+    
 === Documentation ===
   * Version 15.00 and later: Download and save it into your "wordfile" directory which by default is %appdata%\IDMComp\!UltraEdit\wordfiles, unless you have specified a different directory. Further help and documentation is available [http://www.ultraedit.com/support/tutorials_power_tips/ultraedit/add_a_wordfile.html here].
 

@@ -5,7 +5,7 @@ This agent demonstrates how to solve the water jug problem using reinforcement l
   * Reinforcement learning
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Water_Jug_Reinforcement_Learning_Agent.zip Water_Jug_Reinforcement_Learning_Agent.zip]
   
 === External Environment ===
   * None.

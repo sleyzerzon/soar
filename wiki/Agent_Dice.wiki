@@ -5,7 +5,7 @@ Agents that plays the Dice game.
   * ?
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * [Domains_Dice Dice Simulator]

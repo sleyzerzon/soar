@@ -9,9 +9,9 @@ The Towers of Hanoi is a puzzle that consists of three rods and a number of disk
   
 {{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Towers_of_Hanoi its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
-=== Download ===
-  * Pending
-
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/Java_Tower_of_Hanoi_Example.zip Java_Tower_of_Hanoi_Example.zip]
+  
 === Associated Agents ===
   * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.
 

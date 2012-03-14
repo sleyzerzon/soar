@@ -16,7 +16,7 @@ Works with chunking, which compiles the actions in the substates into rules that
   * Internally simulates external environment including an i/o link
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Hierarchical_Agent.zip BlocksWorld_Hierarchical_Agent.zip]
   
 === External Environment ===
   * None.

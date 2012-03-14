@@ -3,8 +3,8 @@
 This project is a word sense disambiguation task that uses a different approach than [Domains_WordNetNate WordNet for Soar].  While they both use the same corpus, this formulation gives the agent a syntactic parse tree (not a graph) and a word, and the agent is asked to disambiguate the word.  Many structures are repeated within the tree over multiple sentences.
 
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/WordNet_With_Parse_Trees.zip WordNet_With_Parse_Trees.zip]
 
 *Note*: The domain requires the soar_exp package above (but will soon be rewritten it so it doesn't). Also necessary are the corpus files, which are included in the download. Each corpus file is a list of triples, which represent the parse tree structure. The script that converts from the !SemCor dataset to this format is also included, but it requires other libraries (both publicly available and not).
 

@@ -9,7 +9,7 @@ Alternatively, you can create a tank using some other Soar project, excise –all 
   * It's a secret!
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]

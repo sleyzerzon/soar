@@ -5,8 +5,8 @@
 === Environment Properties ===
   * Deterministic, dynamic with respect to the agent's actions, continuous
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/Water_Jug_Tie_Agent.zip Pending]
 
 === Associated Agents ===
   * Pending

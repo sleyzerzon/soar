@@ -2,7 +2,7 @@
 This is a simple pair of scripts to help debug/visualize working-memory activation values. The first script (gen_wma.cpp) runs a Soar agent for a fixed number of decisions, outputting working memory at each decision to a specially named file. The second script (aggregate_wma.php) takes these files and produces a CSV file where every working-memory element (columns) has an activation value for every decision (rows). This allows for easy graphing of activation in Excel, for instance.
 
 === Download Links ===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/Working_Memory_Activation_Tracker_Example.zip Working_Memory_Activation_Tracker_Example.zip]
   
 === Documentation ===
 

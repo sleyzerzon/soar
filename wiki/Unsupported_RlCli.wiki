@@ -2,7 +2,7 @@
 This project contains an example of a C++ program that interfaces with Soar, which provides a command-line interface to collect reinforcement learning data. It is a good example of a minimal command-line application. 
 
 === Download Links ===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/RL_Command_Line_Interface_Example.zip RL_Command_Line_Interface_Example.zip]
   
 === Documentation ===
   * None.

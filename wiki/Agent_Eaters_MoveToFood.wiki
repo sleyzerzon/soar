@@ -6,7 +6,7 @@ A very simple eaters agent that proposes the move-to-food operator in any direct
   * Demonstrates using percepts from the input link to propose a context-sensitive operator
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * None.

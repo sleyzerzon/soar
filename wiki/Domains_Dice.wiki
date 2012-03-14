@@ -18,8 +18,8 @@ Here is an abbreviated description of the rules used in our implementation of th
 === Environment Properties ===
   * Uncertainty, incomplete knowledge, multi-player
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/Dice.zip Dice.zip]
 
 === Associated Agents ===
   * [Agent_Dice John Lair'd Dice Agent]

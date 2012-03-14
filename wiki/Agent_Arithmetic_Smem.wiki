@@ -17,7 +17,7 @@ This agent supports using semantic memory through in three different ways contro
   * Chunking
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Arithmetic-SMem_Agent.zip Arithmetic-SMem_Agent.zip]
   
 === External Environment ===
   * None.

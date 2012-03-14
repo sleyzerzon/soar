@@ -5,7 +5,7 @@ A very simple agent that demonstrates reinforcement learning.  Agent chooses bet
   * Reinforcement learning
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Left_Right_RL_Agent.zip Left_Right_RL_Agent.zip]
   
 === External Environment ===
   * None.

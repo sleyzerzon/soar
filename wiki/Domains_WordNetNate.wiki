@@ -2,8 +2,8 @@
 
 This project is a word sense disambiguation task that involves some preliminary work importing a [http://wordnet.princeton.edu WordNet] database into Soar's Semantic Memory.  It contains a set of PhP scripts that does various conversions to a format that Soar can use and an agent that uses that knowledge to disambiguate words in various sentences.
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/WordNet.zip WordNet.zip]
 
 === Associated Agents ===
   * Pending

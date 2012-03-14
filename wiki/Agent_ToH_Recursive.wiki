@@ -7,7 +7,7 @@ This agent solves the problem using a recursive strategy.  It tries to always mo
   * Recursive problem solving
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Tower_Of_Hanoi_Recursive_Agent.zip Tower_Of_Hanoi_Recursive_Agent.zip]
   
 === External Environment ===
   * None.

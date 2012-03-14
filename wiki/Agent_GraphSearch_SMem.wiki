@@ -16,7 +16,7 @@ Has two different uses of semantic memory:
   * Semantic memory
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Graph_Search_SMem_Agent.zip Graph_Search_SMem_Agent.zip]
   
 === External Environment ===
   * None.

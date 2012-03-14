@@ -5,7 +5,7 @@
 To demonstrate its capabilities, it comes packaged with both !TclEaters and the TSI (Tcl Soar Interface, i.e. the old Tcl-based Soar debugger.)
 
 === Download Links===
-  * Pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/Soar_Filter_Tcl_Example.zip Soar_Filter_Tcl_Example.zip]
 
 === Documentation ===
   * While there is no explicit documentation, this example code is heavily commented.

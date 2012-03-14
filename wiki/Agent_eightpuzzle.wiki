@@ -8,7 +8,7 @@ The puzzle consists of eight sliding tiles, numbered by digits from 1 to 8 arran
   * Chunking
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Eight_Puzzle_Agent.zip Eight_Puzzle_Agent.zip]
   
 === External Environment ===
   * None.

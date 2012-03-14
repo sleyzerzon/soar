@@ -5,7 +5,7 @@ A very simple agent that shows how structures are stored in episodic memory and 
   * Episodic memory
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Episodic_Memory_Tutorial_Agent.zip Episodic_Memory_Tutorial_Agent.zip]
   
 === External Environment ===
   * None.

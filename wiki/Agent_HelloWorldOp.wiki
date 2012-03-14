@@ -5,7 +5,7 @@ A very simple agent (2 productions) that prints out "Hello World" and halts.  Th
   * Basic PSCM functions: Operator Proposal, Internal Operator Application
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Hello_World_Operator_Agent.zip Hello_World_Operator_Agent.zip]
   
 === External Environment ===
   * None.

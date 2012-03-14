@@ -6,8 +6,8 @@ In the missionaries and cannibals problem, three missionaries and three cannibal
 
 {{{*}}}_Description of game rules derived from [http://en.wikipedia.org/wiki/Missionaries_and_cannibals_problem its Wikipedia page] and is released under the [http://creativecommons.org/licenses/by-sa/3.0/ Creative Commons license]._
 
-=== Download ===
-  * Pending
+=== Download Links ===
+  * [http://web.eecs.umich.edu/~soar/downloads/Unsupported/Java_Missionaries_and_Cannibals_Example.zip Java_Missionaries_and_Cannibals_Example.zip]
 
 === Associated Agents ===
   * There is one basic agent embedded within the environment that will automatically be sourced when you launch it.

@@ -7,7 +7,7 @@ SoarQnA facilitates agent access to external knowledge stores via the io system.
   * Demonstrates how an agent can use Soar QnA
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * None.

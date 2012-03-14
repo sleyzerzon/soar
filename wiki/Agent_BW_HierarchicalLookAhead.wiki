@@ -7,7 +7,7 @@ This project augments the [Agent_BW_Hierarchical Blocks-World Hierarchical Agent
   * Internally simulates external environment including an i/o link
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Hierarchical_Lookahead_Agent.zip BlocksWorld_Hierarchical_Lookahead_Agent.zip]
   
 === External Environment ===
   * None.

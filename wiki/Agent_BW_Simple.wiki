@@ -5,7 +5,7 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Simple_Agent.zip BlocksWorld_Simple_Agent.zip]
   
 === External Environment ===
   * None.
