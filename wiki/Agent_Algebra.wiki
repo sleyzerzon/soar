@@ -6,7 +6,7 @@ This is an agent that can solve simple algebra problems with one variable. It pa
   * Chunking
 
 === Download Links===
-  * pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
   
 === External Environment ===
   * [Domains_SoarTextIO Soar Text I/O]
