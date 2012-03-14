@@ -3,7 +3,7 @@
 The purpose of this tool is to give complete control of the input-link to the Soar programmer. !QuickLink can be thought of as a way to "fake" an external application, such as a game or simulation, in order to test specific circumstances that are rare and/or hard to reproduce. !QuickLink currently can only be operated through the use of a command line interface.
 	
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/QuickLink.zip QuickLink.zip]
+  * [http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/QuickLink.zip QuickLink.zip]
     
 === Documentation ===
   * [http://soar.googlecode.com/files/QuickLink%20Tutorial.doc QuickLink Tutorial]

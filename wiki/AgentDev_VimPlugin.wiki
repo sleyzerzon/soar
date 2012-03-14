@@ -9,7 +9,7 @@ This package allows you to edit your Soar files in vim more easily by providing 
   * Taglist support
 
 == Download Links ==
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Vim_Soar_Formatting_Plugin.zip Vim_Soar_Formatting_Plugin.zip]
+  * [http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/Vim_Soar_Formatting_Plugin.zip Vim_Soar_Formatting_Plugin.zip]
 
 == Instructions ==
 

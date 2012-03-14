@@ -61,7 +61,7 @@
         * [Agent_ToH_Faster Faster]
         * [Agent_ToH_NoOps No-Ops]
         * [Agent_ToH_Recursive Recursive]
-        * [Agent_ToH_Recursive Recursive 2]
+        * [Agent_ToH_Recursive2 Recursive 2]
       * Water Jug Agents
         * [Agent_WJ_Simple Simple]
         * [Agent_WJ_LookAhead Look-Ahead]

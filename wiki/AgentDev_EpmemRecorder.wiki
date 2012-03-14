@@ -2,7 +2,7 @@
 Records episodic memory.
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Episodic_Memory_Sizer.zip pending]
+  * [http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/test.zip Pending.]
 
 === Documentation ===
   * pending

@@ -3,7 +3,7 @@
 This tool is a command-line python script to determine the size of episodes in episodic memory.
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Episodic_Memory_Sizer.zip Episodic_Memory_Sizer.zip]
+  * [http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/Episodic_Memory_Sizer.zip Episodic_Memory_Sizer.zip]
 
 === Documentation ===
   * None.
