@@ -2,7 +2,7 @@
 #labels Phase-Support,Featured
 
 = 2012 =
-
+Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
 = 2011 =
 
 Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
