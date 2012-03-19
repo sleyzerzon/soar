@@ -2,6 +2,8 @@
 #labels Phase-Support,Featured
 
 = 2012 =
+Laird, J.E.: [http://www.amazon.com/Soar-Cognitive-Architecture-John-Laird/dp/0262122960/ref=sr_1_sc_1?ie=UTF8&qid=1332172759&sr=8-1-spell The Soar Cognitive Architecture], 2012, MIT Press.
+
 Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
 = 2011 =
 
