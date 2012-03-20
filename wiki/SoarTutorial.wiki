@@ -2,7 +2,7 @@
 
 === What You'll Need ===
 To go through the Soar Tutorial, you will need to download three things:
-  # [Downloads The SoarSuite]: This contains the Soar kernel, the Java debugger, the Soar Tutorial, the Soar Manual and agents that don't require an environment.
+  # [Downloads The SoarSuite]: This contains the Soar kernel, the Java debugger, !VisualSoar, the Soar Tutorial, the Soar Manual and agents that don't require an environment.
   # [Domains_Eaters Eaters]: A pac-man like game and related agents.  This is used in chapter 2 of the tutorial.
   # [Domains_TankSoar TankSoar]: A tank battle game and related agents.  This is used in chapter 3 of the tutorial.
 
