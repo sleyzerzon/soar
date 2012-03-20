@@ -3,6 +3,7 @@
 
 === Download Links ===
   * !VisualSoar is included with the !SoarSuite release.  There is a batch or script file at the top level of the !SoarSuite folder that will launch it.
+  * [http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/VisualSoar_Source.zip VisualSoar Source Code]
 
 === Documentation ===
   * A list of key binding for the !VisualSoar can be found at [VSKeyBindings this page] of the wiki.

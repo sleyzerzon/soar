@@ -15,7 +15,6 @@
         * [Agent_BW_Hierarchical Hierarchical]
         * [Agent_BW_HierarchicalLookAhead Hierarchical Look-Ahead]
         * [Agent_BW_RL Reinforcement Learning]
-      * [Agent_Count Counting Agent Simple]
       * [Agent_Count_Test Counting Agent]
       * [Agent_Dice Dice Playing Agent]
       * Eaters Agents
@@ -57,11 +56,7 @@
         * [Agent_fifteenpuzzle Fifteen-Puzzle]
       * Towers of Hanoi Agents
         * [Agent_ToH_Simple Simple]
-        * [Agent_ToH_Fast Fast]
-        * [Agent_ToH_Faster Faster]
-        * [Agent_ToH_NoOps No-Ops]
         * [Agent_ToH_Recursive Recursive]
-        * [Agent_ToH_Recursive2 Recursive 2]
       * Water Jug Agents
         * [Agent_WJ_Simple Simple]
         * [Agent_WJ_LookAhead Look-Ahead]

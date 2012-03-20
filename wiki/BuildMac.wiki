@@ -31,7 +31,7 @@ sudo python setup.py install
 }}}
 
 === Eclipse ===
-*Who Needs It*: People who want to either (a) use the SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
+*Who Needs It*: People who want to either (a) use the !SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
 
 *Where is it*: 
   * You can find it at [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org].
