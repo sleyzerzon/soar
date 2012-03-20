@@ -7,7 +7,7 @@ The agent uses abstract operators that it decomposes into complex combinations o
   * Hierarchical task decomposition
 
 === Download Links===
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
+  * This agent is packaged with the TankSoar environment.
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]
@@ -16,7 +16,7 @@ The agent uses abstract operators that it decomposes into complex combinations o
   * None.
 
 === Associated Publications ===
-  * The Soar Tutorial: Chapter 3
+  * [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%203.pdf The Soar Tutorial: Chapter 3]
 
 === Developer ===
   * John Laird

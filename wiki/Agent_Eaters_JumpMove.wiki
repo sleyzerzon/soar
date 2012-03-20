@@ -5,16 +5,16 @@ An eaters agent that both moves and jumps to squares based on the number of poin
   * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
 
 === Download Links===
-  * [http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip Algebra_Agent.zip]
+  * This agent is packaged with the Eaters environment.
   
 === External Environment ===
-  * None.
+  * [Domains_Eaters Eaters]
 
 === Default Rules ===
   * None.
 
 === Associated Publications ===
-  * The Soar Tutorial: Chapter 2
+  * [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%202.pdf The Soar Tutorial: Chapter 2]
 
 === Developer ===
   * John Laird

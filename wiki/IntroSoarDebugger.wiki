@@ -125,7 +125,7 @@ There’s nothing special about the way the debugger is doing this.  All instanc
 
 == Java Towers of Hanoi (TOH) ==
 
-To walkthrough this demonstration, start by launching the Java version of Towers of Hanoi:
+To walkthrough this demonstration, start by launching the [Unsupported_ToH Java version of Towers of Hanoi]:
 
 http://www.eecs.umich.edu/~soar/sitemaker/misc/intro-screens/7.png
 
