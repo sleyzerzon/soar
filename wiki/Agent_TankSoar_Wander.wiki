@@ -14,7 +14,7 @@ This agent uses four operators and one search control rule:
   * Basic PSCM functions: operator proposal, operator evaluation, internal operator application
 
 === Download Links===
-  * This agent is packaged with the TankSoar environment.
+  * This agent is packaged with the !TankSoar environment.
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]

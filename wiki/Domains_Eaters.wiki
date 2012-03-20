@@ -12,8 +12,8 @@ In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. Th
 
 === Associated Agents ===
     * *[Agent_Eaters_AdvancedMoveBot Advanced Move Bot]*
-    * *[Agent_Eaters_HelloWorldOp Hello World Operator]*
-    * *[Agent_Eaters_HelloWorldRule Hello World Rule]*
+    * *[Agent_HelloWorldOp Hello World Operator]*
+    * *[Agent_HelloWorldRule Hello World Rule]*
     * *[Agent_Eaters_Jump Jump Bot]*
     * *[Agent_Eaters_JumpMove Jump and Move Bot]*
     * *[Agent_Eaters_Move Move Bot]*
@@ -24,7 +24,7 @@ In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. Th
     * *[Agent_Eaters_SyntaxErrors Syntax Errors]*
 
 === Documentation ===
-    * [SoarTutorial Soar Tutorial]: Chapter 2 in the Soar Tutorial is a great introduction to Eaters.
+    * [SoarTutorial Soar Tutorial]: Chapter 2 of the Soar Tutorial is a great introduction to Eaters.
 
 === IO link Specification ===
 {{{

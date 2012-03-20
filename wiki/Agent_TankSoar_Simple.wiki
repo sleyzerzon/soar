@@ -7,7 +7,7 @@ The agent uses abstract operators that it decomposes into complex combinations o
   * Hierarchical task decomposition
 
 === Download Links===
-  * This agent is packaged with the TankSoar environment.
+  * This agent is packaged with the !TankSoar environment.
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]

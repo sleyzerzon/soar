@@ -18,7 +18,7 @@ The !TankSoar world consists of a rectangular grid, 14 squares wide by 14 square
   * *[Agent_TankSoar_Mapping Mapping Bot]*
 
 === Documentation ===
-  * [SoarTutorial Soar Tutorial]: Chapter 3 in the Soar Tutorial is a great introduction to !TankSoar.
+  * [SoarTutorial Soar Tutorial]: Chapter 3 of the Soar Tutorial is a great introduction to !TankSoar.
 
 === IO link Specification ===
 {{{

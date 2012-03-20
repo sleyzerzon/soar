@@ -1,5 +1,14 @@
 = Soar Tutorial =
 
+=== What You'll Need ===
+To go through the Soar Tutorial, you will need to download three things:
+  # [Downloads The SoarSuite]: This contains the Soar kernel, the Java debugger, the Soar Tutorial, the Soar Manual and agents that don't require an environment.
+  # [Domains_Eaters Eaters]: A pac-man like game and related agents.  This is used in chapter 2 of the tutorial.
+  # [Domains_TankSoar TankSoar]: A tank battle game and related agents.  This is used in chapter 3 of the tutorial.
+
+=== Online Version ===
+Within the !SoarSuite download, you will find a complete copy of the Soar Tutorial.  They are also provided here for easier online access.
+
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%201.pdf Introduction]
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%202.pdf Simple External Interaction]
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%203.pdf Subgoals]
@@ -10,8 +19,4 @@
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%208%20-%20SMem.pdf Semantic Memory Tutorial]
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%208%20-%20EpMem.pdf Episodic Memory Tutorial]
   
-*Note*: To go through the Soar Tutorial, you will need to download three things:
-  # [Downloads The Soar Suite]: This contains the Soar kernel, agents that don't require an environment and the Java debugger.
-  # [Domains_Eaters Eaters]: A pac-man like games used in chapter 2 of the tutorial.
-  # [Domains_TankSoar TankSoar]: A tank battle game used in chapter 3 of the tutorial.
   

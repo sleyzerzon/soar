@@ -6,7 +6,7 @@ This agent extends the capabilities of the !TankSoar simple agent (described [Ag
   * Creating persistent working memory structures to remember past state
 
 === Download Links===
-  * This agent is packaged with the TankSoar environment.
+  * This agent is packaged with the !TankSoar environment.
   
 === External Environment ===
   * [Domains_TankSoar TankSoar]
