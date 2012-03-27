@@ -2,6 +2,15 @@
 #labels Phase-Support,Featured
 
 = 2012 =
+
+Derbinsky, N., Essl, G.: Exploring Reinforcement Learning for Mobile Percussive Collaboration. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
+
+Derbinsky, N., Laird, J. E.: Competence-Preserving Retention of Learned Knowledge in Soar's Working and Procedural Memories. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
+
+Derbinsky, N., Laird, J. E.: Computationally Efficient Forgetting via Base-Level Activation. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
+
+Derbinsky, N., Li, J., Laird, J. E.: Algorithms for Scaling in a General Episodic Memory (Extended Abstract). Proc. of the 11th International Conference on Autonomous Agents and Multiagent Systems (AAMAS). Valencia, Spain.
+
 Laird, J.E.: [http://www.amazon.com/Soar-Cognitive-Architecture-John-Laird/dp/0262122960/ref=sr_1_sc_1?ie=UTF8&qid=1332172759&sr=8-1-spell The Soar Cognitive Architecture], 2012, MIT Press.
 
 Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
