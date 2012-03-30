@@ -5,68 +5,36 @@
 === Java Developers Package ===
 *Who Needs It*: Everyone.
 
-*Where is it*: 10.6 is the only one we support. You can find this at http://connect.apple.com/ under Java downloads.
+*Where is it*: 10.6 is the only one we support. You can find this at http://connect.apple.com/ under Java downloads.  You do not have to pay for a developers account.  There's a link at the bottom that will let you register for free resources.
 
 *How to install*: Follow the instructions on the download page.
   * *Note*: If you get an error with "jni.h", visit the [http://discussions.apple.com/thread.jspa?threadID=2630649&tstart=0 following page] to see how to resolve it.
 
 === XCode ===
-*Who Needs It*: Everyone.  XCode is the Mac OS development environment under which you'll build Soar.
+*Who Needs It*: Everyone.  XCode is the Mac OS development environment under which you'll build Soar.  It is free with the latest version of MacOS.
 
 *Where is it*: [http://developer.apple.com/tools/xcode/ XCode].
 
 *How to install*: Follow the instructions on the download page.
 
-=== SCons ===
-*Who Needs It*: Everyone.  SCons is an enhanced version of Make.
+== Build Soar ==
 
-*Where is it*: You must install SCons *version 1.x*.  Unfortunately, *SCons version 2.x does not work*. If you have 2.x installed, you can install 1.x over it, but this may break any applications that require 2.x. Download the tarball from the [http://www.scons.org/ SCons site].
-
-*How to install*:
-  # Open and extract the contents to a folder of your choice. 
-  # Open a terminal and navigate to the extracted folder
-  # Run:
-{{{
-sudo python setup.py install
-}}}
-
-=== Eclipse ===
-*Who Needs It*: People who want to either (a) use the !SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
-
-*Where is it*: 
-  * You can find it at [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org].
-  * Get the 64-bit *Carbon* version.
-
-*How to install*: Drop it into your Applications folder or home folder.
+Run `scons` in the top-level folder, see the [FAQ] for common solutions to errors.
 
 == Set Up Environment Variables ==
 
-To make these changes permenant, edit your `.bash_profile` file and put them at the bottom.
+While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permenant, edit the `.bashrc` file in your home diretory and put them at the bottom.
 
-The binaries are installed to `SoarSuite/out` by default and need to be in the library path during execution, tell the loader where to look by setting:
-
-{{{
-# Note: your exact path will vary depending on the location of SoarSuite
-export DYLD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/lib
-}}}
-
-If you add the `SoarSuite/out/bin` file to the path, you can execute binaries from anywhere:
+Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-based Soar application may need to be able to load relevant dynamic libraries on the fly, so you need to make sure that it can find the libraries it needs. Java will look `DYLD_LIBRARY_PATH`, so you can use that to tell it where to look.
 
 {{{
-export PATH=$PATH=/home/$USER/sandbox/bin
+# The exact path here will depend on your system settings.
+export DYLD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
 }}}
 
-Alternatively you can install things to a well-known location like `/usr/local`
-though this is not recommended. Many users do have sandboxes in their home
-directories, you can do that by using the `SOAR_HOME` variable:
+Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
 
 {{{
-export SOAR_HOME=/home/$USER/sandbox
-export PATH=$PATH:/home/$USER/sandbox/bin
-export DYLD_LIBRARY_PATH=/home/$USER/sandbox/lib
+# The exact path here will depend on your system settings.
+export SOAR_HOME=/home/$USER/soar/SoarSuite/out/
 }}}
-
-*Note for Eclipse users*: Eclipse will not inherit these environment variables unless you launch Eclipse from the shell. Alternatively [http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/EnvironmentVars.html#//apple_ref/doc/uid/20002093-BCIJIJBH look here for other ways to get environment variables into Eclipse].
-== Build Soar ==
-
-Run `make` in the top-level folder, see the [FAQ] for common solutions to errors.

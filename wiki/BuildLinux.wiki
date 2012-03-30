@@ -21,17 +21,16 @@ Run `python scons/scons.py all` in the SoarSuite folder.  All of your resulting 
 
 == Set Up Your Environment Variables ==
 
-While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permenant, edit your `.bashrc` file and put them at the bottom.
+While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permenant, edit the `.bashrc` file in your home diretory and put them at the bottom.
 
-Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  When Soar is running, it needs to be able to load the relevant dynamic libraries on the fly. The environment variable `LD_LIBRARY_PATH` can be set to point to additional places to look, such as the full path to
-`SoarSuite/out/lib`.
+Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-based Soar application may need to be able to load relevant dynamic libraries on the fly, so you need to make sure that it can find the libraries it needs. Java will look `LD_LIBRARY_PATH`, so you can use that to tell it where to look.
 
 {{{
 # The exact path here will depend on your system settings.
 export LD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
 }}}
 
-Certain functions in the kernel may also use SOAR_HOME.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
+Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
 
 {{{
 # The exact path here will depend on your system settings.
