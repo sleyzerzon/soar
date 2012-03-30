@@ -9,87 +9,31 @@ The only officially supported Linux distribution right now is [http://www.ubuntu
     # *Note*:  for optimal performance, we recommend disabling visual effects in the system settings: 
       * _disable_ visual effects: system -> preferences -> appearance -> visual effects
   # Install the following required packages:
-    * scons swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
+    * openjdk-6-jdk swig subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
     * You can use whatever your favorite package manager is, such as `apt-get`.  For example:
 {{{
-sudo apt-get install scons swig sun-java6-jdk subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
-}}}
-    would install everything in Ubuntu.
-  # Make sure the Sun JDK is in use: 
-{{{
-sudo update-java-alternatives -s java-6-sun
-}}}
-
-=== Eclipse ===
-*Who Needs It*: People who want to either (a) use the SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
-
-*Where is it*: [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org]
-
-*How to install*: 
-  * Extract it somewhere convenient, such as your home directory or Desktop.
-  * When running Eclipse, it helps to run it with a copy of your environment. Do this by running it in a terminal using a command like: `./eclipse`
-
-=== Subclipse ===
-*Who Needs It*: People who are using Eclipse and want version control.
-
-*Where is it*:
-  * Subclipse itself will be installed from within Eclipse in the next section.
-  * To use Subclipse, you will need to install an updated subversion client on your system, since the Ubuntu default client is 1.5 and Subclipse (as listed above) is 1.6, and the two versions will not play nice together.
-    * Visit https://launchpad.net/~anders-kaseorg/%2Barchive/subversion-1.6 and follow the instructions there.
-
-*How to install*: 
-  # After you followed the last instruction, subversion will be able to be upgraded to 1.6 in your favorite package manager.
-  # Install Subclipse by opening up Eclipse, choosing Help -> Install new software frp, the menu.  In the dialog box, add the site `http://subclipse.tigris.org/update_1.6.x
-
-=== !PyDev ===
-*Who Needs It*: People who want to write Python code within Eclipse.
-
-*Where is it*:  No manual download necessary.  You can add this component from within Eclipse.
-
-*How to install*: 
-  * Inside Eclipse, visit the Help -> Install new software dialog
-  * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
-
-== Set Up Your Environment Variables ==
-
-To make these changes permenant, edit your `.bashrc` file and put them at the
-bottom.
-
-Scons needs to be able to find the correct version of Java to build Soar. The discovery process often finds the GNU version of the JDK before the Sun JDK if both are installed on the system. To assist it in finding the correct version, environment variable `JAVA_HOME` needs to be set.
-
-{{{
-export JAVA_HOME=/usr/lib/jvm/java-6-sun
-}}}
-
-Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  When Soar is running, it needs to be able to load the relevant dynamic libraries on the fly. Unfortunately, if those libraries are not installed in a system-wide prefix already on the library path such as `/usr/lib`, Soar will (likely) not be able to find them. The environment variable `LD_LIBRARY_PATH` can be set to
-point to additional places to look, such as the full path to
-`SoarSuite/out/lib`.
-
-{{{
-# The exact path here will depend on your system settings.
-export LD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/lib
-}}}
-
-The executables are also installed in that same prefix, and, if added to the PATH
-environment variable, will be able to be executed from anywhere. Usually you want to
-retain your current path:
-
-{{{
-export PATH=$PATH:/home/$USER/soar/SoarSuite/out/bin
-}}}
-
-Alternatively, you can change the prefix to have it install binaries to a more
-well-known location by using `SOAR_HOME`. Although you can do this to send
-binaries to a place like `/usr/local`, this is not recommended. Many people use
-sandboxes in their home directories:
-
-{{{
-export SOAR_HOME=/home/$USER/sandbox
-export PATH=$PATH:/home/$USER/sandbox/bin
-export LD_LIBRARY_PATH=/home/$USER/sandbox/lib
+sudo apt-get install openjdk-6-jdk swig subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
 }}}
 
 == Build Soar ==
 
-Run `make` in the top-level folder, see the [FAQ] for common solutions to
-errors.
+Run `python scons/scons.py all` in the SoarSuite folder.  All of your resulting binaries will be in the /out folder.  See the [FAQ] for common solutions to errors.
+
+== Set Up Your Environment Variables ==
+
+While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permenant, edit your `.bashrc` file and put them at the bottom.
+
+Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  When Soar is running, it needs to be able to load the relevant dynamic libraries on the fly. The environment variable `LD_LIBRARY_PATH` can be set to point to additional places to look, such as the full path to
+`SoarSuite/out/lib`.
+
+{{{
+# The exact path here will depend on your system settings.
+export LD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
+}}}
+
+Certain functions in the kernel may also use SOAR_HOME.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
+
+{{{
+# The exact path here will depend on your system settings.
+export SOAR_HOME=/home/$USER/soar/SoarSuite/out/
+}}}
