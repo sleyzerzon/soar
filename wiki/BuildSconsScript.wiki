@@ -1,0 +1,64 @@
+The latest version of Soar now uses single SCons script to robustly create builds for Windows, Linux, and Mac OSX. SCons tries to be smart and uses the appropriate compilers, linkers, and other commands for your OS. A version of SCons is distributed in the Soar source tree, so you don't need to install it separately. To run the builder, start a shell (cmd.exe in Windows), cd into the !SoarSuite directory and type
+{{{
+  python scons/scons.py <options>
+}}}
+or if you want to use the SCons version you've installed separately,
+{{{
+  scons <options>
+}}}
+{{{<options>}}} is a place holder for options we'll pass into the builder, and should not be typed literally.
+
+For Windows users, we have provided a batch file called build.bat which will perform several functions before launching the SCons script. This file will search for the locations of the python, java, and swig installs, and set the PATH environment variable so that the various compilers can run. In addition, SCons automatically finds the installed Visual C++ compiler, so there's no need to use the Visual Studio Command Prompt. Windows users can simply type:
+{{{
+  build <options>
+}}}
+For the rest of this document we'll be showing example build commands using the {{{"scons <options>"}}} form. Please substitute the appropriate command for "scons".
+
+=== Build Targets ===
+
+The builder can be directed to compile any number of targets, corresponding to the list given above. To see a list of available targets, type
+{{{
+  scons list
+}}}
+You should see something like this:
+{{{
+  all
+  cli
+  debugger
+  debugger_api
+  headers
+  java_sml_misc
+  kernel
+  sml_java
+  sml_python
+  tests
+}}}
+The "all" target tells scons to build everything. Any number of targets can be passed to the builder together. For example:
+{{{
+  scons kernel debugger sml_python headers
+}}}
+If no targets are specified, the default targets that will be built are kernel, sml_java, sml_python, debugger.
+
+=== Output Directories ===
+
+By default, the built libraries and executables will be placed into the "out" subdirectory under !SoarSuite, and intermediates such as .o files will be placed in the "build" subdirectory. You can change these using the {{{--outdir=<dir>}}} and {{{--build-dir=<dir>}}} options. These directories can be located or moved anywhere in your file system. However, we recommend you not change the file structure inside the "out" directory, as the executables expect the libraries to be in certain places relative to them.
+
+To delete all the files you just built, type
+{{{
+  scons -c all
+}}}
+=== Build Flags ===
+
+You can modify building behavior by passing in a number of flags in the form {{{'--<flagname>'}}}. To see the list of available flags, type
+{{{
+  scons --help
+}}}
+and look under the "Local Options" section (the other flags are for scons itself). One particularly useful flag is "--debug", which turns off compiler optimizations and inserts debugging symbols for either gdb (-g) or Visual Studio (/Z7 /DEBUG). Another flag is "--verbose", which makes scons print out the full commands it uses to build each file. This is useful if the build doesn't succeed and you want to figure out what is happening under the hood.
+
+=== Visual Studio Solution Generation ===
+
+SCons can generate Visual Studio project and solution files that allow users to more easily modify and debug the kernel source code. You can generate these files by typing
+{{{
+  scons msvs
+}}}
+Unfortunately, the generated projects are not stand-alone, they still call SCons under the hood to build targets.

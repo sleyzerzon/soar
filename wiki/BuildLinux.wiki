@@ -4,24 +4,30 @@ The only officially supported Linux distribution right now is [http://www.ubuntu
 
 == Install the Prerequisites ==
 
-  # Get your system set up
-    # Install Ubuntu and use the update manager or similar tool to make sure all packages are up-to-date.
-    # *Note*:  for optimal performance, we recommend disabling visual effects in the system settings: 
-      * _disable_ visual effects: system -> preferences -> appearance -> visual effects
-  # Install the following required packages:
-    * openjdk-6-jdk swig subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
+  * Install the following required packages:
+    * openjdk-6-jdk 
+    * swig
+    * g++
+    * python-all-dev
+    * libc6-dev
+
     * You can use whatever your favorite package manager is, such as `apt-get`.  For example:
 {{{
-sudo apt-get install openjdk-6-jdk swig subversion libc6-dev g++ ant manpages-dev python-all-dev libsvn-java subversion-tools
+sudo apt-get install openjdk-6-jdk swig libc6-dev g++ python-all-dev
 }}}
 
 == Build Soar ==
 
-Run `python scons/scons.py all` in the SoarSuite folder.  All of your resulting binaries will be in the /out folder.  See the [FAQ] for common solutions to errors.
+Go into the SoarSuite folder and run: 
+{{{
+python scons/scons.py all
+}}}
+
+All of your resulting binaries will be in the /out folder.  See the [FAQ] for common solutions to errors.
 
 == Set Up Your Environment Variables ==
 
-While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permenant, edit the `.bashrc` file in your home diretory and put them at the bottom.
+While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permanent, edit the `.bashrc` file in your home diretory and put them at the bottom.
 
 Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-based Soar application may need to be able to load relevant dynamic libraries on the fly, so you need to make sure that it can find the libraries it needs. Java will look `LD_LIBRARY_PATH`, so you can use that to tell it where to look.
 

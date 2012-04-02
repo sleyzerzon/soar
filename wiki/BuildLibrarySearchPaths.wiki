@@ -1,0 +1,128 @@
+= OS-Specific Library Search Paths= 
+
+This section is not about building Soar, but running the executables that
+you've built. Because the Soar libraries are not installed to standard
+locations such as /usr/lib on Linux or C:\Windows\System32 on Windows,
+the operating system doesn't know where to look for them. This is probably
+the biggest and most frequently encountered problem when getting Soar up
+and running.
+
+The most straightforward way to solve this problem is to tell the OS where
+to look. In Linux, this means setting the LD_LIBRARY_PATH environment
+variable to include the directory libSoar.so is in. Similarly on Mac OSX,
+you should set DYLD_LIBRARY_PATH. On both operating systems, the command
+for setting the environment variable should look like:
+{{{
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/directory/of/your/Soar/library
+}}}
+or
+{{{
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/directory/of/your/Soar/library
+}}}
+Note that you can't put spaces around the =, and you have to use export
+so that the variable will be inherited by child processes.
+
+In Windows, you should set PATH to include the directory containing Soar.dll.
+
+The rest of this section contains explanations of what's going on under
+the hood of every operating system so that you'll have some insight
+should you run into issues.
+
+=== Linux ===
+In Linux, the GNU linker provides an -rpath flag that hard codes
+library search paths into executables. We use this flag for all native
+executables, such as TestCLI and TestSoarPerformance. These paths are
+set assuming that the executables and required libraries (specifically
+libSoar.so) reside in the same directory, which is the default build
+behavior. Therefore, as long as you don't move the executables or
+libraries to different relative directories, you should be able to just
+run the executables without doing anything special. If you are having
+problems, you should manually set LD_LIBRARY_PATH.
+
+=== Mac OS X ===
+Dynamic libraries on OS X have the concept of install_name. Basically,
+shared libraries have a full path hard-coded into them when they are
+built, and when executables link against the library, they record those
+paths as the places they'll look for the library at runtime. For more
+details, see
+
+https://developer.apple.com/library/mac/documentation/developertools/conceptual/MachOTopics/1-Articles/loading_code.html
+
+We set the install_name of libSoar.dylib to be
+"@executable_path/libSoar.dylib", which means that every executable
+will look for the Soar library in the same directory as itself. For
+the executables that are built with Soar, such as TestCLI and
+TestSoarPerformance, you should be able to just run them without
+any problems. If you are having problems, you should manually set
+DYLD_LIBRARY_PATH.
+
+The more likely case when this will appear is when you build your own
+SML programs and link them against libSoar.dylib. Your programs will
+also think that the library exists in the same directory as themselves. In
+this case please use the above solution. As a more permanent fix,
+you can change the library's install_name to the absolute path of the
+library using the install_name_tool program. Every program you build from
+then on will look for the library using the absolute path, which should
+not fail unless you move the library or rebuild it. Please consult the
+system man page for that command for further information.
+
+
+=== Windows ===
+Windows searches the executable's directory for needed libraries by
+default, and since all Soar libraries and executables are in the same
+directory, there shouldn't be any library not found errors. If you are
+building your own executable environments, either put them in the same
+directory as Soar.dll, or add the directory that contains Soar.dll to
+your PATH environment variable. For more information about library search
+order, see
+
+http://msdn.microsoft.com/en-us/library/windows/desktop/ms682586%28v=vs.85%29.aspx
+
+
+= Java Search Paths =
+The Java virtual machine has two sets of search paths: the class path and
+the library path. In general, java classes and jars are searched for
+in the class path, and native libraries that are loaded by JNI are searched
+for in the library path. Running Java SML clients requires you to set
+both correctly.
+
+The SWIG generated SML wrapper classes are contained in sml.jar,
+so you need to include its path (not the path to the directory
+containing the jar) in the class path. Those classes in turn load the
+Java_sml_ClientInterface and Soar native libraries, so the directory
+containing these libraries must be in the library path.
+
+You can set the class path either by setting the CLASSPATH environment
+variable (remember to export in Linux and OSX), or passing a command
+line switch to the java executable:
+{{{
+java -cp /path/to/sml.jar
+}}}
+By default, the JVM will include the LD_LIBRARY_PATH and DYLD_LIBRARY_PATH
+environment variables in the library path in Linux and OS X,
+respectively. In Windows the current working directory and the PATH
+environment variable is included by default. You can manually set the
+library path by passing a command line switch to the java executable:
+{{{
+java -Djava.library.path=/directory/of/your/Soar/library
+}}}
+Note that while you can also set java.library.path at runtime using Java
+code, you have to use some hacks to make the virtual machine actually
+acknowledge the changes. See this page for more information:
+
+http://stackoverflow.com/questions/5419039/is-djava-library-path-equivalent-to-system-setpropertyjava-library-path
+
+= Python Search Paths =
+Like with Java, SWIG also generates a Python wrapper, called
+Python_sml_ClientInterface.py as well as a native library called
+_Python_sml_ClientInterface.so (.pyd in Windows) for the Python
+interface. Unlike Java, Python only has one list of directories where it
+looks for both files, contained in sys.path. On all operating systems,
+this list will include the directories in the environment variable
+PYTHONPATH. You can also set sys.path directly in your python script. For
+example:
+{{{
+import sys
+sys.path.append('/directory/of/your/Soar/library')
+import Python_sml_ClientInterface as sml
+}}}

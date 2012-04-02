@@ -30,22 +30,6 @@ Please note that *if some _recommended_ prerequisites are not installed, some bu
 
 *How to install*: Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`
 
-=== Apache Ant ===
-*Who Needs It*: Everyone.  The Apache Ant build system is required if using Java applications.
-
-*Where is it*:  Download ant from [http://ant.apache.org/ ant.apache.org].
-
-*How to install*: 
-  * Extract anywhere, such as your home folder or `C:\` or `C:\Program Files`.
-  * Helpful: Add ant's `bin` folder to your PATH environment variable.
-
-=== Eclipse ===
-*Who Needs It*: People who want to either (a) use the SoarEditor (an Eclipse-based Soar development environment) to build Soar agents or (b) build Java environments to interface with Soar.
-
-*Where is it*: [http://download.eclipse.org/eclipse/downloads/ download.eclipse.org]
-
-*How to install*: Extract anywhere you have write permissions without authentication, such as your home folder. System folders (such as `C:\Program Files`) are not recommended locations for Eclipse.
-
 === Python ===
 *Who Needs It*: People who want to use the Python SML interface to interface with a Python-based system.
 
@@ -54,22 +38,6 @@ Please note that *if some _recommended_ prerequisites are not installed, some bu
 *How to install*: 
   * Follow the instructions on the download page.
   * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
-
-=== !PyDev ===
-*Who Needs It*: People who want to write Python code within Eclipse.
-
-*Where is it*:  No manual download necessary.  You can add this component from within Eclipse.
-
-*How to install*: 
-  * Inside Eclipse, visit the Help -> Install new software dialog
-  * Add the site `http://pydev.sourceforge.net/updates/` and install the components.
-
-=== Tcl/Tk ===
-*Who Needs It*: People who want to use the Tcl SML interface to interface with a Tcl-based system.
-
-*Where is it*: [http://www.activestate.com/activetcl/downloads/ activestate.com]
-
-*How to install*: Follow the instructions on the download page.
 
 == Set Up Your Windows Environment Variables ==
 
