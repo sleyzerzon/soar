@@ -136,9 +136,10 @@
     * [BuildWindows Building Windows]
     * [BuildLinux Building Linux]
     * [BuildMac Building MacOS]
-    * [BuildOverview Build Output Components]
-    * [BuildSconsScript SCons Script Details]
-    * [BuildLibrarySearchPaths Library Search Paths]
+    * ----
+    * [BuildOverview Building Individual Subcomponents]
+    * [BuildSconsScript SCons Script Documentation]
+    * [BuildLibrarySearchPaths How Library Search Paths Work]
     * [ConfigEclipse Configuring Eclipse]
   * [Developing_For_Soar Developing For Soar]
     * [CliDev Command Line Interface Development]

@@ -8,12 +8,14 @@
 
 == Build Soar ==
 
-Go into the SoarSuite folder and run: 
+Go into the !SoarSuite folder and run: 
 {{{
-python scons/scons.py all
+scons all
 }}}
 
-All of your resulting binaries will be in the /out folder.  See the [FAQ] for common solutions to errors.
+All of your resulting binaries will be in the /out folder.  
+
+For more detailed information about the Scons script, see the [BuildSconsScript SCons Script Documentation page]. See the [FAQ] for common solutions to errors.
 
 == Set Up Environment Variables ==
 
@@ -32,3 +34,5 @@ Certain functions in the kernel may also use the SOAR_HOME environment variable 
 # The exact path here will depend on your system settings.
 export SOAR_HOME=/home/$USER/soar/SoarSuite/out/
 }}}
+
+For more detailed information about library search paths, see our wiki page on [BuildLibrarySearchPaths how library search paths work].
