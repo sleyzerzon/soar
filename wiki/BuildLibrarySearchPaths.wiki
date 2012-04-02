@@ -1,4 +1,4 @@
-= OS-Specific Library Search Paths= 
+=== OS-Specific Library Search Paths ===
 
 This section is not about building Soar, but running the executables that
 you've built. Because the Soar libraries are not installed to standard
@@ -28,10 +28,10 @@ The rest of this section contains explanations of what's going on under
 the hood of every operating system so that you'll have some insight
 should you run into issues.
 
-=== Linux ===
+==== Linux ====
 In Linux, the GNU linker provides an -rpath flag that hard codes
 library search paths into executables. We use this flag for all native
-executables, such as TestCLI and TestSoarPerformance. These paths are
+executables, such as TestCLI and !TestSoarPerformance. These paths are
 set assuming that the executables and required libraries (specifically
 libSoar.so) reside in the same directory, which is the default build
 behavior. Therefore, as long as you don't move the executables or
@@ -39,7 +39,7 @@ libraries to different relative directories, you should be able to just
 run the executables without doing anything special. If you are having
 problems, you should manually set LD_LIBRARY_PATH.
 
-=== Mac OS X ===
+==== Mac OS X ====
 Dynamic libraries on OS X have the concept of install_name. Basically,
 shared libraries have a full path hard-coded into them when they are
 built, and when executables link against the library, they record those
@@ -52,7 +52,7 @@ We set the install_name of libSoar.dylib to be
 "@executable_path/libSoar.dylib", which means that every executable
 will look for the Soar library in the same directory as itself. For
 the executables that are built with Soar, such as TestCLI and
-TestSoarPerformance, you should be able to just run them without
+!TestSoarPerformance, you should be able to just run them without
 any problems. If you are having problems, you should manually set
 DYLD_LIBRARY_PATH.
 
@@ -67,7 +67,7 @@ not fail unless you move the library or rebuild it. Please consult the
 system man page for that command for further information.
 
 
-=== Windows ===
+==== Windows ====
 Windows searches the executable's directory for needed libraries by
 default, and since all Soar libraries and executables are in the same
 directory, there shouldn't be any library not found errors. If you are
@@ -79,7 +79,7 @@ order, see
 http://msdn.microsoft.com/en-us/library/windows/desktop/ms682586%28v=vs.85%29.aspx
 
 
-= Java Search Paths =
+=== Java Search Paths ===
 The Java virtual machine has two sets of search paths: the class path and
 the library path. In general, java classes and jars are searched for
 in the class path, and native libraries that are loaded by JNI are searched
@@ -89,7 +89,7 @@ both correctly.
 The SWIG generated SML wrapper classes are contained in sml.jar,
 so you need to include its path (not the path to the directory
 containing the jar) in the class path. Those classes in turn load the
-Java_sml_ClientInterface and Soar native libraries, so the directory
+{{{Java_sml_ClientInterface}}} and Soar native libraries, so the directory
 containing these libraries must be in the library path.
 
 You can set the class path either by setting the CLASSPATH environment
@@ -112,10 +112,10 @@ acknowledge the changes. See this page for more information:
 
 http://stackoverflow.com/questions/5419039/is-djava-library-path-equivalent-to-system-setpropertyjava-library-path
 
-= Python Search Paths =
+=== Python Search Paths ===
 Like with Java, SWIG also generates a Python wrapper, called
-Python_sml_ClientInterface.py as well as a native library called
-_Python_sml_ClientInterface.so (.pyd in Windows) for the Python
+{{{Python_sml_ClientInterface.py}}} as well as a native library called
+{{{_Python_sml_ClientInterface.so}}} (.pyd in Windows) for the Python
 interface. Unlike Java, Python only has one list of directories where it
 looks for both files, contained in sys.path. On all operating systems,
 this list will include the directories in the environment variable

@@ -1,51 +1,43 @@
-#summary Soar software download page
-#labels Featured
+=== Download Soar ===
 
-= Download Soar =
-
-The current stable version of Soar is *9.3.1*.
+The current stable version of Soar is *9.3.2*.
 
 This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All learning mechanisms are disabled by default.
 
-[ReleaseNotes#9.3.1 Here are full release notes for the 9.3.1 release].
+[ReleaseNotes#9.3.2 Here are full release notes for the 9.3.2 release].
 
-= Prerequisites = 
+=== Prerequisites ===
 
 Downloading and installing [http://java.sun.com Java] is required since most users will want to use the Soar Java Debugger and other Soar components written in Java. 
 
-* You can download the [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK here]. 
+  * You can download the [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK here]. 
+  * *Important*: the 64-bit version of Soar require the 64-bit version Java!  Make sure to download the correct one.
 
-*Important*: the 64-bit version of Soar require the 64-bit version Java!  Make sure to download the correct one.
 
-
-== Windows ==
+==== Windows ====
   # Determine if you're running 32- or 64-bit Windows.[http://windows.microsoft.com/en-US/windows-vista/32-bit-and-64-bit-Windows-frequently-asked-questions Click here if you need help figuring out which type of Windows you are running.]
   # Download the appropriate version of Soar
-    **[http://soar.googlecode.com/files/SoarSuite-9.3.1-win-i686.zip 9.3.1 for Windows, 32-bit]
-    ** [http://soar.googlecode.com/files/SoarSuite-9.3.1-win-x86_64.zip 9.3.1 for Windows, 64-bit]
+    * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Windows_32bit.zip 9.3.2 for Windows, 32-bit]
+    * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Windows_64bit.zip 9.3.2 for Windows, 64-bit]
   # If you don't have Microsoft Visual Studio installed or the Microsoft Visual C++ redistributable on your machine, you make get an error that says "Native code library failed to load".  If so, install the appropriate version of the Microsoft Visual C++ redistributable:
     ** [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=29 Microsoft Visual C++ 2008 redistributable, 32-bit] 
     ** [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=15336 Microsoft Visual C++ 2008 redistributable, 64-bit]
 
-== OS X ==
-  * [http://soar.googlecode.com/files/SoarSuite-9.3.1-osx-x86_64.tar.gz 9.3.1 for Mac, 64-bit]
+==== OS X ====
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-OSX.zip 9.3.2 for Mac, 64-bit]
 
-== Linux ==
+==== Linux ====
   # Determine if you're running 32- or 64-bit Linux. If the command `uname -m` yields `x86_64`, you have a 64-bit Linux OS.
   # Download the appropriate version of Soar
-    ** [http://soar.googlecode.com/files/SoarSuite-9.3.1-linux-i686.tar.gz 9.3.1 for Linux, 32-bit] (use this if not sure)
-    ** [http://soar.googlecode.com/files/SoarSuite-9.3.1-linux-x86_64.tar.gz 9.3.1 for Linux, 64-bit]
+    * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Linux_32bit.zip 9.3.2 for Linux, 32-bit]
+    * [http://soar.googlecode.com/files/SoarSuite-9.3.2-liLinux_64bit.zip 9.3.2 for Linux, 64-bit]
 
-== Others ==
-  * [http://soar.googlecode.com/files/SoarSuite-9.3.1-source.tar.gz 9.3.1 platform-independent source]
+==== Others ====
+  * Follow the [Build instructions] for building Soar from the platform-independent source code.
 
 === Usage ===
 
   # Download
   # Extract to the folder of your choice
   # Navigate to the folder you extracted to
-  # Double click batch/shell/command files such as `Soar Java Debugger`.
-
-== Other Versions ==
-
-Old, unsupported versions of Soar are archived on the [SoarSoftware Soar software page].
+  # Double click batch/shell/command files such as `SoarJavaDebugger.bat`.

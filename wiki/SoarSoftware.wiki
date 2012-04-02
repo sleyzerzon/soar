@@ -3,6 +3,19 @@
 <wiki:toc max_depth="1" />
 
 ----
+= 9.3.2 =
+This release of Soar continues the 9.3 line which includes modules for reinforcement learning, episodic memory, semantic memory, and working memory activation, as well as everything from previous versions of Soar. All learning mechanisms are disabled by default. This release is primarily a bug fix release.
+
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Windows_32bit.zip 9.3.2 for Windows, 32-bit]
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Windows_64bit.zip 9.3.2 for Windows, 64-bit]
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-OSX.zip 9.3.2 for Mac, 64-bit]
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-Linux_32bit.zip 9.3.2 for Linux, 32-bit]
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-liLinux_64bit.zip 9.3.2 for Linux, 64-bit]
+  * [http://soar.googlecode.com/files/SoarSuite-9.3.2-source.zip 9.3.2 platform-independent source]
+
+[ReleaseNotes#9.3.2 Here are full release notes for the 9.3.2 release].
+
+----
 = 9.3.1 =
 This release of Soar continues the 9.3 line which includes modules for reinforcement learning, episodic memory, semantic memory, and working memory activation, as well as everything from previous versions of Soar. All learning mechanisms are disabled by default. This release is primarily a bug fix release.
 

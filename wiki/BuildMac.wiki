@@ -2,10 +2,11 @@
 
 == Install the Prerequisites ==
 
-  * Java Developers Package:  10.6 is the only one we support. You can find this at http://connect.apple.com/ under Java downloads.  You do not have to pay for a developers account.  There's a link at the bottom that will let you register for free resources.
+  * *Java Developers Package*:  10.6 is the only one we support. You can find this at http://connect.apple.com/ under Java downloads.  You do not have to pay for a developers account.  There's a link at the bottom that will let you register for free resources.
     * *Note*: If you get an error with "jni.h", visit the [http://discussions.apple.com/thread.jspa?threadID=2630649&tstart=0 following page] to see how to resolve it.
-  * XCode: XCode is the Mac OS development environment under which you'll build Soar.  It is free with the latest version of MacOS.  If you don't already have it, you can download it [http://developer.apple.com/tools/xcode/ here].
-
+  * *XCode*: XCode is the Mac OS development environment under which you'll build Soar.  It is free with the latest version of MacOS.  If you don't already have it, you can download it [http://developer.apple.com/tools/xcode/ here].
+  * *Python*: Soar uses the SCons build system (scons.org), which requires Python. This should already be installed on OSX.  Just make sure you're running an appropriate version.  2.7.2 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  To check your version, type {{{python --version}}}
+  
 == Build Soar ==
 
 Go into the !SoarSuite folder and run: 
@@ -28,7 +29,7 @@ Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-base
 export DYLD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
 }}}
 
-Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
+Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, !SpawnDebugger uses it to find the !SoarDebugger.jar.
 
 {{{
 # The exact path here will depend on your system settings.

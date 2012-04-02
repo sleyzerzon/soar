@@ -5,26 +5,26 @@ Other versions of 32-bit windows might work but are not officially supported.
 
 == Install the Prerequisities ==
 
-  # Microsoft Visual Studio 2008
+  # *Microsoft Visual Studio 2008*
     * You must have either Microsoft Visual Studio 2008 or the free [http://www.microsoft.com/visualstudio/en-us/products/2008-editions/express Microsoft Visual C++ 2008 Express Edition].  (Note that the free Express Edition does not include a 64-bit compiler.)
     * *Warning*: *If you are on a 64-bit machine, make sure to explicitly choose to install the the 64-bit compiler*!  It is not installed by default!
-  # Java SE 6 JDK
+  # *Java SE 6 JDK*
     * The latest Java SE 6 JDK is available from [http://java.sun.com/javase/downloads/index.jsp java.sun.com].  Make sure to download the 64-bit version, if you are on a 64-bit machine.
-  # SWIG
+  # *SWIG*
     * SWIG acts as a bridge between the Soar C++ libraries and the various other languages, like Java, Tcl, Python, Perl. Since nearly everyone will need the Soar debugger, which is written in Java, this component is required.
     * You can download it from [http://www.swig.org/download.html swig.org] and extract it anywhere, such as your home folder or `C:\` or `C:\Program Files`
-  # Python ===
-    * Soar uses the SCons build system (scons.org), which requires Python. Python version 2.7.2 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  You can find it at [http://www.python.org/download/releases/2.7.2/ python.org]
+  # *Python*
+    * Soar uses the [scons.org SCons build system], which requires Python. Python version 2.7.2 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  You can download Python 2.7.2 from [http://www.python.org/download/releases/2.7.2/ python.org]
       * If you are planning on a debug build including Python, [http://www.eecs.umich.edu/~soar/sitemaker/misc/python you will need Python debug libraries]. Save the correct one for your architecture in `Python26\libs`.
 
 == Build Soar ==
 
 We're now finally ready to build Soar!  
 
-Start cmd.exe, cd into the SoarSuite directory, and type
-{{
+Start cmd.exe, cd into the !SoarSuite directory, and type
+{{{
   build all
-}}
+}}}
 
 The batch file will ask you for the paths to SWIG and Python before building your script.  You no longer have to specify those paths in environment variables.
 

@@ -5,15 +5,15 @@ The only officially supported Linux distribution right now is [http://www.ubuntu
 == Install the Prerequisites ==
 
   * Install the following required packages:
-    * openjdk-6-jdk 
-    * swig
-    * build-essential
-    * python-all-dev
-
-    * You can use whatever your favorite package manager is, such as `apt-get`.  For example:
+    # openjdk-6-jdk (you can also use Sun's Java JDK)
+    # swig
+    # build-essential
+    # python-all-dev
+    * To get the above items, you can use your favorite package manager is, such as `apt-get`.  For example:
 {{{
 sudo apt-get install openjdk-6-jdk swig build-essential python-all-dev
 }}}
+  * *Python*: Soar uses the SCons build system (scons.org), which requires Python. This should already be installed on Linux.  Just make sure you're running an appropriate version: 2.7.2 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  To check your version, type {{{python --version}}}
 
 == Build Soar ==
 
@@ -37,7 +37,7 @@ Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-base
 export LD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
 }}}
 
-Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, SpawnDebugger uses it to find the SoarDebugger.jar.
+Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, !SpawnDebugger uses it to find the !SoarDebugger.jar.
 
 {{{
 # The exact path here will depend on your system settings.
