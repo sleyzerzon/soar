@@ -2,11 +2,11 @@
 
 === What You'll Need ===
 To go through the Soar Tutorial, you will need to download the Soar Tutorial. It contains Soar, the Java Debugger, !VisualSoar, Eaters, !TankSoar, sample agents, and Soar documentation.
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.32-Windows_32bit.zip Soar Tutorial for 32-bit Windows]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.32-Windows_64bit.zip Soar Tutorial for 64-bit Windows]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.32-Linux_32bit.zip Soar Tutorial for 32-bit Linux]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.32-Linux_64bit.zip Soar Tutorial for 64-bit Linux]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.32-OSX.zip Soar Tutorial for MacOS X]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.2-Windows_32bit.zip Soar Tutorial for 32-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.2-Windows_64bit.zip Soar Tutorial for 64-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.2-Linux_32bit.zip Soar Tutorial for 32-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.2-Linux_64bit.zip Soar Tutorial for 64-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.2-OSX.zip Soar Tutorial for MacOS X]
 
 === Online Version ===
 Within the !SoarSuite download, you will find a complete copy of the Soar Tutorial.  They are also provided here for easier online access.
