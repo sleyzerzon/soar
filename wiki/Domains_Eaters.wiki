@@ -8,11 +8,11 @@ In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. Th
     * Multi-agent
 
 === Download Links ===
-    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.32-Windows_32bit.zip Eaters for 32-bit Windows]
-    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.32-Windows_64bit.zip Eaters for 64-bit Windows]
-    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.32-Linux_32bit.zip Eaters for 32-bit Linux]
-    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.32-Linux_64bit.zip Eaters for 64-bit Linux]
-    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.32-OSX.zip Eaters for MacOS X]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.2-Windows_32bit.zip Eaters for 32-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.2-Windows_64bit.zip Eaters for 64-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.2-Linux_32bit.zip Eaters for 32-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.2-Linux_64bit.zip Eaters for 64-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.2-OSX.zip Eaters for MacOS X]
 
 === Associated Agents ===
     * *[Agent_Eaters_AdvancedMoveBot Advanced Move Bot]*
