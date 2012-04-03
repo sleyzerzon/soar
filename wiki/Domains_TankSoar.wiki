@@ -8,7 +8,11 @@ The !TankSoar world consists of a rectangular grid, 14 squares wide by 14 square
   * Multi-agent, incomplete information
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar.zip TankSoar.zip]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.32-Windows_32bit.zip TankSoar for 32-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.32-Windows_64bit.zip TankSoar for 64-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.32-Linux_32bit.zip TankSoar for 32-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.32-Linux_64bit.zip TankSoar for 64-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.32-OSX.zip TankSoar for MacOS X]
 
 === Associated Agents ===
   * *[Agent_TankSoar_Simple Simple Bot]*

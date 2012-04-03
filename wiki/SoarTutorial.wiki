@@ -1,10 +1,12 @@
 = Soar Tutorial =
 
 === What You'll Need ===
-To go through the Soar Tutorial, you will need to download three things:
-  # [Downloads The SoarSuite]: This contains the Soar kernel, the Java debugger, !VisualSoar, the Soar Tutorial, the Soar Manual and agents that don't require an environment.
-  # [Domains_Eaters Eaters]: A pac-man like game and related agents.  This is used in chapter 2 of the tutorial.
-  # [Domains_TankSoar TankSoar]: A tank battle game and related agents.  This is used in chapter 3 of the tutorial.
+To go through the Soar Tutorial, you will need to download the Soar Tutorial. It contains Soar, the Java Debugger, !VisualSoar, Eaters, !TankSoar, sample agents, and Soar documentation.
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTutorial_9.32-Windows_32bit.zip Soar Tutorial for 32-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTutorial_9.32-Windows_64bit.zip Soar Tutorial for 64-bit Windows]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTutorial_9.32-Linux_32bit.zip Soar Tutorial for 32-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTutorial_9.32-Linux_64bit.zip Soar Tutorial for 64-bit Linux]
+    * [http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTutorial_9.32-OSX.zip Soar Tutorial for MacOS X]
 
 === Online Version ===
 Within the !SoarSuite download, you will find a complete copy of the Soar Tutorial.  They are also provided here for easier online access.

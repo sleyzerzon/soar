@@ -9,7 +9,7 @@ The only officially supported Linux distribution right now is [http://www.ubuntu
     # swig
     # build-essential
     # python-all-dev
-    * To get the above items, you can use your favorite package manager is, such as `apt-get`.  For example:
+    * To get the above items, you can use your favorite package manager, such as `apt-get`.  For example:
 {{{
 sudo apt-get install openjdk-6-jdk swig build-essential python-all-dev
 }}}
