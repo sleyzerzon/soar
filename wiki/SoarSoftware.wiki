@@ -4,7 +4,7 @@
 
 ----
 = 9.3.2 =
-This release of Soar continues the 9.3 line which includes modules for reinforcement learning, episodic memory, semantic memory, and working memory activation, as well as everything from previous versions of Soar. All learning mechanisms are disabled by default. This release is primarily a bug fix release.
+This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes several bug fixes, a new distribution structure, and a simplification of how libraries are built in Soar.  All learning mechanisms are disabled by default.
 
   * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_32bit.zip 9.3.2 for Windows, 32-bit]
   * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_64bit.zip 9.3.2 for Windows, 64-bit]
