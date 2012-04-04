@@ -4,7 +4,7 @@
 
 ----
 = 9.3.2 =
-{{{
+<pre>
 Soar 9.3.2 Release Notes, April 2012
 ===================================
 
@@ -195,10 +195,10 @@ Issue 102: CLI now strips out comments at the end of the line properly.
 
 Issue 103: Watch-wmes command now works again.  You can now set up arbitrary
 filters on which wmes are printed out.
+</pre>
 ----
 = 9.3.1 =
-{{{
-Soar 9.3.1 Release Notes, June 2011
+<pre>Soar 9.3.1 Release Notes, June 2011
 ===================================
 
 This release of Soar continues the 9.3 line which includes modules for
@@ -457,12 +457,10 @@ Configurable at runtime using timers command.
 
 Experimental support to discard learned chunks that are duplicates of
 existing RL rules modulo numeric preference value.
-}}}
-
+</pre>
 ----
 = 9.3.0 =
-{{{
-Soar 9.3.0 Release Notes, March, 2010
+<pre>Soar 9.3.0 Release Notes, March, 2010
 =====================================
 
 This release of Soar includes modules for reinforcement learning
@@ -688,12 +686,10 @@ Issue 7: Memory pool preallocation command added.
 
 Issue 18: preferences command extended to include probability that current
 operators may be selected.
-}}}
-
+</pre>
 ----
 = 9.2.0 =
-{{{
-Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
+<pre>Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
 ======================================
 
 This release of Soar continues the 9.x series of releases during which we
@@ -950,11 +946,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
    -or-
 soar-group@lists.sourceforge.net
-}}}
+</pre>
 
 = 9.1.1 =
-{{{
-Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
+<pre>Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
 ======================================
 
 This release of Soar continues the 9.x series of releases during which we
@@ -1211,12 +1206,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
    -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 9.1.0 =
-{{{
-Soar 9.1.0-beta Release Notes
+<pre>Soar 9.1.0-beta Release Notes
 =============================
 
 This release of Soar continues the 9.x series of releases during which we 
@@ -1349,12 +1342,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
 -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 9.0.1 =
-{{{
-Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
+<pre>Soar 9.0.1, 9.1.1, 9.2.0 Release Notes
 ======================================
 
 This release of Soar continues the 9.x series of releases during which we
@@ -1611,12 +1602,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
    -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 9.0.0 =
-{{{
-Soar 9.0.0 Release Notes
+<pre>Soar 9.0.0 Release Notes
 ========================
 
 This release of Soar begins the 9.x series of releases during which we 
@@ -1762,12 +1751,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
 -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 8.6.4 =
-{{{
-Soar 8.6.4 Release Notes
+<pre>Soar 8.6.4 Release Notes
 ========================
 
 This release of Soar includes reinforcement learning code (Soar-RL).
@@ -1894,12 +1881,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
 -or-
 soar-group@lists.sourceforge.netv
-}}}
-
+</pre>
 ----
 = 8.6.3=
-{{{
-Soar 8.6.3 Release Notes
+<pre>Soar 8.6.3 Release Notes
 ========================
 
 Soar-8.6.3 includes all source code, many demo programs, and a 
@@ -2024,12 +2009,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@umich.edu (preferred)
 -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 8.6.2 =
-{{{
-Soar 8.6.2 Release Notes
+<pre>Soar 8.6.2 Release Notes
 ========================
 
 Soar-8.6.2 includes all source code, many demo programs, and a 
@@ -2164,12 +2147,10 @@ If any other issues or bugs are found, please send mail to:
 soar-sml-list@lists.sourceforge.net (preferred)
 -or-
 soar-group@lists.sourceforge.net
-}}}
-
+</pre>
 ----
 = 8.6.1 =
-{{{
-Announcing Soar 8.6.1!
+<pre>Announcing Soar 8.6.1!
 ======================
 
 This announcement describes the primary changes in this latest release. It also 
@@ -2269,12 +2250,11 @@ Known issues:
 If any other issues or bugs are found, please send mail to:
 
 soar-group@lists.sourceforge.net
-}}}
+</pre>
 
 ----
 = 8.6.0 =
-{{{
-Announcing Soar 8.6.0!
+<pre>Announcing Soar 8.6.0!
 ======================
 
 This announcement describes the primary changes in this latest release. Among
@@ -2414,12 +2394,11 @@ These common commands have NOT changed:
 
 To learn more about SML, the debugger or how to build a simulation using the new
 interface please see the documentation included with the release.
-}}}
+</pre>
 
 ----
 = 8.5.2 =
-{{{
-We are pleased to announce that Soar Suite 8.5.2 is ready for the Windows and 
+<pre>We are pleased to announce that Soar Suite 8.5.2 is ready for the Windows and 
 Linux platforms! Download it here:
 
 --> http://sitemaker.umich.edu/soar/soar_software_downloads
@@ -2634,12 +2613,11 @@ Bug Fixes
 Known Issues
 ------------
 Too many to list. See bugzilla for details.
-}}}
+</pre>
 
 ----
 = 8.5.1 =
-{{{
-Summary of changes between SoarSuite 8.5.0 and SoarSuite 8.5.1
+<pre>Summary of changes between SoarSuite 8.5.0 and SoarSuite 8.5.1
                             June, 2004
 
 
@@ -2921,7 +2899,7 @@ Bug Fixes
 Known Issues
 ------------
 Too many to list. See bugzilla for details.
-}}}
+</pre>
 
 ----
 = 8.5.0 =
@@ -2954,14 +2932,13 @@ In Soar 8.4.5, Operator No Changes were identified agressively by the architectu
 == MatchTime Interrupt ==
 
 Soar 8.5 now supports interrupting execution at production match-time in addition to interrupts when a production matches. This new capability makes it possible to examine Soar's state before the production fires, and even makes it possible to excise the production that matches before its effects are realized. To use the matchtime interrupt feature, productions must add the `:interrupt` directive as in the following example production: 
-{{{
-sp { interrupt*on*application 
+<pre>sp { interrupt*on*application 
 :interrupt 
     (state <s> ^operator.name stop) 
 -->
     (write (crlf) |I've already Halted|)
 }
-}}}
+</pre>
 
 Note that supporting this feature adds a small amount of computational overhead to the match phase. If you desire a maximally streamlined version of Soar, recompile /without/ the MATCHTIME_INTERRUPT flag in soarBuildOptions.h
 
@@ -2988,25 +2965,22 @@ While O Support Mode 3 remains the default for this release, this is for backwar
 
 Soar 8.5 has better capabilities to support behavioral diversity than previous versions of Soar. The difference stems from Soar 8.5 numeric indifferent preferences that allow operators to be assigned weights along with the '=' preference. In the event of a tie, the indifference selection mechanism is invoked. In previous versions of Soar, the probability of selecting any of the tied operators was distributed evenly among the candidates (assuming the indifferent-selection mode was 'random'). Soar 8.5's numeric indifferent preferences allow the programmer to skew this distribution such that certain operators are chosen more or less frequently. Preferences are specified simply by adding an integer or float value following an operator's '=' preference. As in the example below: 
 
-{{{
-sp { example 
+<pre>sp { example 
     (state <s> ^superstate nil -^initialized true) 
 --> 
     (<s> ^operator <o> + = 30) 
     (&lt;o&gt; ^name initialize-a)
 }
-}}}
+</pre>
 
 Two algorithms are available via a run-time switch: 
-{{{
-numeric-indifferent-mode -avg
-}}}
+<pre>numeric-indifferent-mode -avg
+</pre>
 
 Here, we calculate the 'average' preference value associated with a particular operator. Thus, if preference A for operator X has value 30 while preference B for operator X has value 60, the average will be 45. Once this value has been calculated for all competeing operators, we sum their average preferences and select a random number between 0 and this sum. Each operator is associated with a range on this scal equal to its average numeric preference. Thus, the randomly selected number can simply be mapped back to an operator that then becomes for 'selected' operator for the current decison. In average mode, indifferent preferences without a numeric value are given the default value of 50 for selection purposes. For programmers, we expect that this mode of numeric-indifferent selection will be most intuitive. Note however, that this scheme doesn't make a lot of sense for preferences are less than zero. If an operator's average value is ever below zero, Soar will print a warning indicating this situation. As an initial recommendation, we suggest using values between 0.0 and 100.0 for your operators. 
 
-{{{
-numeric-indifferent-mode -sum
-}}}
+<pre>numeric-indifferent-mode -sum
+</pre>
 
 Here, the preferences for each operator are first summed. Thus, if preference A for operator X has value 30 while preference B for operator X has value 70.5 the sum will be 100.5. This sum is calculated for all competing operators. Next, we calculate: e ^ (preference_sum / agent_temperature) where agent_temperature is a compile time constant currently set at 25.0 We'll call this value the operator's final numeric preference. Finally, we sum all the competing operator's final numeric preferences and select a random number between 0 and this sum. Each operator is associated with a range on this scale equal to the size of its final numeric preference. Thus, the randomly selected number can simply be mapped back to an operator that then becomes the 'selected' operator for the current decision. In the sum mode, indifferent preferences without a numeric value are given the default value 0.0 for the selection purposes. Note it does make sense to use this methodology even if the numeric preferences are negative, however, because the numeric preference are used in exponientation, their values should be somewhat limited so floating-point overflow does not become a problem. We expect this sum mode to be more useful for future reinforcement-learning methods, and have included it here mainly for experimental purposes.
 

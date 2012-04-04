@@ -6,7 +6,7 @@ The !SoarEditor is downloadable via [http://download.eclipse.org/eclipse/downloa
   # Install the latest version of Eclipse.
   # In Eclipse, go to _Help_ > _Install New Software..._
   # Click on the _Add..._ button to add a new update site.
-  # Under _Name_, enter whatever you like—something like "Soar Editor".
+  # Under _Name_, enter whatever you like, something like "Soar Editor".
   # Under _Location_, enter https://raw.github.com/mtinkerhess/Soar-Editor/master/Site/site.xml
   # Click _OK_, and wait for a minute for Eclipse to download information about the plugin.
   # Check the box next to "Uncategorized", and click _Next_.

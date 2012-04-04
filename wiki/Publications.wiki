@@ -1,5 +1,5 @@
 #summary Publications related to the Soar project.
-#labels Phase-Support,Featured
+#labels Featured
 
 = 2012 =
 

@@ -3,7 +3,7 @@ The Obscure-bot is an advanced bot that uses mapping. This is a good bot to test
 
 To use the Obscure-bot, load in the file obscure-bot through the tank-soar control panel. This in turn loads in the binary file obscure-bot.soarx. 
 
-Alternatively, you can create a tank using some other Soar project, excise –all of the rules, and then use production load (off the file menu) to directly load  in obscure-bot.soarx.
+Alternatively, you can create a tank using some other Soar project, {{{excise –all}}} of the rules, and then use production load (off the file menu) to directly load  in obscure-bot.soarx.
 
 === Soar capabilities ===
   * It's a secret!

@@ -23,7 +23,7 @@ them to a socket maintained by Soar (port 12121 by default).  The format used
 is _4-byte length_ followed by stream of characters representing the XML
 message.
 
-However, we donÂ’t expect many clients will have to go down to this level.
+However, we donÂ't expect many clients will have to go down to this level.
 Instead, we provide a series of classes that together hide the details of the
 XML messaging system while allowing the client full control over Soar.  This
 guide will provide a quick introduction to using those classes which we call
@@ -38,13 +38,13 @@ Windows) are:
   * Static libraries: ClientSML.lib, ElementXML.lib and ConnectionSML.lib
   * Shared libraries (dynamically loaded): SoarKernelSML.dll, ElementXML.dll.
 
-Also if youÂ’re working in Java you need `Java_sml_ClientInterface.dll`, in Tcl
-youÂ’d need `Tcl_sml_ClientInterface.dll`.  You get the idea.
+Also if youÂ're working in Java you need `Java_sml_ClientInterface.dll`, in Tcl
+youÂ'd need `Tcl_sml_ClientInterface.dll`.  You get the idea.
 
 The required include files are all found in `ClientSML/include`.
 
 Configuring Visual Studio to use these libraries can be a bit confusing if
-youÂ’re not used to it.  HereÂ’s some specific steps:
+youÂ're not used to it.  HereÂ's some specific steps:
 
 {{{
 // Doug: These were my changes from a vanilla MFC app created by Visual Studio in order to get SML going for a project named "Test":
@@ -91,7 +91,7 @@ cout << pKernel->GetLastErrorDescription() << endl ;
 sml::Agent* pAgent = pKernel->CreateAgent("test") ;
 
 // Check that nothing went wrong
-// NOTE: No agent gets created if thereÂ’s a problem, so we have to check for
+// NOTE: No agent gets created if thereÂ's a problem, so we have to check for
 // errors through the kernel object.
 if (pKernel->HadError())
 {
@@ -110,7 +110,7 @@ if (pAgent->HadError())
 Identifier* pInputLink = pAgent->GetInputLink() ;
 
 // Create (I3 ^plane P1) (P1 ^type Boeing747 ^speed 200 ^direction 50.5) on
-// the input link.  (We donÂ’t own any of the returned objects).
+// the input link.  (We donÂ't own any of the returned objects).
 Identifier* pID 	 = pAgent->CreateIdWME(pInputLink, "plane") ;
 StringElement* pWME1 = pAgent->CreateStringWME(pID, "type", "Boeing747") ;
 IntElement* pWME2    = pAgent->CreateIntWME(pID, "speed", 200) ;
@@ -188,7 +188,7 @@ client to periodically call `pKernel->CheckForIncomingCommands()` so that the
 kernel has a chance to check for commands coming in from other remote processes
 (e.g. from a debugger).  So if you want maximum speed choose the current thread
 option, but your code will be a bit more complicated.  If speed is not as
-critical then choose the new thread option.  The speed difference isnÂ’t that
+critical then choose the new thread option.  The speed difference isnÂ't that
 large, perhaps a factor of two on the cost of making a call -- which will often
 be dwarfed by the cost of matching productions or updating the environment.
 
@@ -197,11 +197,11 @@ you use `CreateKernelInNewThread` until you are somewhat familiar with the
 system.  If you find you need higher performance later, switching over to the
 `CurrentThread` model later only requires changing this one line of code.
 
-=== Creating input link wmeÂ’s ===
+=== Creating input link wmeÂ's ===
 
 {{{
 // Create (I3 ^plane P1) (P1 ^type Boeing747 ^speed 200 ^direction 50.5) on
-// the input link.  (We donÂ’t own any of the returned objects).
+// the input link.  (We donÂ't own any of the returned objects).
 Identifier* pID 	 = pAgent->CreateIdWME(pInputLink, "plane") ;
 StringElement* pWME1 = pAgent->CreateStringWME(pID, "type", "Boeing747") ;
 }}}
@@ -212,7 +212,7 @@ The client can build up an arbitrarily complex graph of working memory elements
 identifiers are created by `CreateIdWME()` and new simple WMEs are created
 through `CreateStringWME`/`CreateIntWME`/`CreateFloatWME`.
 
-A WMEÂ’s value can be updated through the `pAgent->Update()` method and it can
+A WMEÂ's value can be updated through the `pAgent->Update()` method and it can
 be removed through `pAgent->DestroyWME()` which also makes the working memory
 object invalid.
 
@@ -251,7 +251,7 @@ In most real environments, Soar should be run with
 `pKernel->StopAllAgents()` to interrupt.  This allows a user to run the
 environment from a debugger as well as from the environment.
 
-ThereÂ’s more discussion of this in Section 2 of this document.
+ThereÂ's more discussion of this in Section 2 of this document.
 
 === Retrieving Output ===
 
@@ -276,11 +276,11 @@ std::string speed = pCommand->GetParameterValue("speed") ;
 }}}
 
 There is direct support provided for an output model where "commands" are
-represented as distinction identifierÂ’s on the output-link.  For example, if
+represented as distinction identifierÂ's on the output-link.  For example, if
 the output-link identifier is O1 then the agent might add a move command with
 `(O1 ^move M1) (M1 ^speed 20)`.
 
-If you choose to adopt this model for the agentÂ’s actions then it is possible
+If you choose to adopt this model for the agentÂ's actions then it is possible
 to query the agent for the number of commands added since the last time Soar
 was run and to retrieve each Command in turn, its name and parameter values.
 In this example, pCommand would point to M1, the name would be `move` and the
@@ -291,7 +291,7 @@ supported, but the support is less direct.
 
 First, notice that `GetCommand()` returns a standard Identifier WME, so this
 can be manipulated in the same manner as any other WME.  In particular
-IdentifierÂ’s offer `GetNumberChildren` and `GetChild` methods, so using these
+IdentifierÂ's offer `GetNumberChildren` and `GetChild` methods, so using these
 it is possible to start from the output link and examine all of working memory
 beneath the output link.  There are also other methods (such as
 `FindByAttribute`) that can make this search more efficient.
@@ -337,7 +337,7 @@ command.
 To capture output during a run you need to register for the `smlEVENT_PRINT`
 event which will be called periodically during the course of the run. To do
 this you need to define a handler function which will be called during the run.
-HereÂ’s a simple example:
+HereÂ's a simple example:
 
 {{{
 void MyPrintEventHandler(smlPrintEventId id, void* pUserData, Agent* pAgent, char const* pMessage)
@@ -379,9 +379,9 @@ the approach taken in the Java debugger.
 There are a lot of events you can register for and the list given here will
 surely grow over time.  Here are the types of the handlers in C++ and Java (the
 Java ones are a little different from the C++ and are more error prone as
-theyÂ’re checked at runtime not at compile time):
+theyÂ're checked at runtime not at compile time):
 
-C++ event handlers (if youÂ’re not sure how to convert these types into
+C++ event handlers (if youÂ're not sure how to convert these types into
 functions look at the example of the print handler in the previous section):
 
 {{{
@@ -571,7 +571,7 @@ If you are converting an existing SGIO environment you should also read the
 "Moving from SGIO to SML" document as well as this section.
 
 The Java implementation of Towers of Hanoi (TOH) is a useful reference, showing
-a simple environment environment.  IÂ’ll use that to as an example here, so the
+a simple environment environment.  IÂ'll use that to as an example here, so the
 code snippets will be in Java, but a very similar approach can be taken in
 other languages (currently Tcl or C++).
 
@@ -609,7 +609,7 @@ reported to the user.
 
 == Input ==
 
-Mapping from the environmentÂ’s state to input values involves calls to create,
+Mapping from the environmentÂ's state to input values involves calls to create,
 update and destroy working memory elements using calls like these:
 
 {{{
@@ -626,8 +626,8 @@ A key step after making multiple calls to modify the input link is to call
 `Commit()`.  All changes to working memory are buffered (in the environment)
 until the moment Commit is called, at which point they are all sent over as a
 single large message to the kernel.  This greatly improves performance, but you
-must remember to call Commit before running the agent or your changes wonÂ’t
-actually appear on the agentÂ’s input link.  This was changed in 8.6.2 so the
+must remember to call Commit before running the agent or your changes wonÂ't
+actually appear on the agentÂ's input link.  This was changed in 8.6.2 so the
 default now is that `Commit()` is called automatically each time a wme is
 modified on the input link.  To enable the faster version which then requires
 manual calls to `Commit()` call `SetAutoCommit(false)`.  Calling Commit
@@ -707,7 +707,7 @@ be removed by the agent.
 (Note that this is simple form of input that in this case is sent to the output
 link rather than the input link.  This is technically a bit of "back door"
 input, but is simpler than passing a large structure to the input link and
-having the agent match up the two.  This addition is made during the agentÂ’s
+having the agent match up the two.  This addition is made during the agentÂ's
 next input cycle as with all input).
 
 In order for the Commands method to work, the system has to keep track of
@@ -732,7 +732,7 @@ and proceed to examine the tree (graph) from there.
 
 There are two main methods for running an agent:
 
-  * `RunSelfForever()` and itÂ’s twin `RunAllAgentsForever()`
+  * `RunSelfForever()` and itÂ's twin `RunAllAgentsForever()`
   * `RunSelf(1)` and `RunAllAgents(1)` (to step the environment rather than running it).
 
 The trick here is that the code for running the agents should be separate from
@@ -741,7 +741,7 @@ sending input).  By separating the two we can either issue the run from the
 environment or from a debugger (or other client) and everything works
 correctly.
 
-LetÂ’s assume we have the `updateWorld()` method from above, which should have the form:
+LetÂ's assume we have the `updateWorld()` method from above, which should have the form:
 
 {{{
 void updateWorld()
@@ -813,7 +813,7 @@ public void updateEventHandler(int eventID, Object data, Kernel kernel, int runF
 The Run code is pretty simple.  The only issues to be aware of are:
 
   * `RunAllAgentsForever()` is currently (8.6.2) a blocking call, so we usually spawn a thread and issue this call in that thread.
-  * `StopAllAgents()` canÂ’t currently be called from an arbitrary thread (or it blocks waiting for the Run to terminate).  This may be fixed in a later version, but for now calling it from an event callback solves this problem.
+  * `StopAllAgents()` canÂ't currently be called from an arbitrary thread (or it blocks waiting for the Run to terminate).  This may be fixed in a later version, but for now calling it from an event callback solves this problem.
 
 The way `updateWorld()` is called is after the
 `smlEVENT_AFTER_ALL_OUTPUT_PHASES` event fires.  Why bother to do this rather
@@ -868,7 +868,7 @@ combinations may make sense for different situations but this might be a
 typical set (for a multi-agent environment):
 
 if `sml_RUN_SELF` set and `SML_UPDATE_WORLD` not set or `sml_DONT_UPDATE_WORLD`
-set then donÂ’t call `updateWorld()`.
+set then donÂ't call `updateWorld()`.
 
 The meaning of this would be that:
 
@@ -877,7 +877,7 @@ The meaning of this would be that:
   * `run --self --update` would cause  one agent to run and update the environment
   * `run` would cause all agents to run and update the environment.
  
-You are free to make other choices if thereÂ’s a compelling reason.
+You are free to make other choices if thereÂ's a compelling reason.
 
 == Integrating with other clients (esp. the debugger) ==
 
@@ -885,13 +885,13 @@ One final issue is updating the controls in the environment correctly if the
 user runs Soar from the debugger and not the environment (e.g. disabling the
 `run` button and enabling `stop` during a run).
 
-There are two approaches to this.  First, ignore the problem and donÂ’t
+There are two approaches to this.  First, ignore the problem and donÂ't
 enable/disable controls.  Instead, just handle errors if the user tries to
 issue a second run while a run is already going ahead.  The second option is to
 register for the `smlEVENT_SYSTEM_START` and `smlEVENT_SYSTEM_STOP` events and use
 these to enable/disable the UI in the environment in appropriate ways.
 
-HereÂ’s an example for implementing this support:
+HereÂ's an example for implementing this support:
 
 *Registering and Handling Start/Stop Sample Code*
 
@@ -947,7 +947,7 @@ its vicinity.
 
 The Tcl and Java interfaces were generated by SWIG (http://www.swig.org).  We
 have provided some custom code to help SWIG out in a few places, mostly with
-callbacks.  If youÂ’re interested in creating interfaces for other languages
+callbacks.  If youÂ're interested in creating interfaces for other languages
 that SWIG supports, check out the SWIG documentation and try to follow our
 existing solutions.
 
@@ -959,7 +959,7 @@ following line in your Tcl code:
 package require tcl_sml_clientinterface
 }}}
 
-Note that the directory where the package resides must be added to TclÂ’s
+Note that the directory where the package resides must be added to TclÂ's
 auto_path variable.  The available functions are direct translations of their
 C++ counterparts.  See `TOHtest.tcl` in soar-library for examples showing how
 to use the Tcl interface.  The Tcl package includes
@@ -980,42 +980,42 @@ settings (locations are from VS.NET 2003):
 
   * General -> Use Managed Extensions : No
   * C/C++ -> Code Generation -> Runtime Library: Multi-threaded or Multi-threaded Debug
-    * You can also use Multi-threaded DLL or Multi-threaded Debug DLL, but then youÂ’ll have to rebuild all of the stuff in SML.sln with this setting.
+    * You can also use Multi-threaded DLL or Multi-threaded Debug DLL, but then youÂ'll have to rebuild all of the stuff in SML.sln with this setting.
 
 == Memory Management ==
 
 Memory management is actually really easy.  Generally, the only objects you
 should explicitly delete are the kernel object and any objects you directly
 allocated through a call to new.  In Java and Tcl, this generally means you can
-just let things go out of scope when youÂ’re done with them.  There are a couple
+just let things go out of scope when youÂ're done with them.  There are a couple
 special cases you should be aware of, though:
 
   * Agent objects are automatically deleted when the owning Kernel object is deleted (actually, when the call to `Kernel::Shutdown` is made, which you should always make before deleting the kernel). If you want to destroy an agent earlier, you can by making a call to `Kernel::DestroyAgent`. Under no circumstances should you delete (in the C++ sense) an `Agent` object.
 
-  * In Java if you create a `ClientXML` object through `xml = new ClientXML()` you should call `xml.delete()` on it when you're done. This isn't strictly required (the garbage collector will get it eventually) but is good practice and will avoid messages about leaked memory when the application shuts down. As per the general rule, in C++ if you create it with new youÂ’re responsible for destroying it with delete.
+  * In Java if you create a `ClientXML` object through `xml = new ClientXML()` you should call `xml.delete()` on it when you're done. This isn't strictly required (the garbage collector will get it eventually) but is good practice and will avoid messages about leaked memory when the application shuts down. As per the general rule, in C++ if you create it with new youÂ're responsible for destroying it with delete.
 
-  * Since there can be multiple clients interacting with the same kernel and agents, your application needs to be listening for the appropriate events so if some other client deletes/destroys a kernel or agent your application is using, you donÂ’t crash. Specifically, listen for the BEFORE_AGENT_DESTOYED and BEFORE_SHUTDOWN events so you can clean things up as needed in your application.
+  * Since there can be multiple clients interacting with the same kernel and agents, your application needs to be listening for the appropriate events so if some other client deletes/destroys a kernel or agent your application is using, you donÂ't crash. Specifically, listen for the BEFORE_AGENT_DESTOYED and BEFORE_SHUTDOWN events so you can clean things up as needed in your application.
 
 == Boosting Performance ==
 
 It is often desirable to maximize the performance of your SML application.
 This section assumes that you just want to make things as fast as possible
 after you have finished debugging your application.  Debugging is an inherently
-slow process, so these tips will be less helpful while youÂ’re still debugging.
+slow process, so these tips will be less helpful while youÂ're still debugging.
 
   * Compile with optimizations turned on.  In Visual Studio this means doing a release build. On Linux and OS X, the default settings are probably sufficient, but you can experiment with new settings if you want (let us know if you find better settings).
 
   * Put primary application and Soar in the same process.  That is, use `CreateInNewThread` or `CreateInCurrentThread`, not `CreateRemoteConnection`.  Using a remote kernel means socket communications are used, which is slow.
 
-  * DonÂ’t register for unnecessary events.  Every event that is registered for causes extra work to be done.  Try to find an appropriate event to register for so you donÂ’t end up getting more event calls than you actually need -- that is, try to avoid registering for events which occur more frequently than you need and then filtering them on the application side.
+  * DonÂ't register for unnecessary events.  Every event that is registered for causes extra work to be done.  Try to find an appropriate event to register for so you donÂ't end up getting more event calls than you actually need -- that is, try to avoid registering for events which occur more frequently than you need and then filtering them on the application side.
 
-  * DonÂ’t connect the debugger.  Connecting the debugger creates a remote connection and also registers for several events.
+  * DonÂ't connect the debugger.  Connecting the debugger creates a remote connection and also registers for several events.
 
-  * Set watch level 0.  Even if you donÂ’t have a client registered for any of the print or XML events, work is still done internally to generate some of the information that would have been sent out.  Setting watch level 0 avoids this work.
+  * Set watch level 0.  Even if you donÂ't have a client registered for any of the print or XML events, work is still done internally to generate some of the information that would have been sent out.  Setting watch level 0 avoids this work.
 
   * Disable monitor productions.  Again, even if no client is registered to print out the text of monitor productions, work is still done internally to prepare the text.  Monitor productions can be disabled by excising them or commenting them out, but an easier method is to have each monitor production test a debug flag in working memory which is set by some initialization production or operator.  Thus all of the monitor productions can be turned on or off by changing one line of code.
 
-  * Disable timers.  Soar uses timers internally to generate the output of the stats command.  If you donÂ’t need this information, you can use the `timers --off` command to disable this bookkeeping.  This can make a significant difference in the watch 0 case.
+  * Disable timers.  Soar uses timers internally to generate the output of the stats command.  If you donÂ't need this information, you can use the `timers --off` command to disable this bookkeeping.  This can make a significant difference in the watch 0 case.
 
   * Avoid running agents separately.  Instead of calling `RunSelf` or `RunSelfTilOutput` on each agent, just call `RunAllAgents` on the kernel itself.  This runs all agents together and avoids the overhead of running them separately.  The absolute best you can do is to call `RunAllAgentsForever` as described in section 2.4 -- this avoids repeatedly calling the run functions at all and will make it easier to stop and restart your application from the debugger (or other clients).
 

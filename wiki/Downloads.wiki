@@ -2,15 +2,16 @@
 
 The current stable version of Soar is *9.3.2*.
 
-This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All learning mechanisms are disabled by default.
+This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (!EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All learning mechanisms are disabled by default.
 
 [ReleaseNotes#9.3.2 Here are full release notes for the 9.3.2 release].
 
 === Prerequisites ===
 
-Downloading and installing [http://java.sun.com Java] is required since most users will want to use the Soar Java Debugger and other Soar components written in Java. 
+Downloading and installing Java is required since most users will want to use the Soar Java Debugger and other Soar components written in Java. 
 
-  * You can download the [http://java.sun.com/javase/downloads/index.jsp latest version of the Sun JRE or JDK here]. 
+  * If you are running Ubuntu Linux or OSX, you probably already have Java installed.
+  * Otherwise, you can download the [http://www.oracle.com/technetwork/java/javase/downloads/index.html latest version of the Sun JRE or JDK here]. 
   * *Important*: the 64-bit version of Soar require the 64-bit version Java!  Make sure to download the correct one.
 
 
@@ -19,9 +20,6 @@ Downloading and installing [http://java.sun.com Java] is required since most use
   # Download the appropriate version of Soar
     * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_32bit.zip 9.3.2 for Windows, 32-bit]
     * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_64bit.zip 9.3.2 for Windows, 64-bit]
-  # If you don't have Microsoft Visual Studio installed or the Microsoft Visual C++ redistributable on your machine, you make get an error that says "Native code library failed to load".  If so, install the appropriate version of the Microsoft Visual C++ redistributable:
-    ** [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=29 Microsoft Visual C++ 2008 redistributable, 32-bit] 
-    ** [http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=15336 Microsoft Visual C++ 2008 redistributable, 64-bit]
 
 ==== OS X ====
   * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-OSX.zip 9.3.2 for Mac, 64-bit]

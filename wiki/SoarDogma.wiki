@@ -13,7 +13,7 @@ curve over the course of my first year as a graduate student at the University
 of Michigan. My hope was that by writing these guidelines down I might ease the
 curve for future Soar users. To get the most value from this document, I
 recommend you read it once at the beginning of your Soar experience and then
-read it again once youve started using Soar in earnest.
+read it again once you've started using Soar in earnest.
 
 == Golden Rule: Beware the devil of "character efficiency" ==
 
@@ -27,7 +27,7 @@ A production with too many conditions often has a subset of conditions that
 define a separate "concept" that should be identified with a separate
 elaboration. When counting conditions, you should only count those that
 actually test a WME for its value not to reach other WMEs. For example, the
-condition `(<s> ^io.input-link <il>)` likely doesnt count because its probably
+condition `(<s> ^io.input-link <il>)` likely doesn't count because it's probably
 being used to reach and test another WME on the input link.
 
 If a rule has too many actions usually some of those actions are not truly
@@ -36,12 +36,12 @@ similar conditions. When counting actions, you should only count those that
 actually add or remove a WME in working memory.  _Exception_: Initialization
 rules can often have a very large number of actions and this is ok.
 
-*Example*: The rule shown at left (below) was taken from TankSoar. It has a
+*Example*: The rule shown at left (below) was taken from !TankSoar. It has a
 total of six conditions. This is not necessarily too big. However, if you study
-this production (and you are familiar with TankSoar), youll see that it is
+this production (and you are familiar with !TankSoar), you'll see that it is
 really testing three high level conditions:
 
-  * Am I in the state tanksoar?
+  * Am I in the state tankSoar?
   * Am I low on health (less than 300)?
   * Am I in danger?
 
@@ -99,12 +99,12 @@ unwanted or unexpected side effects as the program evolves.
 
 == Only include the conditions you need ==
 
-When proposing an operator, dont compute information that wont be needed
-until application.  _Exception_: Its ok to attach matched values that were
+When proposing an operator, don't compute information that won't be needed
+until application.  _Exception_: It's ok to attach matched values that were
 already required for the conditions of the proposal rule.
 
-*Example*: Your TankSoar tank needs to turn on its radar whenever it turns.
-Youve cleverly decided to set the range of the radar based upon the tanks
+*Example*: Your !TankSoar tank needs to turn on its radar whenever it turns.
+You've cleverly decided to set the range of the radar based upon the tank's
 distance from the wall it is facing in order to save energy. Rather than
 calculate this range in the proposal rule, use a separate elaboration to add
 the range data once the operator has been selected.
@@ -116,7 +116,7 @@ re-proposed when the extraneous data changes.
 == Consider all your options ==
 
 Operator proposal rules should fire whenever an operator is legitimate, not
-just when it is appropriate. _Exception_: If limiting the agents options will
+just when it is appropriate. _Exception_: If limiting the agent's options will
 significantly improve its performance you may consider violating this
 guideline.
 
@@ -144,13 +144,13 @@ special case of the move-to-xyz operator. However, this is probably poor
 practice.
 
 *Justification*: When an operator is vaguely named or has multiple behaviors
-your Soar program will be difficult to debug because you arent certain what
+your Soar program will be difficult to debug because you aren't certain what
 the agent is doing. You can get the same effect by having additional
 augmentations on the operator that trigger the general actions.  For example,
 you could have ^type move on the above operators and there can be selection and
 application rules that test for the type (but not the name).
 
-== Dont force operator proposals ==
+== Don't force operator proposals ==
 
 If you find yourself adding operators that put o-supported data on the top
 state for the sole purpose of causing another rule to fire and not be retracted
@@ -164,7 +164,7 @@ before you complete. You decide to have on operator record the angle off on the
 top state and a second operator turn to that angle off as recorded.
 
 A better solution: Create an I-supported augmentation that records that the
-object is to the agents right, left or directly in front. Have your agent turn
+object is to the agent's right, left or directly in front. Have your agent turn
 in the specified direction until the object is in front of the agent.
 
 *Justification*: Having operators depend on transient, yet o-supported top
@@ -255,22 +255,22 @@ sp {my-rule
 *Justification*: This creates multiple matches on the RETE and may, as a
 result, create performance bottlenecks.
 
-== Use VisualSoar ==
+== Use !VisualSoar ==
 
-Write your Soar code using VisualSoar and maintain and use your VisualSoar data
+Write your Soar code using !VisualSoar and maintain and use your !VisualSoar data
 map!
 
 *Example*: N/A
 
-*Justification*: Much like comments on code, VisualSoars enforced structure
+*Justification*: Much like comments on code, !VisualSoar's enforced structure
 and data map is exceptionally helpful for people who are examining code they
-have not themselves written.  VisualSoar provides helpful functionality like
+have not themselves written.  !VisualSoar provides helpful functionality like
 syntax highlighting and identifier completion. It also helps you catch bugs in
 your code by watching for rules that match unspecified WMEs.  Such bugs
 (particularly typos involving nearly identical letters like l and 1) can
 sometimes require significant effort to discover.
 
-== Dont Sacrifice Semantics for Syntax ==
+== Don't Sacrifice Semantics for Syntax ==
 
 Only write rules that perform standard problem space functions: state
 elaboration, operator proposal, operator comparison, operator elaboration, and
@@ -301,7 +301,7 @@ what you are trying to do.
 
 == One thing at a time ==
 
-Dont mix different problem space functions in the same rule except operator
+Don't mix different problem space functions in the same rule except operator
 proposal and selection. It is ok to propose an operator and create a unary
 preference at the same time.
 

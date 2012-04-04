@@ -22,7 +22,7 @@ Here is an abbreviated description of the rules used in our implementation of th
   * [http://web.eecs.umich.edu/~soar/downloads/Domains/Dice.zip Dice.zip]
 
 === Associated Agents ===
-  * [Agent_Dice John Lair'd Dice Agent]
+  * [Agent_Dice John Laird's Dice Agent]
 
 === Documentation ===
   * Requires these jars on the classpath:

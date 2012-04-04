@@ -1,16 +1,9 @@
 = Getting the Source =
 
 There are two ways to get the source code:
-  # Download the the [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-source.zip 9.3.2 platform-independent source].  This will contain the last major release of the entire !SoarSuite.
-  # Checkout the latest code directly from the Soar SVN repository.
-
-If you chose the first option and manually downloaded the full !SoarSuite, skip down to your operating system notes below:
-
-  * [BuildWindows Windows Build Notes]
-  * [BuildLinux Linux Build Notes]
-  * [BuildMac Mac OS X Build Notes]
-
-Otherwise, follow the instructions in the next section to download Soar from the SVN repository.
+  * Download the the [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-source.zip 9.3.2 platform-independent source].  This will contain the last major release of the entire !SoarSuite.
+*OR*
+  * Checkout the latest code directly from the Soar SVN repository using the directions below.
 
 == How to Check Out Soar from SVN ==
 
@@ -22,7 +15,7 @@ Otherwise, follow the instructions in the next section to download Soar from the
     ** The URL for the repository is *http://soar.googlecode.com/svn/trunk/SoarSuite/ * (if you are a Soar developer affiliated with the U of M and plan to check in changes, use *https:// *)
       ** *Command-line SVN program*: Use the command `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite`
       ** *TortoiseSVN (Windows)*: Right click in the folder that you want to install the SoarSuite in and select "Checkout". A [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html checkout dialog box] will appear. Enter the URL for the repository as given above.
-    ** *Note*:  Your username is your Google account name without the `@` or domain. [http://code.google.com/hosting/settings Your password is your googlecode.com password].
+    ** *Note*:  Your username is your Google account name without the `@` or domain. [http://code.google.com/hosting/settings Your password is your googlecode.com randomly generated password].
 
 You can now skip to your operating system build notes:
 

@@ -9,7 +9,7 @@ Other versions of 32-bit windows might work but are not officially supported.
     * You must have either Microsoft Visual Studio 2008 or the free [http://www.microsoft.com/visualstudio/en-us/products/2008-editions/express Microsoft Visual C++ 2008 Express Edition].  (Note that the free Express Edition does not include a 64-bit compiler.)
     * *Warning*: *If you are on a 64-bit machine, make sure to explicitly choose to install the the 64-bit compiler*!  It is not installed by default!
   # *Java SE 6 JDK*
-    * The latest Java SE 6 JDK is available from [http://java.sun.com/javase/downloads/index.jsp java.sun.com].  Make sure to download the 64-bit version, if you are on a 64-bit machine.
+    * The latest Java SE 6 JDK is available from [http://www.oracle.com/technetwork/java/javase/downloads/index.html Oracle's web site].  Make sure to download the 64-bit version, if you are on a 64-bit machine.
   # *SWIG*
     * SWIG acts as a bridge between the Soar C++ libraries and the various other languages, like Java, Tcl, Python, Perl. Since nearly everyone will need the Soar debugger, which is written in Java, this component is required.
     * You can download it from [http://www.swig.org/download.html swig.org] and extract it anywhere, such as your home folder or `C:\` or `C:\Program Files`
