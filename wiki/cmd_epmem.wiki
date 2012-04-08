@@ -52,6 +52,7 @@ displays a summary of the parameter settings.
 || `graph-match-ordering` || Ordering of identifiers during graph match || `undefined`, `dfs`, `mcv` || `undefined` ||
 || `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
 || `learning` ||  Episodic memory enabled  || `on`, `off` || `off` ||
+|| `merge` || Controls how retrievals interact with long-term identifiers in working memory || `none`, `add` || `none` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
@@ -111,6 +112,7 @@ The `balance` parameter sets the linear weight of match cardinality vs. cue acti
 
 The `graph-match-ordering` parameter sets the heuristic by which identifiers are ordered during graph match (assuming `graph-match` is `on`). The default, `undefined`, does not enforce any order and may be sufficient for small cues. For more complex cues, there will be a one-time sorting cost, during each retrieval, if the parameter value is changed. The currently available heuristics are depth-first search (`dfs`) and most-constrained variable (`mcv`). It is advised that you attempt these heuristics to improve performance if the `query_graph_match` timer reveals that graph matching is dominating retrieval time.
 
+The `merge` parameter controls how the augmentations of retrieved long-term identifiers (LTIs) interact with an existing LTI in working memory. If the LTI is not in working memory or has no augmentations in working memory, this parameter has no effect. If the augmentation is in working memory and has augmentations, by default (`none`), episodic memory will not augment the LTI. If the parameter is set to `add` then any augmentations that augmented the LTI in a retrieved episode are added to working memory.
 
 === Statistics ===
 
