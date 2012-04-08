@@ -54,6 +54,7 @@ displays a summary of the parameter settings.
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
 || `learning` || Semantic memory enabled || `on`, `off` || `off` ||
+|| `merge` || Controls how retrievals interact with long-term identifiers in working memory || `none`, `add` || `add` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
@@ -66,6 +67,8 @@ The `smem --backup` command can be used to make
 a copy of the current state of the database, whether in memory or on
 disk. This command will commit all outstanding changes before
 initiating the copy.
+
+The `merge` parameter controls how the augmentations of retrieved long-term identifiers (LTIs) interact with an existing LTI in working memory. If the LTI is not in working memory or has no augmentations in working memory, this parameter has no effect. If the augmentation is in working memory and has augmentations, by default (`add`), semantic memory will add any augmentations that augmented the LTI in a retrieved LTI are added to working memory. If the parameter is set to `none` then semantic memory will not augment the LTI. Note this is opposite of the value of the same parameter in episodic memory.
 
 === Statistics ===
 
