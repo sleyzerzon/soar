@@ -32,6 +32,10 @@ Due to the large number of parameters, the `rl` command uses the
 switches for each parameter.  Running `rl` without any switches
 displays a summary of the parameter settings.
 
+|| `apoptosis` || Automatic excising of productions via base-level decay  || `none`, `chunks`, `rl-chunks` || `none` ||
+|| `apoptosis-decay` || Base-level decay parameter || `[`0, 1`]` || 0.5 ||
+|| `apoptosis-thresh` || Base-level threshold parameter (negates supplied value) || (0, inf) || 2 ||
+|| `chunk-stop` || If enabled, chunking does not create duplicate RL rules that differ only in numeric-indifferent preference value || `on`, `off` || `on` ||
 || `discount-rate` || Temporal discount (gamma) || `[`0, 1`]` || 0.9 ||
 || `eligibility-trace-decay-rate` || Eligibility trace decay factor (lambda) || `[`0, 1`]` || 0 ||
 || `eligibility-trace-tolerance` || Smallest eligibility trace value not considered 0 || (0, inf) || 0.001 ||
@@ -39,7 +43,11 @@ displays a summary of the parameter settings.
 || `learning` || Reinforcement learning enabled || `on`, `off` || `off` ||
 || `learning-rate` || Learning rate (alpha) || `[`0, 1`]` || 0.3 ||
 || `learning-policy` || Value update policy || `sarsa`, `q-learning` || `sarsa` ||
+|| `temporal-discount` || Discount RL updates over gaps  || `on`, `off` || `on` ||
 || `temporal-extension` || Propagation of RL updates over gaps  || `on`, `off` || `on` ||
+
+Apoptosis is a process to automatically excise chunks via the base-level decay model (where rule firings are the activation events).
+A value of `chunks` has this apply to any chunk, whereas `rl-chunks` means only chunks that are also RL rules can be forgotten.
 
 === Statistics ===
 
