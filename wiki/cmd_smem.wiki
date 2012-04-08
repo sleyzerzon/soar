@@ -55,6 +55,7 @@ displays a summary of the parameter settings.
 || `lazy-commit` || Delay writing semantic store changes to file until agent exits || `on`, `off` || `on` ||
 || `learning` || Semantic memory enabled || `on`, `off` || `off` ||
 || `merge` || Controls how retrievals interact with long-term identifiers in working memory || `none`, `add` || `add` ||
+|| `mirroring` || Controls automatic encoding of working-memory changes || `on`, `off` || `off` ||
 || `optimization` ||  Policy for committing data to disk || `safety`, `performance` || `performance` ||
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
@@ -70,6 +71,8 @@ initiating the copy.
 
 The `merge` parameter controls how the augmentations of retrieved long-term identifiers (LTIs) interact with an existing LTI in working memory. If the LTI is not in working memory or has no augmentations in working memory, this parameter has no effect. If the augmentation is in working memory and has augmentations, by default (`add`), semantic memory will add any augmentations that augmented the LTI in a retrieved LTI are added to working memory. If the parameter is set to `none` then semantic memory will not augment the LTI. Note this is opposite of the value of the same parameter in episodic memory.
 
+The `mirroring` parameter controls a useful form of automatic encoding. If enabled (`on`), all changes to long-term identifiers (LTIs) in working memory are "mirrored" to semantic memory (assuming the LTI in working memory has at least one augmentation - i.e. no accidental clearing). The `mirrors` statistic is incremented for each LTI that is updated in this way.
+
 === Statistics ===
 
 Semantic memory tracks statistics over the lifetime of the agent.
@@ -84,6 +87,7 @@ Available statistics are:
 || `edges` || Edges || Number of edges in the semantic store ||
 || `mem-usage` || Memory Usage || Current SQLite memory usage in bytes ||
 || `mem-high` || Memory Highwater || High SQLite memory usage watermark in bytes ||
+|| `mirrors` || Mirrors || Number of LTIs that have been automatically encoded via `mirroring` ||
 || `nodes` || Nodes || Number of nodes in the semantic store ||
 || `queries` || Queries || Number of times the *query* command has been issued ||
 || `retrieves` || Retrieves || Number of times the *retrieve* command has been issued ||
