@@ -35,7 +35,7 @@ displays a summary of the parameter settings.
 || `discount-rate` || Temporal discount (gamma) || `[`0, 1`]` || 0.9 ||
 || `eligibility-trace-decay-rate` || Eligibility trace decay factor (lambda) || `[`0, 1`]` || 0 ||
 || `eligibility-trace-tolerance` || Smallest eligibility trace value not considered 0 || (0, inf) || 0.001 ||
-|| `hrl-discount` || Discounting of RL updates over time in impassed states || `on`, `off` || `on` ||
+|| `hrl-discount` || Discounting of RL updates over time in impassed states || `on`, `off` || `off` ||
 || `learning` || Reinforcement learning enabled || `on`, `off` || `off` ||
 || `learning-rate` || Learning rate (alpha) || `[`0, 1`]` || 0.3 ||
 || `learning-policy` || Value update policy || `sarsa`, `q-learning` || `sarsa` ||
