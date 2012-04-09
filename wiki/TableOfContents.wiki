@@ -1,6 +1,7 @@
   * [Home Soar Wiki Home]
   * [DLCategory_Downloads Downloads]
     * [Downloads Soar Suite]
+    * [SoarTutorial Soar Tutorial]
     * ----
     * [DLCategory_Agents Agents]
       * [Agent_Algebra Algebra Agent]

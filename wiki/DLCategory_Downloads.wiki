@@ -4,6 +4,9 @@
 == Soar Suite ==
 [Downloads This category] contains pre-compiled binaries of the Soar Suite.  This is the most common form of Soar that people will download.
 
+== Soar Tutorial ==
+If you are new to Soar, this is what you'll want to download.  [SoarTutorial This page] contains a single self-contained package with all the things you'll need to go through the Soar Tutorial, namely Soar, the Java Debugger, !VisualSoar, Eaters, !TankSoar, sample agents, and Soar documentation.  It's also an excellent companion download for those reading [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture].
+
 == Agents ==
 [DLCategory_Agents This category] contains a variety of agents developed for a wide range of different tasks and environments.  You will find a full description of the agent, its capabilities and problem solving approach as well, as a download link.  If the agent requires an environment, a link will be provided.
 

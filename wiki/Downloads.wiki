@@ -2,9 +2,11 @@
 
 The current stable version of Soar is *9.3.2*.
 
-This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (!EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes many bugfixes, a major reworking of working memory activation, and under-the-hood improvements to support very long agent runs. All learning mechanisms are disabled by default.
+This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes a new "forgetting" mechanism, several bug fixes, a new distribution structure, and a simplification of how libraries are built in Soar.  All learning mechanisms are disabled by default.
 
 [ReleaseNotes#9.3.2 Here are full release notes for the 9.3.2 release].
+
+*Note*: If you are new to Soar, you'll probably want to download the [SoarTutorial Soar Tutorial package], which is a single self-contained package with all the things you'll need to go through the Soar Tutorial, namely Soar, the Java Debugger, !VisualSoar, Eaters, !TankSoar, sample agents, and Soar documentation.  It's also an excellent companion download for those reading [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture].  The downloads below only contain Soar, VisualSoar and the debugger.
 
 === Prerequisites ===
 
@@ -13,7 +15,6 @@ Downloading and installing Java is required since most users will want to use th
   * If you are running Ubuntu Linux or OSX, you probably already have Java installed.
   * Otherwise, you can download the [http://www.oracle.com/technetwork/java/javase/downloads/index.html latest version of the Sun JRE or JDK here]. 
   * *Important*: the 64-bit version of Soar require the 64-bit version Java!  Make sure to download the correct one.
-
 
 ==== Windows ====
   # Determine if you're running 32- or 64-bit Windows.[http://windows.microsoft.com/en-US/windows-vista/32-bit-and-64-bit-Windows-frequently-asked-questions Click here if you need help figuring out which type of Windows you are running.]
