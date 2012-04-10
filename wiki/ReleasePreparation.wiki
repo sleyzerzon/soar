@@ -1,113 +1,50 @@
-#summary Preparing a release
-
-= Version Bump =
-
-Many places to change the version number (this list is shorter than it
-used to be):
-
-  * Core/shared/soarversion.h
-  * rename Java/Debugger/src/main/resources/.dlf files
-  * Java/SMLJava/ edu.umich.soar.!SoarProperties.VERSION
-  * Inside the root SConstruct file
-  * Inside all Java launchers in Release/ subfolders
-  * soar-vars.bat in root
-
-= Readme.txt =
-
-See a previous version's release notes for a template. 
-
-  * http://code.google.com/p/soar/wiki/ReleaseNotes
-
-A great (and tedious) way to prepare for this is to find out the date of
-the previous release and to go through the Subversion repository from
-that date to the current release, and summarize as many changes as you
-can. Break major changes out and include those near the top of the file.
-List the smaller changes (and the big ones, again, with shorter text)
-later in the file in a bulletted list.
-
-I usually email the people involved with changes that are complex,
-obscure, or insufficiently documented and have them write summaries for
-those.
-
-= Compiler Switches =
-
-High-performance timers should be disabled but are often checked in
-enabled. They carry an unacceptable performance penalty on many
-platforms, but we need them when doing research. This should be a
-runtime switch in the timers command. Make sure this line is commented
-out in `shared/misc.h`:
-
-{{{
-//#define USE_PERFORMANCE_FOR_BOTH 1
-}}}
-
-Timing stats should be on but not detailed. Same reasons as above. Make
-sure these are commented out in `SoarKernel/src/kernel.h`:
-
-{{{
-//#define NO_TIMING_STUFF
-//#define DETAILED_TIMING_STATS
-}}}
-
-= Documentation =
-
-Many of the documents in the documentation folder are stored in the
-repository as Word documents. Many of these should probably be
-converted to living documentation on the wiki or something, eliminating this step. Arguably some shouldn't, like the tutorial, which are
-really nice as fully functional Word documents.
-
-At any rate, they should all be converted to PDF for the release. This
-is probably scriptable using PDFCreator or similar. Macs can print to
-PDF easily and out of the box but I don't know how scriptable that is.
-
-Before releasing, *convert all `.doc` and `.docx` files to PDF*. Replace
-these as noted below.
-
-= Platform Release Procedures =
-
-== Windows Release ==
-
-  * completely remove old output and intermediate directories
-  * run `build.bat`
-  * copy all of `Release/` in to `out/`
-  * copy all of `Release/win` in to `out/`
-  * remove `out/bin/*.pdb`
-  * copy `Python/*.py` to `out/bin`
-  * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs
-  * copy `out/` to `Soar-Suite-<version>-win<arch>[-rcN]`
-    * example version: 9.3.1
-    * example arch: 32 64
-
-== OS X release ==
-
-  * completely remove old output and intermediate directories
-  * cd Core, run `scons --prefix ../out`
-  * copy all of `Release/` in to `out/`
-  * copy all of `Release/osx` in to `out/`
-  * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs
-  * copy `out/` to `Soar-Suite-<version>-osx<arch>[-rcN]`
-    * example version: 9.3.1
-    * example arch: 32-bit 64
-  * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
-
-== Linux release ==
-
-  * completely remove old output and intermediate directories
-  * cd Core, run `scons --prefix ../out`
-  * copy all of `Release/` in to `out/`
-  * copy all of `Release/linux` in to `out/`
-  * remove `out/share/java/*.src.jar`
-  * replace `share/soar/Documentation/*.doc` and `docx` with pdfs 
-  * copy `out/` to `Soar-Suite-<version>-linux<arch>[-rcN]`
-    * example version: 9.3.1
-    * example arch: 32 64
-  * repeat for other architecture (32 if on 64-bit machine) `scons --prefix=../out --platform=32`
-
-== Source release ==
-
-  * Use linux to do this, usually winter
-  * tag the release `tags/Soar-Suite-9.3.0`
-  * *export* the tag, rename to `Soar-Suite-<version>-source`
-  * move `Release/*` to top-level
+= University of Michigan Soar Release Procedure = 
+(Updated 4/10/12 by Mazin Assanie)
+  # Prioritize bugs and decide which to do.  Fix them, test, then declare a code freeze.
+  # Update each platform’s build instructions on wiki.
+    * It contains version numbers of prerequisites that may change from release to release (at least with the the items that say download the latest version of…)
+    * May need to test with the latest versions of prerequisites if they change
+  # Update all version numbers on web site
+    * Can just grep 9.3.1 over the wiki directory.
+  # Bump version number in code files  
+    * {{{Core/shared/soarversion.h}}}
+    * {{{Java/SMLJava/ edu.umich.soar.SoarProperties.VERSION}}}
+    * Inside the root SConstruct file
+  # Prepare release notes
+    * See a previous version's release notes for a template.: http://code.google.com/p/soar/wiki/ReleaseNotes
+    * A great (and tedious) way to prepare for this is to find out the date of the previous release and to go through the Subversion repository from that date to the current release, and summarize as many changes as you can. Break major changes out and include those near the top of the file. List the smaller changes (and the big ones, again, with shorter text) later in the file in a bulleted list.
+    * I usually email the people involved with changes that are complex, obscure, or insufficiently documented and have them write summaries for those.
+  # Turn off timing switches before final build compile
+    * High-performance timers should be disabled but are often checked in enabled. They carry an unacceptable performance penalty on many platforms, but we need them when doing research. This should be a runtime switch in the timers command. Make sure this line is commented out in shared/misc.h:
+    {{{
+    //#define USE_PERFORMANCE_FOR_BOTH 1
+    }}}
+    Timing stats should be on but not detailed. Same reasons as above. Make sure these are commented out in SoarKernel/src/kernel.h:
+    {{{
+    //#define NO_TIMING_STUFF
+    //#define DETAILED_TIMING_STATS
+    }}}
+  # Convert all docx and doc files in the Documentation folder to pdf
+    * First update release date and latest Soar version number in the first chapter of the tutorial. 
+    * The tutorial also specifically cites directories where users can find agents and so forth.  If there are any changes in the distribution’s directory structure, you’ll need to go through the tutorial and update all of those references accordingly.
+    * After conversion with Adobe Acrobat, move into the Documentation/pdf directory and check in.
+  # Generate Manual
+    * Update the version number in trunk/Documentation/!ManualSource/manual.tex
+    * Follow the instructions in the readme.txt to generate the pdf.  This must be done on a linux machine.  If you have the right packages installed, you basically just run make.
+    * Copy the pdf to the Documentation/pdf directory and check in.
+  # Build on each platform and copy to repository
+    * Update the source code on each platform and run scons all to build Soar
+    * Copy the 'out' directory from each platform’s build to the appropriate directory in trunk/Compiled/(platform)
+  # Build !VisualSoar and copy to trunk/Compiled/!VisualSoar/
+    * To build, open a command line in the !VisualSoar directory and type ‘ant’
+  # Build Eaters/!TankSoar and copy to to trunk/Compiled/Soar2D
+    * To build, open a command line in the Eaters_!TankSoar directory and type ‘ant’
+  # Run !Soar_Shuffler.py
+    * The script can be found in the Release directory of the repository.  Just copy the three files into your python directory for easiest use.
+    * Load up a python interpreter and type 'import soar_shuffler'
+    * 'Soarshuffler.doit(False)' will generate all zips.  (true will only do the updated ones)
+  # Test Release
+    * Run all test executables in the !SoarSuite, !TankSoar, Eaters, !VisualSoar, and the Java Debugger on each platform. 
+    * Compare performance with last release by repeatedly running !TestSoarPerformance with both versions.
+  # Upload files to eecs web server into the public_html/downloads directory
+  # Check all links on web site

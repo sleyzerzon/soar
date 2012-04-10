@@ -8,7 +8,7 @@
   * Extensive documentation is available on the download page.
   
 === Developer ===
-  * Soar Technologies
+  * Dave Ray
 
 === Language ===
   * Java

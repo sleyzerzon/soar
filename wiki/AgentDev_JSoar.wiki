@@ -12,14 +12,13 @@ There are a few benefits to a pure-Java implementation of Soar:
   * JSoar is downloadable via [https://code.google.com/p/jsoar/ this page].
 
 === Documentation ===
-  * [https://code.google.com/p/soaride/wiki/GettingStarted SoarIDE Getting Started Page].
   * [https://code.google.com/p/jsoar/wiki/Faq Frequently Anticipated Questions]
   * [https://code.google.com/p/jsoar/wiki/JSoarUsersGuide JSoarUsersGuide] - Start here if you want to use JSoar in a project
   * [https://code.google.com/p/jsoar/wiki/JSoarDevelopersGuide JSoarDevelopersGuide] - Start here if you want to check out and compile the source code
   * [http://darevay.com/jsoar/current/docs/jsoar-core/api/ Javadoc]
   
 === Developer ===
-  * Soar Technologies
+  * Dave Ray
 
 === Language ===
   * Java
