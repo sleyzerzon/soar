@@ -19,7 +19,7 @@ The !SoarEditor is downloadable via [http://download.eclipse.org/eclipse/downloa
   * While there isn't much documentation yet, you can find a _Getting Started_ page [https://github.com/mtinkerhess/Soar-Editor/wiki/Getting-Started here].
 
 === Developer ===
-  * Miller Tinkerhess.  (it did borrow from several previous Soar Eclipse plug-in projects programmed by other people)
+  * Miller Tinkerhess, Soar Technologies (it used code from the SoarIDE).
 
 === Language ===
   * Java

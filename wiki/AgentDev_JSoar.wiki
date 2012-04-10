@@ -1,9 +1,9 @@
-= !JSoar = 
+= JSoar = 
 JSoar is a pure Java implementation of Soar. Soar is a general cognitive architecture for developing systems that exhibit intelligent behavior.
 
 There are a few benefits to a pure-Java implementation of Soar:
   * Idiomatic Java API in contrast to CSoar's SWIG-generated bindings.
-  * "Free" multi-language support (JRuby, Jython, Rhino (JavaScript), Groovy, Scala, Clojure, etc)
+  * "Free" multi-language support (JRuby, Jython, Rhino (!JavaScript), Groovy, Scala, Clojure, etc)
   * A codebase and tools more friendly to rapid research prototyping
   * No native libraries to deal with
   * Cleaner integration with "enterprisey" systems
