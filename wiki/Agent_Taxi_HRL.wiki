@@ -1,4 +1,4 @@
-= Blocks-World Subgoaling Agent with Reinforcement Learning =
+= Hierarchical Reinforcement Learning Taxi Driver Agent =
 This agent simulates an omniscient taxi driver that uses reinforcement learning and hierarchical task decomposition to improve its performance over runs.
 
 === Soar capabilities ===

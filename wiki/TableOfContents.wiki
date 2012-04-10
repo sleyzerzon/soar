@@ -74,8 +74,11 @@
       * ----
       * [AgentDev_EpmemRecorder Episodic Memory Recorder]
       * [AgentDev_EpmemSize Episodic Memory Sizer]
+      * [AgentDev_JSoar JSoar (SoarTech)]
       * [AgentDev_QuickLink QuickLink I/O Simulator]
-      * [AgentDev_SDC Soar Data Collector]
+      * [AgentDev_SDC Soar Data Collector (SoarTech)]
+      * [AgentDev_SoarIDE Soar IDE (SoarTech)]
+      * [AgentDev_SoarUnit SoarUnit (SoarTech)]
       * [AgentDev_State2Dot State2Dot Visualization Tool]
       * ----
       * [AgentDev_UltraEdit UltraEdit Syntax Coloring]
