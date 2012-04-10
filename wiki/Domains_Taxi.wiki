@@ -1,17 +1,24 @@
 = Taxi =
+The taxicab problem domain is well known in the area of reinforcement learning.  Simply put, a taxicab driver is tasked with the problem of picking up a passenger and delivering him to his destination in as few steps as possible.  Typically, the taxi is constrained by a limit on the amount of fuel that can be carried.
 
+The canonical taxicab problem is a 5x5 gridworld.  There are four cells which serve as possible starting locations
+and possible destinations for the passenger.  There is a refueling station near the middle of the map.
+Additionally, there are six impassable walls (or 26 counting the walls surrounding the map).
+The seven actions available to the taxi are moving North, South, East and West, picking up the passenger,
+putting down the passenger, and refueling. An attempt to move North, South, East, or West automatically results in the taxi moving one cell in that direction unless there is a wall in the way, in which case the move action is ignored and the taxi remains in place.  Fuel decreases by 1 unless the move action is ignored.  Pickup always results in the passenger being picked up if the taxi does not have the passenger and is at the passenger's starting location.  Putdown always results in the passenger being put down if the taxi has the passenger and is at the destination.  Refuel always sets the amount of fuel to 14 if the taxi is at the refueling station.
 
 === Environment Properties ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/Water_Jug_Tie_Agent.zip Pending]
+  * Single-agent
   
 === Download Links ===
-  * Pending
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/zeni_taxicab.zip Taxi (all platforms)]
 
 === Associated Agents ===
-  * Pending
+  * [Agent_Taxi_RL Reinforcement Learning Taxi Driver Agent]
+  * [Agent_Taxi_HRL Hierarchical Reinforcement Learning Taxi Driver Agent]
 
 === Documentation ===
-  * Pending
+  * There are a variety of launch scripts you can use to start Taxi with the two included agents, depending on your platform.  Open them up to see how you can create a script to launch your own agents.
 
 === IO link Specification ===
 {{{
@@ -25,7 +32,6 @@
         ^passenger [true false] true if a passenger is carried
         ?^destination [red blue green yellow]
         ^fuel <int> fuel remaining
-        ^former-destination [red blue green yellow none] what destination the passenger was recently on
     ^view
         ^north
             ^type [none normal red blue green yellow fuel]
@@ -59,14 +65,12 @@
                 ^status [complete error]
         ^fillup
                 ^status [complete error]
-        ^stop-sim
-                ^status [complete error]
 }}}
 === Developer ===
   * Mitchell Bloch
 
 === Soar Versions ===
-  * Soar 8, 9
+  * Soar 9
 
 === Language ===
   * C++
