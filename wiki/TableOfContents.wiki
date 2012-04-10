@@ -52,6 +52,9 @@
         * [Agent_TankSoar_SimpleSound Simple Sound Bot]
         * [Agent_TankSoar_Mapping Mapping Bot]      
         * [Agent_TankSoar_Obscure Obscure Bot]
+      * Taxi Agents
+        * [Agent_Taxi_RL RL Taxi Driver]
+        * [Agent_Taxi_HRL Hierarchical RL Taxi Driver]
       * Tile Puzzle Agents
         * [Agent_eightpuzzle Eight-Puzzle]
         * [Agent_fifteenpuzzle Fifteen-Puzzle]

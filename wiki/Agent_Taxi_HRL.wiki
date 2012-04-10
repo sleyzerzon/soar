@@ -1,0 +1,27 @@
+= Blocks-World Subgoaling Agent with Reinforcement Learning =
+This agent simulates an omniscient taxi driver that uses reinforcement learning and hierarchical task decomposition to improve its performance over runs.
+
+=== Soar capabilities ===
+  * Hierarchical task decomposition
+  * Reinforcement learning
+  
+=== Download Links===
+  *  The agent is included in the Taxi download.
+  
+=== External Environment ===
+  * [Domains_Taxi Taxi Domain]
+
+=== Default Rules ===
+  * None.
+
+=== Associated Publications ===
+  * Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Hierarchical Reinforcement Learning in the Taxicab Domain.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+
+=== Developer ===
+  * John Laird
+
+=== Soar Versions ===
+  * Soar 8,9
+
+=== Project Type ===
+  * !VisualSoar

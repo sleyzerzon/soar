@@ -20,6 +20,9 @@ putting down the passenger, and refueling. An attempt to move North, South, East
 === Documentation ===
   * There are a variety of launch scripts you can use to start Taxi with the two included agents, depending on your platform.  Open them up to see how you can create a script to launch your own agents.
 
+=== Associated Publications ===
+  * Bloch, M.K. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf Hierarchical Reinforcement Learning in the Taxicab Domain.]_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+  
 === IO link Specification ===
 {{{
 ^input-link
