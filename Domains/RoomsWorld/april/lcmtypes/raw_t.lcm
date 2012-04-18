@@ -1,6 +1,0 @@
-struct raw_t
-{
-	int64_t utime;
-	int32_t len;
-	byte buf[len];
-}

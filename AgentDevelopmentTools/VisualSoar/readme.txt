@@ -1,1 +1,0 @@
-To compile VisualSoar, you must put a copy of the lates version of sml.lib (from the SoarSuite) into the lib directory.

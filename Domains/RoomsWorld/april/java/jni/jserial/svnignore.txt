@@ -1,3 +1,0 @@
-april_jserial_JSerial.h
-*.o
-*.so

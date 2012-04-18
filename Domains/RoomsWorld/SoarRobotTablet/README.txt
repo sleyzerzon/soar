@@ -1,1 +1,0 @@
-This is the project for the Soar Robot Tablet. This is an android project. To build this project, you need to use Eclipse and the Andrdoid SDK. See: http://developer.android.com/guide/developing/tools/index.html
