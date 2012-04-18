@@ -10,7 +10,7 @@
   * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Linux_64bit.zip Linux 64-bit]
   * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Windows_32bit.zip Windows 32-bit]
   * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Windows_64bit.zip Windows 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Linux_OSX.zip MacOS X]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-OSX.zip MacOS X]
 
 === Associated Agents ===
   * Pending
