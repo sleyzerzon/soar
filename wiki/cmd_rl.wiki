@@ -72,7 +72,7 @@ To enable DBD, use "rl --set decay-mode delta-bar-delta". To change the meta lea
 
 Note that DBD is a different feature than "meta". Meta determines whether metadata about a production is stored in its header string. If meta is on and DBD is on, then each rule's beta and h values will be stored in the header string in addition to the update count, so you can print out the rule, source it later and that metadata about the rule will still be in place.
 
-=== RL Update Loggin ===
+=== RL Update Logging ===
 
 Sets a path to a file that Soar RL will write to whenever a production's RL value gets updated. This can be useful for logging these updates without having to capture all of Soar's output and parse it for these updates. Enable with e.g. "rl --set update-log-path rl_log.txt". Disable with <rl --set update-log-path ""> —that is, use the empty string "" as the log path. The current log path appears under the experimental section when you execute "rl".
 
