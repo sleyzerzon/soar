@@ -36,6 +36,7 @@ displays a summary of the parameter settings.
 || `apoptosis-decay` || Base-level decay parameter || `[`0, 1`]` || 0.5 ||
 || `apoptosis-thresh` || Base-level threshold parameter (negates supplied value) || (0, inf) || 2 ||
 || `chunk-stop` || If enabled, chunking does not create duplicate RL rules that differ only in numeric-indifferent preference value || `on`, `off` || `on` ||
+|| `decay-mode` || How the learning rate changes over time || `normal`, `exponential`, `logarithmic`, `delta-bar-delta` || `normal` ||
 || `discount-rate` || Temporal discount (gamma) || `[`0, 1`]` || 0.9 ||
 || `eligibility-trace-decay-rate` || Eligibility trace decay factor (lambda) || `[`0, 1`]` || 0 ||
 || `eligibility-trace-tolerance` || Smallest eligibility trace value not considered 0 || (0, inf) || 0.001 ||
@@ -43,8 +44,10 @@ displays a summary of the parameter settings.
 || `learning` || Reinforcement learning enabled || `on`, `off` || `off` ||
 || `learning-rate` || Learning rate (alpha) || `[`0, 1`]` || 0.3 ||
 || `learning-policy` || Value update policy || `sarsa`, `q-learning` || `sarsa` ||
+|| `meta` || Store rule metadata in header string || `on`, `off` || `off` ||
 || `temporal-discount` || Discount RL updates over gaps  || `on`, `off` || `on` ||
 || `temporal-extension` || Propagation of RL updates over gaps  || `on`, `off` || `on` ||
+|| `update-log-path` || File to log information about RL rule updates  || `""`, `<filename>` || `""` ||
 
 Apoptosis is a process to automatically excise chunks via the base-level decay model (where rule firings are the activation events).
 A value of `chunks` has this apply to any chunk, whereas `rl-chunks` means only chunks that are also RL rules can be forgotten.
@@ -58,6 +61,20 @@ without a statistic will list the values of all statistics.
 || `update-error` || Difference between target and current values in last RL update ||
 || `total-reward` || Total accumulated reward in the last update ||
 || `global-reward` || Total accumulated reward since agent initialization ||
+
+=== Delta-Bar-Delta ===
+
+This is an experimental feature of Soar RL. It based on the work in Richard S. Sutton's paper "Adapting Bias by Gradient Descent: An Incremental Version of DeltaBarDelta", available online at http://webdocs.cs.ualberta.ca/~sutton/papers/sutton-92a.pdf.
+
+Delta Bar Delta (DBD) is implemented in Soar RL as a decay mode. It changes the way all the rules in the eligibility trace get their values updated. In order to implement this, the agent gets an additional learning parameter "meta-learning-rate" and each rule gets two additional decay parameters: beta and h. The meta learning rate is set manually; the per-rule features are handles automatically by the DBD algorithm. The key idea is that the meta parameters keep track of how much a rule's RL value has been updated recently, and if a rule gets updates in the same direction multiple times in a row then subsequent updates in the same direction will have more effect. So DBD acts sort of like momentum for the learning rate.
+
+To enable DBD, use "rl --set decay-mode delta-bar-delta". To change the meta learning rate, use e.g. "rl --set meta-learning-rate 0.1". When you execute "rl", under the Experimental section you'll see the current settings for decay-mode and meta-learning-rate. Also, if a rule gets printed concisely (e.g. by executing "p"), and the rule is an RL rule, and the decay mode is set to delta-bar-delta, then instead of printing the rule name followed by the update count and the RL value, it will print the rule name, beta, h, update count, and RL value.
+
+Note that DBD is a different feature than "meta". Meta determines whether metadata about a production is stored in its header string. If meta is on and DBD is on, then each rule's beta and h values will be stored in the header string in addition to the update count, so you can print out the rule, source it later and that metadata about the rule will still be in place.
+
+=== RL Update Loggin ===
+
+Sets a path to a file that Soar RL will write to whenever a production's RL value gets updated. This can be useful for logging these updates without having to capture all of Soar's output and parse it for these updates. Enable with e.g. "rl --set update-log-path rl_log.txt". Disable with <rl --set update-log-path ""> —that is, use the empty string "" as the log path. The current log path appears under the experimental section when you execute "rl".
 
 == See Also ==
 
