@@ -18,7 +18,7 @@ Involves removing the original operator evaluation rules, changing the operator 
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture]: Chapter 4
 
 === Developer ===
   * John Laird

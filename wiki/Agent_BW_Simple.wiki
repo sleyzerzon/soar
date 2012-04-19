@@ -14,7 +14,7 @@ A very simple instance of an internally-simulated blocks world with three blocks
   * None.
 
 === Associated Publications ===
-  * The Soar Cognitive Architecture: Chapter 4
+  * [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture]: Chapter 4
 
 === Developer ===
   * John Laird
