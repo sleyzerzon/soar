@@ -14,13 +14,22 @@ Get more details on the mario domain [http://2009.rl-competition.org/mario.php h
   * Continuous, single-agent, episodic, RL, uncertainty, complete information.
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/Water_Jug_Tie_Agent.zip Pending]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/InfiniteMario-9.3.2.zip Infinite Mario Download (Linux only)]
 
 === Associated Agents ===
   * [Agent_InfiniteMario_RL Infinite Mario Soar-RL Agent]
 
 === Documentation ===
-  * None
+  * Running Instructions
+    * Download and install [http://code.google.com/p/soar/wiki/Downloads?tm%3D2 Soar].
+    * Configure environment variables for Soar ($SOAR_HOME)
+    * Perform the install instructions found at [http://2009.rl-competition.org/software.php#download RL-Competition 2009 software].  Use the software that is already in the above Infinite Mario download, within the 15-rl-competition-2009 directory
+    * Configure $COMP_HOME to point to the topmost directory of your local install of the competition software
+    * Configure $AGENT_HOME to point to the topmost directory of your local install of MarioSoar
+    * cd $AGENT_HOME
+    * make clean;make
+    * Run the agent ./run.bash config/combined.config
+    * cd to trainer $COMP_HOME/trainers/guiTrainerJava/ for GUI trainer and ./run.bash or $COMP_HOME/trainers/consoleTrainerJava/ for headless trainer
 
 === IO link Specification ===
 {{{

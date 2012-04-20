@@ -17,7 +17,6 @@
         * [Agent_BW_HierarchicalLookAhead Hierarchical Look-Ahead]
         * [Agent_BW_RL Reinforcement Learning]
       * [Agent_Count_Test Counting Agent]
-      * [Agent_Dice Dice Playing Agent]
       * Eaters Agents
         * [Agent_Eaters_AdvancedMoveBot Advanced Move Bot]
         * [Agent_HelloWorldRule Hello World Rule Agent]
