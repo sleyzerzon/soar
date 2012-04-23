@@ -172,21 +172,20 @@ Level three
 || `ncb_edge` || Collecting edges during reconstruction ||
 || `ncb_edge_rit` || Collecting edges from relational interval tree ||
 || `ncb_node` || Collecting nodes during reconstruction ||
-|| `ncb_node_rit` || Collecting nodes from relational interval tree ||
-|| `query_dnf` || DNF graph construction ||
+|| `ncb_node_rit` || Collecting nodes from relational interval tree |||| `query_cleanup` || Deleting dynamic data structures ||
+|| `query_dnf` || Building the first level of the DNF ||
 || `query_graph_match` || Graph match ||
-|| `query_neg_end_ep` || Interval search for negative cue, end point, ranges ||
-|| `query_neg_end_now` || Interval search for negative cue, end point, now ||
-|| `query_neg_end_point` || Interval search for negative cue, end point, points ||
-|| `query_neg_start_ep` || Interval search for negative cue, start point, ranges ||
-|| `query_neg_start_now` || Interval search for negative cue, start point, now ||
-|| `query_neg_start_point` || Interval search for negativecue, start point, points ||
-|| `query_pos_end_ep` || Interval search for positive cue, end point, ranges ||
-|| `query_pos_end_now` || Interval search for positive cue, end point, now ||
-|| `query_pos_end_point` || Interval search for positive cue, end point, points ||
-|| `query_pos_start_ep` || Interval search for positive cue, start point, ranges ||
-|| `query_pos_start_now` || Interval search for positive cue, start point, now ||
-|| `query_pos_start_point` || Interval search for positivecue, start point, points ||
+|| `query_result` || Putting the episode in working memory ||
+|| `query_sql_edge` || SQL query for an edge ||
+|| `query_sql_end_ep` || SQL query for the end of the range of an edge ||
+|| `query_sql_end_now` || SQL query for the end of the now of an edge ||
+|| `query_sql_end_point` || SQL query for the end of the point of an edge ||
+|| `query_sql_start_ep` || SQL query for the start of the range of an edge ||
+|| `query_sql_start_now` || SQL query for the start of the now of an edge ||
+|| `query_sql_start_point` || SQL query for the start of the point of an edge ||
+|| `query_walk` || Walking the intervals ||
+|| `query_walk_edge` || Expanding edges while walking the intervals ||
+|| `query_walk_interval` || Updating satisfaction while walking the intervals ||
 
 === Visualization ===
 
