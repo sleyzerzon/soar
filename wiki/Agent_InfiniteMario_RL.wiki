@@ -5,6 +5,9 @@ Various agents for learning and playing Infinite Mario domain from RLCompetition
 === Soar capabilities ===
   * Reinforcement learning
 
+=== Downloads ===
+  * This agent is packaged with the Infinite Mario environment download.
+  
 === External Environment ===
   * [Domains_InfiniteMario Infinite Mario]
 

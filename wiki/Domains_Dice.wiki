@@ -20,7 +20,6 @@ Here is an abbreviated description of the rules used in our implementation of th
 
 === Download Links ===
   * [http://web.eecs.umich.edu/~soar/downloads/Domains/Dice.zip Dice.zip]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/DiceQnA.zip DiceQnA.zip] (An optional [Domains_SoarQnA SoarQNA interface] for hooking up agents to Dice)
   
 === Associated Agents ===
   * A variety of agents is included in the environment download.
