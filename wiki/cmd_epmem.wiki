@@ -172,7 +172,8 @@ Level three
 || `ncb_edge` || Collecting edges during reconstruction ||
 || `ncb_edge_rit` || Collecting edges from relational interval tree ||
 || `ncb_node` || Collecting nodes during reconstruction ||
-|| `ncb_node_rit` || Collecting nodes from relational interval tree |||| `query_cleanup` || Deleting dynamic data structures ||
+|| `ncb_node_rit` || Collecting nodes from relational interval tree ||
+|| `query_cleanup` || Deleting dynamic data structures ||
 || `query_dnf` || Building the first level of the DNF ||
 || `query_graph_match` || Graph match ||
 || `query_result` || Putting the episode in working memory ||
