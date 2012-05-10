@@ -11,7 +11,7 @@
 
 Go into the !SoarSuite folder and run: 
 {{{
-scons all
+python scons/scons.py all
 }}}
 
 All of your resulting binaries will be in the /out folder.  
