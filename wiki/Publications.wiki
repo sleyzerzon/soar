@@ -32,6 +32,9 @@ Gorski, N. A., Laird, J. E. (2011) [http://www.eecs.umich.edu/~soar/sitemaker/do
 
 Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of the 20th Behavior Representation in Modeling & Simulation Conference, 33-40. Sundance, UT.
 
+Mohan, S., Laird, J. E. (2011).
+_[http://www-personal.umich.edu/~shiwali/content/mohan_aiide_2011.pdf]_ Proceedings of 7th the Artificial Intelligence for Interactive Digital Entertainment Conference, AIIDE, Palo Alto, CA
+
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/yongjiaw_1.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
 Xu, J. Z., Laird, J. E. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
