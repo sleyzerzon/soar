@@ -35,6 +35,9 @@ Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar
 Mohan, S., Laird, J. E. (2011).
 _[http://www-personal.umich.edu/~shiwali/content/mohan_aiide_2011.pdf An Object-Oriented Approach to Reinforcement Learning in an Action Game]_, Proceedings of 7th the Artificial Intelligence for Interactive Digital Entertainment Conference, AIIDE 2011
 
+Mohan, S., Laird, J. E. (2011).
+_[http://www-personal.umich.edu/~shiwali/content/mohan_fss_2011.pdf Towards Situated, Interactive, Instructable Agents in a Cognitive Architecture]_, Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/yongjiaw_1.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
 Xu, J. Z., Laird, J. E. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2011.pdf Combining Learned Discrete and Continuous Action Models.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence. San Francisco, CA.
