@@ -3,6 +3,8 @@
 
 = 2012 =
 
+Derbinsky, N., Li, J., Laird, J. E.: A Multi-Domain Evaluation of Scaling in a General Episodic Memory. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
 Derbinsky, N., Essl, G.: Exploring Reinforcement Learning for Mobile Percussive Collaboration. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
 Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm_2012_competence.pdf Competence-Preserving Retention of Learned Knowledge in Soar's Working and Procedural Memories]. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
@@ -13,7 +15,10 @@ Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/
 
 Laird, J.E.: [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture], 2012, MIT Press.
 
+Li, J., Derbinsky, N., Laird, J. E.: Functional Interactions between Memory and Recognition Judgments. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
 Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
+
 = 2011 =
 
 Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
