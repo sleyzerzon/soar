@@ -3,9 +3,13 @@
 
 = 2012 =
 
-Derbinsky, N., Li, J., Laird, J. E.: A Multi-Domain Evaluation of Scaling in a General Episodic Memory. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z. (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
-Derbinsky, N., Essl, G.: Exploring Reinforcement Learning for Mobile Percussive Collaboration. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
+Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2012_epmem.pdf A Multi-Domain Evaluation of Scaling in a General Episodic Memory]. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
+Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2012_recognition.pdf Functional Interactions between Memory and Recognition Judgments]. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
+Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
 Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm_2012_competence.pdf Competence-Preserving Retention of Learned Knowledge in Soar's Working and Procedural Memories]. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
 
