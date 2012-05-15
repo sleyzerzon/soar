@@ -2,6 +2,7 @@
 #labels Featured
 
 = 2012 =
+Mohan, S., and Laird, J.E. (2012). [http://www.shiwali.me/content/mohan_AAAIGPS_2012.pdf Situated Comprehension of Imperative Sentences in Embodied, Cognitive Agents], In The AAAI 2012 Workshop on Grounding Language for Physical Systems, Toronto CA.
 
 Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z. (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
