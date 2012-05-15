@@ -1,5 +1,9 @@
 #summary Conferences that are relevant to the Soar group at UM.
 
+= Workshop and Symposium Information =
+
+Updated November 11, 2011
+
 || *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Due* || *Paper Due* ||
 || [http://www.aaai.org/Conferences/AAAI/aaai12.php AAAI] || National Conference on Artificial Intelligence || 0.99 || 2012-07-22 to 2012-07-26 || Toronto, Canada || 2012-01-20 || 2012-01-24 ||
 || [http://aamas2012.webs.upv.es/ AAMAS] || Autonomous Agents and Multi-Agent Systems || 0.76 || 2012-06-04 to 2012-06-08 || Valencia, Spain || 2011-10-07 || 2011-10-12 ||
@@ -19,8 +23,6 @@
 || [http://nips.cc/Conferences/2012/ NIPS] || Neural Information Processing Systems || 0.98 || 2012-12-03 to 2012-12-06 || Lake Tahoe, NV ||  || unknown ||
 || [http://w3.uniroma1.it/icsc/2012/ SC] || International Conference on Spatial Cognition ||  || 2012-09-04 to 2012-09-08 || Rome, Italy || 2012-01-31 || 2012-04-15 ||
 || [http://www.auai.org/uai2012/ UAI] || Uncertainty in Artificial Intelligence || 0.91 || 2012-08-15 to 2012-08-17 || Catalina Islands, CA ||  || 2012-03-30 ||
- 
-= Workshop and Symposium Information =
 
 Recurring workshops / symposia:
   * [http://msoar.org/ Soar Workshop]
