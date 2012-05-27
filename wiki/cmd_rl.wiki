@@ -74,7 +74,7 @@ Note that DBD is a different feature than "meta". Meta determines whether metada
 
 === RL Update Logging ===
 
-Sets a path to a file that Soar RL will write to whenever a production's RL value gets updated. This can be useful for logging these updates without having to capture all of Soar's output and parse it for these updates. Enable with e.g. "rl --set update-log-path rl_log.txt". Disable with <rl --set update-log-path ""> —that is, use the empty string "" as the log path. The current log path appears under the experimental section when you execute "rl".
+Sets a path to a file that Soar RL will write to whenever a production's RL value gets updated. This can be useful for logging these updates without having to capture all of Soar's output and parse it for these updates. Enable with e.g. "rl --set update-log-path rl_log.txt". Disable with <rl --set update-log-path ""> - that is, use the empty string "" as the log path. The current log path appears under the experimental section when you execute "rl".
 
 == See Also ==
 
