@@ -24,6 +24,6 @@ Within the !SoarSuite download, you will find a complete copy of the Soar Tutori
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%206.pdf Quakebot]
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%207%20-%20RL.pdf Reinforcement Learning Tutorial]
   # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%208%20-%20SMem.pdf Semantic Memory Tutorial]
-  # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%208%20-%20EpMem.pdf Episodic Memory Tutorial]
+  # [http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%209%20-%20EpMem.pdf Episodic Memory Tutorial]
   
   
