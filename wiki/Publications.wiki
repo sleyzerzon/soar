@@ -2,17 +2,6 @@
 #labels Featured
 
 = 2012 =
-Laird, J.E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AISB_quarterly_134.pdf The Soar Cognitive Architecture], AISB Quarterly, #134, 2012
-
-Wintermute, S.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute2012.pdf Imagery in Cognitive Architecture: Representation and Control at Multiple Levels of Abstraction], Cognitive Systems Research, 19-20,1-29.
-
-Mohan, S. and Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_AAAISA_2012.pdf Exploring Mixed-Initiative Interaction for Learning with Situated Instruction in Cognitive Agents], In Proceedings of the 26th AAAI Conference on Artificial Intelligence, 2012. (Extended Abstract).
-
-Mohan, S., and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_AAAIGPS_2012.pdf Situated Comprehension of Imperative Sentences in Embodied, Cognitive Agents], In The AAAI 2012 Workshop on Grounding Language for Physical Systems, Toronto CA.
-
-Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z.: (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
-
-Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2012_epmem.pdf A Multi-Domain Evaluation of Scaling in a General Episodic Memory]. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
 
 Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
@@ -20,37 +9,47 @@ Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pub
 
 Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm_2012_efficiency.pdf Computationally Efficient Forgetting via Base-Level Activation]. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
 
+Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2012_epmem.pdf A Multi-Domain Evaluation of Scaling in a General Episodic Memory]. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
 Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aamas2012.pdf Algorithms for Scaling in a General Episodic Memory (Extended Abstract)]. Proc. of the 11th International Conference on Autonomous Agents and Multiagent Systems (AAMAS). Valencia, Spain.
+
+Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z.: (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
 Laird, J.E.: [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture], 2012, MIT Press.
 
+Laird, J.E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AISB_quarterly_134.pdf The Soar Cognitive Architecture], AISB Quarterly, #134, 2012
+
 Li, J., Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2012_recognition.pdf Functional Interactions between Memory and Recognition Judgments]. Proc. of the 26th AAAI Conference on Artificial Intelligence (AAAI). Toronto, Canada.
+
+Mohan, S. and Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_AAAISA_2012.pdf Exploring Mixed-Initiative Interaction for Learning with Situated Instruction in Cognitive Agents], In Proceedings of the 26th AAAI Conference on Artificial Intelligence, 2012. (Extended Abstract).
+
+Mohan, S., and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_AAAIGPS_2012.pdf Situated Comprehension of Imperative Sentences in Embodied, Cognitive Agents], In The AAAI 2012 Workshop on Grounding Language for Physical Systems, Toronto CA.
 
 Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
 
+Wintermute, S.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute2012.pdf Imagery in Cognitive Architecture: Representation and Control at Multiple Levels of Abstraction], Cognitive Systems Research, 19-20,1-29.
+
 = 2011 =
 
-Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
-
-Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_wma.pdf Effective and Efficient Management of Soar's Working Memory via Base-Level Activation.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
-
-Laird, J. E., Derbinsky, N. Tinkerhess, M.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_dice.pdf A Case Study in Integrating Probabilistic Decision Making and Learning in a Symbolic Cognitive Architecture: Soar Plays Dice.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression, 104-107. Oslo, Norway.
 
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011_derbinsky_laird.pdf A Functional Analysis of Historical Memory Retrieval Bias in the Word Sense Disambiguation Task.]_ Proceedings of the 25th AAAI Conference on Artificial Intelligence, 663-668. San Francisco, CA.
 
-Derbinsky, N., Essl, G.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2011.pdf Cognitive Architecture in Mobile Music Interactions.]_ Proceedings of the International Conference on New Interfaces for Musical Expression, 104-107. Oslo, Norway.
+Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_wma.pdf Effective and Efficient Management of Soar's Working Memory via Base-Level Activation.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
 
 Derbinsky, N., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2011_smem.pdf A Preliminary Functional Analysis of Memory in the Word Sense Disambiguation Task.]_ Proceedings of the 2nd Symposium on Human Memory for Artificial Agents, AISB, 25-29. York, England.
 
 Gorski, N. A., Laird, J. E. (2011) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/GorskiLaird_CogSysRes10.pdf Learning to use episodic memory] _Cognitive Systems Research_, 12, 144-153. doi:10.1016/j.cogsys.2010.08.001
 
+Laird, J. E., Derbinsky, N. Tinkerhess, M.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_dice.pdf A Case Study in Integrating Probabilistic Decision Making and Learning in a Symbolic Cognitive Architecture: Soar Plays Dice.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+
 Laird, J. E., Derbinsky, N., Voigt, J. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/laird_brims2011.pdf Performance Evaluation of Declarative Memory Systems in Soar]_, Proceedings of the 20th Behavior Representation in Modeling & Simulation Conference, 33-40. Sundance, UT.
 
-Mohan, S., Laird, J. E. (2011).
-_[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_aiide_2011.pdf An Object-Oriented Approach to Reinforcement Learning in an Action Game]_, Proceedings of 7th the Artificial Intelligence for Interactive Digital Entertainment Conference, AIIDE 2011
+Li, J., Laird, J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aaai2011fss_intentions.pdf Preliminary Evaluation of Long-term Memories for Fulfilling Delayed Intentions.]_ Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
 
-Mohan, S., Laird, J. E. (2011).
-_[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_fss_2011.pdf Towards Situated, Interactive, Instructable Agents in a Cognitive Architecture]_, Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
+Mohan, S., Laird, J. E. (2011)._[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_aiide_2011.pdf An Object-Oriented Approach to Reinforcement Learning in an Action Game]_, Proceedings of 7th the Artificial Intelligence for Interactive Digital Entertainment Conference, AIIDE 2011
+
+Mohan, S., Laird, J. E. (2011)._[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_fss_2011.pdf Towards Situated, Interactive, Instructable Agents in a Cognitive Architecture]_, Papers from the 2011 AAAI Fall Symposium Series: Advances in Cognitive Systems. Arlington, VA.
 
 Wang, Y. (2011). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/yongjiaw_1.pdf Hierarchical Functional Category Learning for Efficient Value Function Approximation in Object-Based Environments.]_ PhD Thesis, University of Michigan
 
