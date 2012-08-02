@@ -340,3 +340,7 @@ Jones, R. M., & Laird, J. E. (1997). Constraints on the design of a high-level m
 Jones, R. M., Laird, J. E., & Nielsen, P. E. (1996). Moving intelligent automated forces into theater-level scenarios. /Proceedings of the Sixth Conference on Computer Generated Forces and Behavioral Representation/, 113-117. Orlando, FL.
 
 Laird, J. E., Pearson, D. J., Jones, R. M., & Wray, R. E., III. (1996). Dynamic knowledge integration during plan execution. /Plan execution: Problems and issues, /papers from the 1996 Fall symposium (Technical Report No. FS-96-01). Menlo Park, CA: AAAI Press.
+
+= 1992 =
+
+Brian G. Milnes, Garrett Pelton, Robert Doorenbos, Mike H Laird, Paul Rosenbloom, and Allen Newell. 1992. [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ASpecificationOfTheSoarCognitiveArchitecture-1992.pdf A Specification of the Soar Cognitive Architecture in Z]. Technical Report. Carnegie Mellon Univ., Pittsburgh, PA, USA.
