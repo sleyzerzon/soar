@@ -128,6 +128,7 @@ public:
 	std::string m_HandlerMethod ;	// The name of the method we will call
 	jobject		m_CallbackData ;	// Arbitrary Java object which we'll pass back in the call.
 	int			m_CallbackID ;		// Unique ID for this callback (we use this during unregistering)
+	jmethodID	m_Mid;
 
 private:
 	JNIEnv*		m_JavaEnv ;			// The JNI environment (private so we're forced to use the accessor function)
@@ -143,6 +144,15 @@ public:
 		m_HandlerMethod = handlerMethod ;
 		m_CallbackData = callbackData ;
 		m_CallbackID   = 0 ;
+
+		jclass cls = pEnv->GetObjectClass(m_HandlerObject) ;
+
+		// Look up the Java method we want to call.
+		// The method name is passed in by the user (and needs to match exactly, including case).
+		// The method should be owned by the m_HandlerObject that the user also passed in.
+		// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
+		m_Mid = pEnv->GetMethodID(cls, m_HandlerMethod.c_str(), "(ILjava/lang/Object;Lsml/Kernel;I)V") ;
+
 	}
 
 	JNIEnv* GetEnv()
@@ -886,33 +896,33 @@ static void UpdateEventHandler(sml::smlUpdateEventId id, void* pUserData, sml::K
 	// The user data is the class we declared above, where we store the Java data to use in the callback.
 	JavaCallbackData* pJavaData = (JavaCallbackData*)pUserData ;
 
-	// Now try to call back to Java
-	JNIEnv *jenv = pJavaData->GetEnv() ;
+	//// Now try to call back to Java
+	//JNIEnv *jenv = pJavaData->GetEnv() ;
 
-	// We start from the Java object whose method we wish to call.
-	jobject jobj = pJavaData->m_HandlerObject ;
-	jclass cls = jenv->GetObjectClass(jobj) ;
+	//// We start from the Java object whose method we wish to call.
+	//jobject jobj = pJavaData->m_HandlerObject ;
+	//jclass cls = jenv->GetObjectClass(jobj) ;
 
-	if (cls == 0)
-	{
-		printf("Failed to get Java class\n") ;
-		return ;
-	}
+	//if (cls == 0)
+	//{
+	//	printf("Failed to get Java class\n") ;
+	//	return ;
+	//}
 
-	// Look up the Java method we want to call.
-	// The method name is passed in by the user (and needs to match exactly, including case).
-	// The method should be owned by the m_HandlerObject that the user also passed in.
-	// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
-	jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(ILjava/lang/Object;Lsml/Kernel;I)V") ;
+	//// Look up the Java method we want to call.
+	//// The method name is passed in by the user (and needs to match exactly, including case).
+	//// The method should be owned by the m_HandlerObject that the user also passed in.
+	//// Any slip here and you get a NoSuchMethod exception and my Java VM shuts down.
+	//jmethodID mid = jenv->GetMethodID(cls, pJavaData->m_HandlerMethod.c_str(), "(ILjava/lang/Object;Lsml/Kernel;I)V") ;
 
-	if (mid == 0)
-	{
-		printf("Failed to get Java method\n") ;
-		return ;
-	}
+	//if (mid == 0)
+	//{
+	//	printf("Failed to get Java method\n") ;
+	//	return ;
+	//}	
 
 	// Make the method call.
-	jenv->CallVoidMethod(jobj, mid, (int)id, pJavaData->m_CallbackData, pJavaData->m_KernelObject, runFlags);
+	pJavaData->GetEnv()->CallVoidMethod(pJavaData->m_HandlerObject, pJavaData->m_Mid, (int)id, pJavaData->m_CallbackData, pJavaData->m_KernelObject, runFlags);
 }
 
 // This is the hand-written JNI method for registering a callback.
