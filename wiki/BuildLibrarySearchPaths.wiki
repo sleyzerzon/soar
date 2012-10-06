@@ -56,22 +56,17 @@ the executables that are built with Soar, such as TestCLI and
 any problems. If you are having problems, you should manually set
 DYLD_LIBRARY_PATH.
 
-The more likely case when this will appear is when you build your own
-SML programs and link them against libSoar.dylib. Your programs will
-also think that the library exists in the same directory as themselves. In
-this case please use the above solution. As a more permanent fix,
-you can change the library's install_name to the absolute path of the
-library using the install_name_tool program. Every program you build from
-then on will look for the library using the absolute path, which should
-not fail unless you move the library or rebuild it. Please consult the
-system man page for that command for further information.
+When you build your own SML program and link it against libSoar.dylib, your program will also think that the library is in the same directory as itself, and will not load properly if it isn't.
+You can fix this either by setting DYLD_LIBRARY_PATH as described above or by changing libSoar.dylib's install_name to an absolute path using the install_name_tool program.
+In the latter case, every program you build from then on will look for the library using the absolute path, which should not fail unless you move the library or rebuild it.
+Please consult the system man page for that command for further information.
 
 
 ==== Windows ====
 Windows searches the executable's directory for needed libraries by
 default, and since all Soar libraries and executables are in the same
 directory, there shouldn't be any library not found errors. If you are
-building your own executable environments, either put them in the same
+building your own SML client programs, either put them in the same
 directory as Soar.dll, or add the directory that contains Soar.dll to
 your PATH environment variable. For more information about library search
 order, see
