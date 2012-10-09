@@ -8,7 +8,7 @@ Set the parameters for chunking.
 {{{
 learn [-l]
 learn [-d|E|o]
-learn [-eabnN]
+learn [-eabnNpP]
 }}}
 
 === Default Aliases ===
@@ -24,8 +24,10 @@ learn [-eabnN]
 || `-l, --list` || Prints listings of `dont-learn` and `force-learn` states. ||
 || `-a, --all-levels` || Build chunks whenever a subgoal returns a result. Learning must be enabled. ||
 || `-b, --bottom-up` || Build chunks only for subgoals that have not yet had any subgoals with chunks built. Learning must be enabled. ||
-|| `-n, --enable-through-local-negations` || Build chunks when local negation encountered in backtrace. (default) ||
-|| `-N, --disable-through-local-negations` || Do not build chunks when local negation encountered in backtrace. ||
+|| `-n, --enable-through-local-negations` || Build chunks when local negation encountered in backtraces. (default) ||
+|| `-N, --disable-through-local-negations` || Do not build chunks when local negation encountered in backtraces. ||
+|| `-p, --add-desirability-prefs` || Add relevant desirability preferences to backtraces. ||
+|| `-P, --do-not-add-desirability-prefs` || Do not add any desirability preferences to backtraces. (default)||
 
 == Description ==
 
@@ -53,17 +55,21 @@ allow developers to temporarily turn learning off for debugging purposes. These
 facilities are provided as debugging tools, and do not correspond to any theory
 of learning in Soar.
 
-The `--all-levels` and `--bottom-up` flags are orthogonal to the `--on`,
+The final six settings, `--all-levels`, `--bottom-up`, `--enable-through-local-negations`,
+`--disable-though-local-negations`, `--add-desirability-prefs` and
+`--do-not-add-desirability-prefs`, are orthogonal to the `--on`,
 `--except`, `--only`, and `--off` flags, and so, may be used in combination
-with them. With bottom-up learning, chunks are learned only in states in which
-no subgoal has yet generated a chunk. In this mode, chunks are learned only for
-the "bottom" of the subgoal hierarchy and not the intermediate levels. With
-experience, the subgoals at the bottom will be replaced by the chunks, allowing
-higher level subgoals to be chunked.
+with them.
 
-Similarly, `--enable-through-local-negations` and
-`--disable-though-local-negations` are orthogonal to the rest of the learn
-options. These options control whether or not chunks can be created that are
+The `--all-levels` and `--bottom-up` control when chunks are formed when there
+are multiple levels of subgoals. With bottom-up learning, chunks are learned
+only in states in which no subgoal has yet generated a chunk. In this mode,
+chunks are learned only for the "bottom" of the subgoal hierarchy and not the
+intermediate levels. With experience, the subgoals at the bottom will be
+replaced by the chunks, allowing higher level subgoals to be chunked.
+
+The options `--enable-through-local-negations` and
+`--disable-though-local-negations` control whether or not chunks can be created that are
 derived from rules that check for negated WMEs on the substate (local
 negations). Chunking through local negations can result in overgeneral chunks,
 but disabling this ability will reduce the number of chunks formed. The default
@@ -72,6 +78,16 @@ is to enable chunking through local negations.
 If chunking through local negations is disabled, to see when chunks are
 discarded (and why), set `watch --learning print` (see
 [cmd_watch watch] command).
+
+The options `--add-desirability-prefs` and
+`--do-not-add-desirability-prefs` control whether or not desirability preferences are
+added to the context dependent preference set, which is the set of operator evaluation
+preferences that led to the selection of an operator in a subgoal. All preferences in
+the CDPS are backtraced through when creating justifications and chunks.  When this
+option is disabled, only requirement preferences (requires and prohibits) will be added
+to the CDPS.  When this option is enabled, relevant desirability prefs (better, best,
+worse, worst, indifferent) will also be added. The default is to not include desirability
+preferences.
 
 Learning can be turned on or off at any point during a run.
 
