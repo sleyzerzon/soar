@@ -156,6 +156,7 @@
       * [ThreadsInSML Threads in SML]
       * [SMLOutputLinkGuide SML Output Link Guide]
       * [SoarXMLInterfaceSpecification SoarXMLInterfaceSpecification]
+      * [BuildingSMLClients How to compile C++ SML clients]
     * [SoarKernel Soar Kernel]
       * [Symbols]
       * [Links]
