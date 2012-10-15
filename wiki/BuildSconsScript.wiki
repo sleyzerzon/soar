@@ -60,7 +60,7 @@ and look under the "Local Options" section (the other flags are for scons itself
  * `--build` and `--out`, as explained above.
  * `--opt` will turn on compiler optimizations and strip debugging symbols from targets, resulting in slightly faster Soar agents and significantly smaller file sizes. By default optimizations are disabled for faster build times.
  * `--verbose` makes scons print out the full commands it uses to build each file. This is useful if the build doesn't succeed and you want to figure out what is happening under the hood.
- * `--static` will build a static version of the Soar library. This is necessary for running Soar in environments that don't support dynamic linking, such as iOS.
+ * `--static` will build a static version of the Soar library. The resulting library is normally named `libSoar.a` in Linux/OSX, and `Soar.lib` in Windows (there won't be a Soar.dll). This is necessary for running Soar in environments that don't support dynamic linking, such as iOS.
 
 === Visual Studio Solution Generation ===
 
