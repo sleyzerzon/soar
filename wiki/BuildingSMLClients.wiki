@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
 = Linux / Mac OS X =
 
-It's fairly straightforward to compile an SML client program from a shell using g++ or clang++. Both compilers take the same arguments. Supposing you unpacked the release into /home/user/SoarSuite, the compilation command should be:
+It's fairly straightforward to compile an SML client program from a shell using g++ or clang++. Both compilers take the same arguments. Supposing you unpacked the release into `/home/user/SoarSuite`, the compilation command should be:
 
 {{{
 g++ -L/home/user/SoarSuite/bin -I/home/user/SoarSuite/bin/include your_program.cpp -lSoar
