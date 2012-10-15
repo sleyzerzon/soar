@@ -25,6 +25,6 @@ Frequently asked questions that focus on the theoretical underpinnings of Soar. 
 
 Frequently asked questions that focus on running and developing for Soar, maintained by the University of Michigan Soar group. [FAQ]
 
-== VisualSoar Key Bindings ==
+== !VisualSoar Key Bindings ==
 
 A listing of all the [VSKeyBindings key binding shortcuts] used in the [AgentDev_VisualSoar VisualSoar IDE].
