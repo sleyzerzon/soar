@@ -3,21 +3,28 @@
 
 == Soar Manual ==
 
-A handy reference and [SoarManual the authoritative documentation] for Soar.
+A handy reference and the authoritative documentation for Soar. [SoarManual]
+
+== Soar Tutorials ==
+
+Learn Soar through a series of hands-on tutorials. [SoarTutorial]
+
+== SML Quick Start Guide ==
+
+You can use the SML API to connect Soar agents to an external environment, such as a simulation or game. Learn to use the API with a comprehensive tutorial. [SMLQuickStartGuide]
 
 == Command Line Help ==
 
-An online reference of precisely how [CommandIndex every command-line command] in Soar works.
+An online reference for Soar's command line. [CommandIndex]
 
 == Soar FAQ ==
 
-[http://acs.ist.psu.edu/soar-faq/soar-faq.html Frequently asked questions] that focus on the theoretical underpinnings of Soar.  There is some technical information on Soar contained in this FAQ.  This FAQ is maintained by Frank Ritter at Penn State University.
+Frequently asked questions that focus on the theoretical underpinnings of Soar.  There is some technical information on Soar contained in this FAQ.  This FAQ is maintained by Frank Ritter at Penn State University. [http://acs.ist.psu.edu/soar-faq/soar-faq.html FAQ]
 
 == Soar Technical FAQ ==
 
-[FAQ Frequently asked questions] that focus on running and developing for Soar.  This FAQ is maintained by the University of Michigan Soar group.
+Frequently asked questions that focus on running and developing for Soar, maintained by the University of Michigan Soar group. [FAQ]
 
-== !VisualSoar Key Bindings ==
+== VisualSoar Key Bindings ==
 
 A listing of all the [VSKeyBindings key binding shortcuts] used in the [AgentDev_VisualSoar VisualSoar IDE].
-
