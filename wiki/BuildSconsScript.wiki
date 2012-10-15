@@ -1,4 +1,4 @@
-The latest version of Soar now uses single SCons script to robustly create builds for Windows, Linux, and Mac OSX. SCons tries to be smart and uses the appropriate compilers, linkers, and other commands for your OS. A version of SCons is distributed in the Soar source tree, so you don't need to install it separately. To run the builder, start a shell (cmd.exe in Windows), cd into the !SoarSuite directory and type
+As of version 9.3.2, Soar is built by a single SCons script for all operating systems. SCons tries to be smart and uses the appropriate compilers, linkers, and other commands for your OS. A version of SCons is distributed in the Soar source tree, so you don't need to install it separately. To run the builder, start a shell (Visual Studio Command Prompt in Windows, see below), cd into the !SoarSuite directory and type
 {{{
   python scons/scons.py <options>
 }}}
@@ -8,10 +8,13 @@ or if you want to use the SCons version you've installed separately,
 }}}
 {{{<options>}}} is a place holder for options we'll pass into the builder, and should not be typed literally.
 
-For Windows users, we have provided a batch file called build.bat which will perform several functions before launching the SCons script. This file will search for the locations of the python, java, and swig installs, and set the PATH environment variable so that the various compilers can run. In addition, SCons automatically finds the installed Visual C++ compiler, so there's no need to use the Visual Studio Command Prompt. Windows users can simply type:
+For Windows users, we have provided a batch file called build.bat which will perform several functions before launching the SCons script. This file will search for the locations of the python, java, and swig installs, and set the PATH environment variable so that the various compilers can run. Windows users can simply type:
 {{{
   build <options>
 }}}
+
+The build script must be invoked from the Visual Studio Command Prompt so that scons can locate the VC++ compiler. A shortcut to launch this prompt can be found in the start menu under the Visual Studio program group.
+
 For the rest of this document we'll be showing example build commands using the {{{"scons <options>"}}} form. Please substitute the appropriate command for "scons".
 
 === Build Targets ===
@@ -41,7 +44,7 @@ If no targets are specified, the default targets that will be built are kernel, 
 
 === Output Directories ===
 
-By default, the built libraries and executables will be placed into the "out" subdirectory under !SoarSuite, and intermediates such as .o files will be placed in the "build" subdirectory. You can change these using the {{{--outdir=<dir>}}} and {{{--build-dir=<dir>}}} options. These directories can be located or moved anywhere in your file system. However, we recommend you not change the file structure inside the "out" directory, as the executables expect the libraries to be in certain places relative to them.
+By default, the built libraries and executables will be placed into the "out" subdirectory under !SoarSuite, and intermediates such as .o files will be placed in the "build" subdirectory. You can change these using the {{{--out=<dir>}}} and {{{--build=<dir>}}} options. These directories can be located or moved anywhere in your file system. However, we recommend you not change the file structure inside the "out" directory, as the executables expect the libraries to be in certain places relative to them.
 
 To delete all the files you just built, type
 {{{
@@ -53,7 +56,11 @@ You can modify building behavior by passing in a number of flags in the form {{{
 {{{
   scons --help
 }}}
-and look under the "Local Options" section (the other flags are for scons itself). One particularly useful flag is "--debug", which turns off compiler optimizations and inserts debugging symbols for either gdb (-g) or Visual Studio (/Z7 /DEBUG). Another flag is "--verbose", which makes scons print out the full commands it uses to build each file. This is useful if the build doesn't succeed and you want to figure out what is happening under the hood.
+and look under the "Local Options" section (the other flags are for scons itself). Some flags of interest:
+ * `--build` and `--out`, as explained above.
+ * `--opt` will turn on compiler optimizations and strip debugging symbols from targets, resulting in slightly faster Soar agents and significantly smaller file sizes. By default optimizations are disabled for faster build times.
+ * `--verbose` makes scons print out the full commands it uses to build each file. This is useful if the build doesn't succeed and you want to figure out what is happening under the hood.
+ * `--static` will build a static version of the Soar library. This is necessary for running Soar in environments that don't support dynamic linking, such as iOS.
 
 === Visual Studio Solution Generation ===
 
@@ -61,4 +68,4 @@ SCons can generate Visual Studio project and solution files that allow users to 
 {{{
   scons msvs
 }}}
-Unfortunately, the generated projects are not stand-alone, they still call SCons under the hood to build targets.
+Unfortunately, the generated projects are not stand-alone, they still call SCons under the hood to build targets. This is not yet a well-supported feature, so the resulting project files will probably require some hand-tweaking.
