@@ -132,11 +132,10 @@ delete pKernel ;		// Deletes the kernel itself
 
 {{{
 // Create an instance of the Soar kernel in our process
-Kernel* pKernel = Kernel::CreateKernelInNewThread("SoarKernelSML") ;
+Kernel* pKernel = Kernel::CreateKernelInNewThread() ;
 }}}
 
-The client can either create a local Soar kernel (i.e. load Soar as a DLL into
-its process) or a remote connection to an existing Soar kernel (where commands
+The client can either create a local Soar kernel or a remote connection to an existing Soar kernel (where commands
 are sent over a socket to a separate process on the same or a different
 machine).
 
