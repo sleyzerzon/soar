@@ -11,11 +11,11 @@ An [IntroSoarDebugger overview and tutorial] covering all the basic functions of
 
 == Soar Dogma ==
 
-A [SoarDogma document contains a collection of suggestions] that may help when first learning how to program Soar agents.
+A [SoarDogma document] containing a collection of suggestions that may help when first learning how to write Soar agents.
 
 == SML Quick Start Guide ==
 
-A [SMLQuickStartGuide a comprehensive tutorial] describing how you can use the SML API to connect Soar agents to an external environment, such as a simulation or game. 
+A [SMLQuickStartGuide comprehensive tutorial] describing how you can use the SML API to connect Soar agents to an external environment, such as a simulation or game. 
 
 == How to compile SML clients ==
 
