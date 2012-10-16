@@ -156,7 +156,16 @@ Exception in thread "main" java.lang.UnsatisfiedLinkError: no Java_sml_ClientInt
 
 == Eclipse ==
 
-To be added.
+Many Java programmers use the [http://eclipse.org Eclipse IDE]. Here are the steps to create an SML project in Eclipse. Note that Eclipse is a general purpose IDE and comes in many different variations. These instructions were written for "Eclipse IDE for Java Developers". Remember that all we are doing here is getting Eclipse to find `sml.jar` at compile time and the JNI shared libraries at run time.
+
+ # In the main menu bar, choose File / New / Java Project. Give the project a name, then click Next.
+ # Choose the Libraries tab, then click "Add External JARs". Choose `SoarSuite/bin/java/sml.jar` in the file selection dialog. Click Finish.
+ # In the "Package Explorer", right click on the "src" folder under your project and choose New / Class, and create a class with a main function. For example, you can create a `HelloWorld` class and paste in the contents of the Hello World program above.
+ # Again in the "Package Explorer", right click on your project, choose Properties. Then choose "Run/Debug Settings", and click the "New..." button on the right. Choose "Java Application" in the pop-up window. In the configuration properties window that comes up, click "Search..." and choose the class you created with the main function.
+ # In the same window, select the "Environment" tab, click "New..." to add a new environment variable. For the Name field in the pop-up, enter `LD_LIBRARY_PATH` if you're in Linux, `DYLD_LIBRARY_PATH` if in OSX, or `PATH` if in Windows. For the Value, enter the full path to your `SoarSuite/bin` directory. This will help the JVM find the JNI shared library when you run your project.
+ # Click OK, then OK again to close the configuration properties window.
+
+Now you should be able to run your project by choosing Run / Run in the main menu bar. 
 
 = Python =
 
