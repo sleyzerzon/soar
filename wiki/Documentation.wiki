@@ -1,17 +1,9 @@
 #labels Featured
-= Soar Documentation =
+= Manuals and Frequently Asked Questions =
 
 == Soar Manual ==
 
 A handy reference and the authoritative documentation for Soar. [SoarManual]
-
-== Soar Tutorials ==
-
-Learn Soar through a series of hands-on tutorials. [SoarTutorial]
-
-== SML Quick Start Guide ==
-
-You can use the SML API to connect Soar agents to an external environment, such as a simulation or game. Learn to use the API with a comprehensive tutorial. [SMLQuickStartGuide]
 
 == Command Line Help ==
 
