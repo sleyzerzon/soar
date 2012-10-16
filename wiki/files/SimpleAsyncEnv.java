@@ -1,5 +1,3 @@
-package edu.umich.soar.examples;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,7 +14,6 @@ import sml.Identifier;
 import sml.Kernel;
 import sml.smlUpdateEventId;
 import sml.Kernel.UpdateEventInterface;
-import edu.umich.soar.ProductionUtils;
 
 /**
  * A simple, asynchronous, interactive environment example. A loop is started
@@ -180,23 +177,10 @@ public class SimpleAsyncEnv
             }
 
             /*
-             * Load the productions from the jar file. Most of the time
-             * agent.LoadProductions() is used instead of this to load
-             * productions.
+             * Load the productions.
              */
-            try
-            {
-                String result = ProductionUtils.sourceAgentFromJar(agent,
-                        "/simpleasyncenv.soar");
-                if (agent.GetLastCommandLineResult() == false)
-                {
-                    System.err.println(result);
-                    System.exit(1);
-                }
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
+            if (!agent.LoadProductions("simpleasyncenv.soar")) {
+                System.err.println("Can't load simpleasyncenv.soar");
                 System.exit(1);
             }
 

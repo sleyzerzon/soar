@@ -1,5 +1,3 @@
-package edu.umich.soar.examples;
-
 import java.io.IOException;
 
 import sml.Agent;
@@ -7,7 +5,6 @@ import sml.Identifier;
 import sml.Kernel;
 import sml.smlUpdateEventId;
 import sml.Kernel.UpdateEventInterface;
-import edu.umich.soar.ProductionUtils;
 
 /**
  * Very simple environment that adds a WME to the agent's input link with
@@ -64,19 +61,9 @@ public class HelloWorld
 
         /*
          * Once the agent is created it must be given Soar productions to run.
-         * Usually these are loaded from the file system by handing a path to
-         * Agent.LoadProductions() but in this example I use a utility function
-         * to load the Soar productions from a file inside of the jar:
          */
-
-        System.out.println("Loading productions...");
-        try
-        {
-            ProductionUtils.sourceAgentFromJar(agent, "/helloworld.soar");
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
+        if (!agent.LoadProductions("helloworld.soar")) {
+            System.err.println("Can't load helloworld.soar");
             System.exit(1);
         }
 
