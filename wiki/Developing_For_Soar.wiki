@@ -1,4 +1,4 @@
 #labels Featured
-= Developing For Soar =
+= Technical Documentation =
 
-This section contains an assortment of documents that will help you build tools and environments for Soar.
+This section contains an assortment of more esoteric, technical documents that will help you build tools and environments for Soar.

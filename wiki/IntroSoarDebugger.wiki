@@ -12,43 +12,6 @@ In order to take advantage of these features we needed a new debugger and we cho
 
 Thus the Java debugger was born.
 
-== Design Principles ==
-
-The central design principles for the Soar debugger in Java are:
-
-*1. Plug-in architecture*
-
-Each window within the debugger is designed as a separate module, with control over its own user interface and its own methods for accepting commands from a user, submitting those to Soar and receiving the results.  The intention is that the list of modules will grow over time and that the user community will (in time) be able to develop and submit their own modules, extending the capability of the debugger in ways they deem important.
-
-For example, if you were working on learning you might find a module that displays a tree of information showing all of the working memory elements that were tested in creating a chunk very helpful.  By creating this as a module within the debugger you would be provided with substantial support (e.g. methods for sending commands to Soar and listening to events Soar generates—such as notification when a new chunk was formed) and the new module could then be shared with all other developers increasing the overall power of the debugger.
-
-*2. User configurable*
-
-There’s a basic tension in designing a debugger for a diverse user community (such as the Soar community) in that many users have very different needs from a debugger.  When a new feature is added some rejoice at the new capability and others curse at the performance hit or the loss of screen real estate to a feature they don’t care about.  To alleviate this problem this debugger has been designed from the start to be highly configurable.  Windows can be added or removed at will from the display and the behavior of individual windows can be adjusted through properties.
-
-This allows us as a community to build the new modules (described just above) without concern for whether they are of universal appeal as each user is free to include a given module (window) in their debugger or not as they please.
-
-== Performance Comparison ==
-
-A key concern with any debugger is how fast is it?  In the initial release of the debugger we’re offering two main forms of “trace” window—one based around a simple text display and the other based around a structured tree display.  We compared the performance of these two different forms of window to the performance of the TSI debugger included with 8.5.2 on the towers of Hanoi task.
-
-Method is to maximize each window then use “time {run x}” in TSI or “time run x” in Java Debugger to time each run.  Obviously, times could vary from run to run, but in practice the variance is usually small.  Maximizing the windows ensures that scrolling effort is similar.
-
-These are the timing results:
-
-|| || TSI (8.5.2) || Java Debugger (Tree View) || Java Debugger (Text View) ||
-|| Watch 0 (run to completion || 15.51s || 7.828s || 8.047s ||
-|| Watch 1 (run 100 dc) || 1.25s || 0.75s || 0.734s ||
-|| Watch 5 (run 100 dc) || 59.68s || 1.51s (0.579 with full filtering) || 2.141s ||
-
-Watch 0 of TOH still generates output (write commands in productions).
-
-So the conclusions are that the Tree and Text view in the Java debugger run at about the same speed.  The tree view can actually run a bit faster on a high watch trace because it’s not displaying all of the text at the moment it is created.  (The base watch 5 times assume the trace is displayed as a collapsed tree with the full-filtering value showing the performance if the user initially filters out all of the display – filtering will be explained more later on).  Also, running at watch 5 is no longer vastly slower than running at watch 1 (for this Towers of Hanoi task).
-
-The other observation is that the new debugger is substantially faster than the previous version (sometimes order of magnitude faster), especially when tracing at high watch levels.  (The reason we can go faster even while doing more work is that we have optimized the path for generating trace output).
-
-= Getting started with the new debugger =
-
 == Quick Tour ==
 
 On launch you should see a display similar to this:
@@ -220,3 +183,41 @@ If you run Soar from within the debugger for long periods of time (i.e. tens of 
 java.exe –Xmx256m –jar SoarJavaDebugger.jar
 
 On Windows you can use javaw.exe if you prefer.  This and other X options are non-standard and may not exist on non-Sun JVMs.  Also, note that the default value is only 64m (64 megabytes).
+
+== Design Principles ==
+
+The central design principles for the Soar debugger in Java are:
+
+*1. Plug-in architecture*
+
+Each window within the debugger is designed as a separate module, with control over its own user interface and its own methods for accepting commands from a user, submitting those to Soar and receiving the results.  The intention is that the list of modules will grow over time and that the user community will (in time) be able to develop and submit their own modules, extending the capability of the debugger in ways they deem important.
+
+For example, if you were working on learning you might find a module that displays a tree of information showing all of the working memory elements that were tested in creating a chunk very helpful.  By creating this as a module within the debugger you would be provided with substantial support (e.g. methods for sending commands to Soar and listening to events Soar generates—such as notification when a new chunk was formed) and the new module could then be shared with all other developers increasing the overall power of the debugger.
+
+*2. User configurable*
+
+There’s a basic tension in designing a debugger for a diverse user community (such as the Soar community) in that many users have very different needs from a debugger.  When a new feature is added some rejoice at the new capability and others curse at the performance hit or the loss of screen real estate to a feature they don’t care about.  To alleviate this problem this debugger has been designed from the start to be highly configurable.  Windows can be added or removed at will from the display and the behavior of individual windows can be adjusted through properties.
+
+This allows us as a community to build the new modules (described just above) without concern for whether they are of universal appeal as each user is free to include a given module (window) in their debugger or not as they please.
+
+== Performance Comparison ==
+
+A key concern with any debugger is how fast is it?  In the initial release of the debugger we’re offering two main forms of “trace” window—one based around a simple text display and the other based around a structured tree display.  We compared the performance of these two different forms of window to the performance of the TSI debugger included with 8.5.2 on the towers of Hanoi task.
+
+Method is to maximize each window then use “time {run x}” in TSI or “time run x” in Java Debugger to time each run.  Obviously, times could vary from run to run, but in practice the variance is usually small.  Maximizing the windows ensures that scrolling effort is similar.
+
+These are the timing results:
+
+|| || TSI (8.5.2) || Java Debugger (Tree View) || Java Debugger (Text View) ||
+|| Watch 0 (run to completion || 15.51s || 7.828s || 8.047s ||
+|| Watch 1 (run 100 dc) || 1.25s || 0.75s || 0.734s ||
+|| Watch 5 (run 100 dc) || 59.68s || 1.51s (0.579 with full filtering) || 2.141s ||
+
+Watch 0 of TOH still generates output (write commands in productions).
+
+So the conclusions are that the Tree and Text view in the Java debugger run at about the same speed.  The tree view can actually run a bit faster on a high watch trace because it’s not displaying all of the text at the moment it is created.  (The base watch 5 times assume the trace is displayed as a collapsed tree with the full-filtering value showing the performance if the user initially filters out all of the display – filtering will be explained more later on).  Also, running at watch 5 is no longer vastly slower than running at watch 1 (for this Towers of Hanoi task).
+
+The other observation is that the new debugger is substantially faster than the previous version (sometimes order of magnitude faster), especially when tracing at high watch levels.  (The reason we can go faster even while doing more work is that we have optimized the path for generating trace output).
+
+= Getting started with the new debugger =
+
