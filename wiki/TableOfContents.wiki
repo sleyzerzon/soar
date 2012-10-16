@@ -127,7 +127,7 @@
     * ----
     * [SoarSoftware SoarSuite Archives]
     * [ReleaseNotes Release Note Archives]
-  * [Manuals and FAQs]
+  * [Documentation Manuals and FAQs]
     * [SoarManual Soar Manual]
     * [CommandIndex Command Line Help]
     * [http://acs.ist.psu.edu/soar-faq/soar-faq.html Soar FAQ]
