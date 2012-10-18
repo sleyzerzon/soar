@@ -17,7 +17,7 @@ Can be relative path name or fully specified.
 == See Also ==
 
 [cmd_cd cd] [cmd_dirs dirs]
-[cmd_home home] [cmd_ls ls]
+[cmd_ls ls]
 [cmd_popd popd] [cmd_source source]
 [cmd_pwd pwd]
 

@@ -27,8 +27,7 @@ everything printed by Soar is written to the file (in addition to the screen).
 
 Invoke `clog` with no arguments (or with `-q`) to query the current logging
 status. Pass a filename to start logging to that file (relative to the command
-line interface's home directory (see the [cmd_home home]
-command)). Use the `close` option to stop logging.
+line interface's home directory). Use the `close` option to stop logging.
 
 == Examples ==
 

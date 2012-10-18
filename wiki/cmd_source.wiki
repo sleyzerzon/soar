@@ -93,7 +93,7 @@ for each file.
 == See Also ==
 
 [cmd_cd cd] [cmd_dirs dirs]
-[cmd_home home] [cmd_ls ls]
+[cmd_ls ls]
 [cmd_pushd pushd] [cmd_popd popd]
 [cmd_pwd pwd]
 

@@ -23,7 +23,7 @@ top of the stack.
 
 == See Also ==
 
-[cmd_cd cd] [cmd_home home]
+[cmd_cd cd]
 [cmd_ls ls] [cmd_pushd pushd]
 [cmd_popd popd] [cmd_source source]
 [cmd_pwd pwd]
