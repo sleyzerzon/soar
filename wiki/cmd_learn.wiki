@@ -56,7 +56,7 @@ facilities are provided as debugging tools, and do not correspond to any theory
 of learning in Soar.
 
 The final six settings, `--all-levels`, `--bottom-up`, `--enable-through-local-negations`,
-`--disable-though-local-negations`, `--add-desirability-prefs` and
+`--disable-through-local-negations`, `--add-desirability-prefs` and
 `--do-not-add-desirability-prefs`, are orthogonal to the `--on`,
 `--except`, `--only`, and `--off` flags, and so, may be used in combination
 with them.
@@ -82,12 +82,13 @@ discarded (and why), set `watch --learning print` (see
 The options `--add-desirability-prefs` and
 `--do-not-add-desirability-prefs` control whether or not desirability preferences are
 added to the context dependent preference set, which is the set of operator evaluation
-preferences that led to the selection of an operator in a subgoal. All preferences in
-the CDPS are backtraced through when creating justifications and chunks.  When this
-option is disabled, only requirement preferences (requires and prohibits) will be added
-to the CDPS.  When this option is enabled, relevant desirability prefs (better, best,
-worse, worst, indifferent) will also be added. The default is to not include desirability
-preferences.
+preferences that led to the selection of an operator in a subgoal. All
+preferences in the CDPS are backtraced through when creating justifications and
+chunks.  When this option is disabled, only requirement preferences (requires
+and prohibits) will be added to the CDPS.  When this option is enabled, relevant
+desirability prefs (better, best, worse, worst, indifferent) will also be added,
+producing more specific and possibly correct chunks. The default is to not
+include desirability preferences.
 
 Learning can be turned on or off at any point during a run.
 
