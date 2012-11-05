@@ -5,9 +5,14 @@ Other versions of 32-bit windows might work but are not officially supported.
 
 == Install the Prerequisities ==
 
-  # *Microsoft Visual Studio 2008*
-    * You must have either Microsoft Visual Studio 2008 or the free [http://www.microsoft.com/visualstudio/en-us/products/2008-editions/express Microsoft Visual C++ 2008 Express Edition].  (Note that the free Express Edition does not include a 64-bit compiler.)
-    * *Warning*: *If you are on a 64-bit machine, make sure to explicitly choose to install the the 64-bit compiler*!  It is not installed by default!
+  # *Microsoft Visual C++ compiler*
+  There are several ways you can get this:
+    * Visual Studio Professional or better. This includes both the 32 and 64 bit compilers and the full VS IDE. If you are on a 64-bit machine, make sure to explicitly choose to install the the 64-bit compiler. It is not installed by default.
+    * [http://www.microsoft.com/en-us/download/details.aspx?id=14597 Visual C++ Express Edition]. Free, but only includes the 32 bit compiler, and a basic IDE.
+    * [http://msdn.microsoft.com/en-us/windowsserver/bb980924.aspx Windows SDK]. Free, and includes both the 32 and 64 bit compilers, but no IDE.
+    
+    Note that because Soar is built by [http://scons.org SCons], you don't need the Visual Studio IDE or project configurations to build it. You only need the command-line compiler, linker, and runtime libraries.
+
   # *Java SE 6 JDK*
     * The latest Java SE 6 JDK is available from [http://www.oracle.com/technetwork/java/javase/downloads/index.html Oracle's web site].  Make sure to download the 64-bit version, if you are on a 64-bit machine.
   # *SWIG*
@@ -20,14 +25,12 @@ Other versions of 32-bit windows might work but are not officially supported.
 
 == Build Soar ==
 
-Launch the Visual Studio Command Prompt from the start menu. It should have been installed with all versions of Visual Studio. Use `cd` to change to the `SoarSuite` directory, and type
+Launch the Visual Studio Command Prompt (or WinSDK command prompt, if you installed that instead) from the start menu. Use `cd` to change to the `SoarSuite` directory, and type
 {{{
   build all
 }}}
 
-The batch file may ask you for the paths to Java, SWIG, or Python, if it can't find them automatically. You no longer have to manually specify those paths in environment variables.
-
-For more detailed information about the Scons script, see the [BuildSconsScript SCons Script Documentation page]. See the [FAQ] for common solutions to errors.
+The batch file may ask you for the paths to Java, SWIG, or Python, if it can't find them automatically. You no longer have to manually specify those paths in environment variables. After that it will run the included SCons scripts to build Soar. For more detailed information about the Scons script, see the [BuildSconsScript SCons Script Documentation page]. See the [FAQ] for common solutions to errors.
 
 === Visual Studio Solution Generation ===
 
