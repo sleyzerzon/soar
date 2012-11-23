@@ -32,9 +32,7 @@ Due to the large number of parameters, the `rl` command uses the
 switches for each parameter.  Running `rl` without any switches
 displays a summary of the parameter settings.
 
-|| `apoptosis` || Automatic excising of productions via base-level decay  || `none`, `chunks`, `rl-chunks` || `none` ||
-|| `apoptosis-decay` || Base-level decay parameter || `[`0, 1`]` || 0.5 ||
-|| `apoptosis-thresh` || Base-level threshold parameter (negates supplied value) || (0, inf) || 2 ||
+|| *Parameter* || *Description* || *Possible values* || *Default* ||
 || `chunk-stop` || If enabled, chunking does not create duplicate RL rules that differ only in numeric-indifferent preference value || `on`, `off` || `on` ||
 || `decay-mode` || How the learning rate changes over time || `normal`, `exponential`, `logarithmic`, `delta-bar-delta` || `normal` ||
 || `discount-rate` || Temporal discount (gamma) || `[`0, 1`]` || 0.9 ||
@@ -48,6 +46,13 @@ displays a summary of the parameter settings.
 || `temporal-discount` || Discount RL updates over gaps  || `on`, `off` || `on` ||
 || `temporal-extension` || Propagation of RL updates over gaps  || `on`, `off` || `on` ||
 || `update-log-path` || File to log information about RL rule updates  || `""`, `<filename>` || `""` ||
+
+==== Apoptosis Parameters ====
+
+|| *Parameter* || *Description* || *Possible values* || *Default* ||
+|| `apoptosis` || Automatic excising of productions via base-level decay  || `none`, `chunks`, `rl-chunks` || `none` ||
+|| `apoptosis-decay` || Base-level decay parameter || `[`0, 1`]` || 0.5 ||
+|| `apoptosis-thresh` || Base-level threshold parameter (negates supplied value) || (0, inf) || 2 ||
 
 Apoptosis is a process to automatically excise chunks via the base-level decay model (where rule firings are the activation events).
 A value of `chunks` has this apply to any chunk, whereas `rl-chunks` means only chunks that are also RL rules can be forgotten.
