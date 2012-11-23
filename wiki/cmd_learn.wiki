@@ -55,9 +55,7 @@ allow developers to temporarily turn learning off for debugging purposes. These
 facilities are provided as debugging tools, and do not correspond to any theory
 of learning in Soar.
 
-The final six settings, `--all-levels`, `--bottom-up`, `--local-negations`,
-`--no-local-negations`, `--desirability-prefs` and
-`--no-desirability-prefs`, are orthogonal to the `--on`,
+The following final six settings are orthogonal to the `--on`,
 `--except`, `--only`, and `--off` flags, and so, may be used in combination
 with them.
 
