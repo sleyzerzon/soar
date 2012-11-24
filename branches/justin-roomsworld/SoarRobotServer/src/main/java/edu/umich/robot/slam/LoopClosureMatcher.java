@@ -239,6 +239,7 @@ public class LoopClosureMatcher {
 	 *         will return an empty (null) GXYTEdge. Note that the edge will
 	 *         point from Node A to Node B as Node A is the reference node.
 	 */
+	@SuppressWarnings("unchecked")
 	public GXYTEdge match(GXYTNode a, GXYTNode b, double[] priorXYT) {
 		// new edge to return if successful match found
 		GXYTEdge newEdge = new GXYTEdge();
