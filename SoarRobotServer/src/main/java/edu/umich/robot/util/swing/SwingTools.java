@@ -71,6 +71,7 @@ public class SwingTools
      *            the items to add
      * @return the list model
      */
+	@SuppressWarnings("unchecked")
     public static DefaultListModel addAll(DefaultListModel model,
             Collection<?> items)
     {
