@@ -1,6 +1,6 @@
 <!-- Based on http://ant.apache.org/manual/tutorial-HelloWorldWithAnt.html -->
 
-<project name="SoarRobotLibrary" basedir="." default="clean-build">
+<project name="libgrrc-java" basedir="." default="clean-build">
 
     <property name="src.dir" value="src" />
     <property name="build.dir" value="build" />
