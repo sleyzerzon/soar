@@ -22,19 +22,19 @@ fi
 # build april
 pushd april/java
 ant
-cp april.jar "$basedir/SoarRobotServer/lib/"
+mv april.jar "$basedir/SoarRobotServer/lib/"
 popd
 
 # build SoarRobotLibrary 
 pushd SoarRobotLibrary
 ant
-cp build/jar/SoarRobotLibrary.jar "$basedir/SoarRobotServer/lib/"
+mv build/jar/SoarRobotLibrary.jar "$basedir/SoarRobotServer/lib/"
 popd
 
 # build libgrrc-java
 pushd libgrrc-java
 ant
-cp build/jar/libgrrc-java.jar "$basedir/SoarRobotServer/lib/"
+mv build/jar/libgrrc-java.jar "$basedir/SoarRobotServer/lib/"
 popd
 
 # copy soar libraries
