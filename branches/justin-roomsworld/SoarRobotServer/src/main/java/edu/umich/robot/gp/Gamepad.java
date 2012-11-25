@@ -178,8 +178,10 @@ public class Gamepad
                         return;
                     }
                     
-                    if (output.getCarriedObject() != null)
+                    if (!output.getCarriedObjects().isEmpty())
+					{
                         controller.fireGamepadControlEvent(new EffectorDropObjectEvent());
+					}
                     else
                     {
                         VirtualObject target = null;

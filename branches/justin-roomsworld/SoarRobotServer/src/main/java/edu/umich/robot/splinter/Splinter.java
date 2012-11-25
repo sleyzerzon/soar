@@ -22,6 +22,7 @@
 package edu.umich.robot.splinter;
 
 import java.util.List;
+import java.util.SortedSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -257,7 +258,7 @@ public class Splinter implements Robot
             return metamap.getVisibleObjects(Splinter.this);
         }
 
-        public VirtualObject getCarriedObject()
+        public SortedSet<VirtualObject> getCarriedObjects()
         {
             return metamap.getCarried(Splinter.this);
         }

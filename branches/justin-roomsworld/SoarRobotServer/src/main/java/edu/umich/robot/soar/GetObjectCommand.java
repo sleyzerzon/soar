@@ -43,9 +43,6 @@ public class GetObjectCommand extends AbstractEffectorCommand
     {
         super(wme, agent, LogFactory.getLog(GetObjectCommand.class));
 
-        if (agent.getRobotOutput().getCarriedObject() != null)
-            throw new SoarCommandError("Already carrying an object.");
-
         id = CommandParameters.requireInteger(wme, IOConstants.ID);
 
         addEvent(new EffectorGetObjectEvent(id), AbstractEffectorEvent.class);
