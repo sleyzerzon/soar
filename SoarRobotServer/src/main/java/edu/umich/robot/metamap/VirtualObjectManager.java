@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +37,8 @@ import april.lcmtypes.pose_t;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 
 import edu.umich.robot.Robot;
 import edu.umich.robot.util.Pose;
@@ -62,7 +65,7 @@ class VirtualObjectManager
     
     private final List<VirtualObjectImpl> placed = Lists.newArrayList();
     
-    private final Map<Robot, VirtualObjectImpl> carried = Maps.newHashMap();
+    private final Multimap<Robot, VirtualObjectImpl> carried = TreeMultimap.create();
     
     private final ObstacleBroadcaster obc = new ObstacleBroadcaster();
     
@@ -244,19 +247,16 @@ class VirtualObjectManager
      */
     boolean pickupObject(Robot robot, int id)
     {
-        if (!carried.containsKey(robot))
-        {
-            VirtualObjectImpl voi = instances.get(Integer.valueOf(id));
-            if (voi != null && placed.contains(voi))
-            {
-                if (isInRange(robot, voi))
-                {
-                    removePlaced(voi);
-                    carried.put(robot, voi);
-                    return true;
-                }
-            }
-        }
+		VirtualObjectImpl voi = instances.get(Integer.valueOf(id));
+		if (voi != null && placed.contains(voi))
+		{
+			if (isInRange(robot, voi))
+			{
+				removePlaced(voi);
+				carried.put(robot, voi);
+				return true;
+			}
+		}
         
         return false;   
     }
@@ -267,21 +267,25 @@ class VirtualObjectManager
      * @param robot
      * @return
      */
-    boolean dropObject(Robot robot)
+    boolean dropObject(Robot robot, int id)
     {
         // TODO placement restrictions
         
-        VirtualObjectImpl voi = carried.get(robot);
+		VirtualObjectImpl voi = instances.get(Integer.valueOf(id));
         if (voi != null)
         {
-            pose_t rp = robot.getOutput().getPose().asLcmType();
-            pose_t vp = voi.getPose().asLcmType();
-            double[] dpos = LinAlg.quatRotate(rp.orientation, new double[] { MANIPULATION_DISTANCE, 0, 0 });
-            vp.pos = LinAlg.add(rp.pos, dpos);
-            voi.setPose(new Pose(vp));
-            addPlaced(voi);
-            carried.remove(robot);
-            return true;
+        	SortedSet<VirtualObjectImpl> vois = carried.get(robot);
+			if (vois.contains(voi))
+			{
+				pose_t rp = robot.getOutput().getPose().asLcmType();
+				pose_t vp = voi.getPose().asLcmType();
+				double[] dpos = LinAlg.quatRotate(rp.orientation, new double[] { MANIPULATION_DISTANCE, 0, 0 });
+				vp.pos = LinAlg.add(rp.pos, dpos);
+				voi.setPose(new Pose(vp));
+				addPlaced(voi);
+				vois.remove(voi);
+				return true;
+			}
         }
         
         return false;
@@ -332,7 +336,7 @@ class VirtualObjectManager
      * @param robot
      * @return
      */
-    VirtualObject getCarried(Robot robot)
+    SortedSet<VirtualObject> getCarried(Robot robot)
     {
         return carried.get(robot);
     }

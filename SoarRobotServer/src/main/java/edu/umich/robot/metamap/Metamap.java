@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -331,7 +332,7 @@ public class Metamap implements RobotEventListener
      * @param robot
      * @return
      */
-    public VirtualObject getCarried(Robot robot)
+    public SortedSet<VirtualObject> getCarried(Robot robot)
     {
         return objects.getCarried(robot);
     }

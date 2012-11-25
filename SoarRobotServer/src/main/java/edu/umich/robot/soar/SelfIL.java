@@ -53,7 +53,7 @@ public class SelfIL extends InputLinkElement
 
     private final IntWme areaId;
 
-    private IntWme carryId;
+	private final InputLinkElement carry;
 
     private final List<DistanceWme> xyz = Lists.newArrayList();
 
@@ -75,6 +75,9 @@ public class SelfIL extends InputLinkElement
         this.output = agent.getRobotOutput();
         properties = agent.getProperties();
 
+		// FIXME JUSTIN
+		carry = new CarryIL(agent, IOConstants.CARRY, agent.getSoarAgent().GetInputLink(), agent.getRobotOutput().getVisibleObjects());
+
         areaId = IntWme.newInstance(getRoot(), IOConstants.AREA);
         headlight = StringWme.newInstance(getRoot(), IOConstants.HEADLIGHT);
         battery = FloatWme.newInstance(getRoot(), IOConstants.BATTERY);
@@ -95,22 +98,7 @@ public class SelfIL extends InputLinkElement
     @Override
     public void update()
     {
-        if (output.getCarriedObject() == null)
-        {
-            if (carryId != null)
-            {
-                carryId.destroy();
-                carryId = null;
-            }
-        }
-        else
-        {
-            if (carryId == null)
-                carryId = IntWme.newInstance(getRoot(), IOConstants.CARRY);
-            
-            carryId.update(output.getCarriedObject().getId());
-            logger.trace(carryId);
-        }
+        carry.update();
 
         AreaDescription a = output.getAreaDescription();
         areaId.update((a != null) ? a.getId() : -1);
