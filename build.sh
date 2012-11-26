@@ -83,6 +83,8 @@ case "$1" in
 		soar-robot-library;;
 	"grrc")
 		grrc;;
+	"copy")
+		copy-soar-libraries;;
 	"all")
 		april
 		soar-robot-library
