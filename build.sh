@@ -73,24 +73,34 @@ fi
 # navigate to RoomsWorld base
 cd "$basedir"
 
-case "$1" in
-	"clean")
-		clean
-		exit;;
-	"april")
-		april;;
-	"SoarRobotLibrary")
-		soar-robot-library;;
-	"grrc")
-		grrc;;
-	"copy")
-		copy-soar-libraries;;
-	"all")
-		april
-		soar-robot-library
-		grrc
-		copy-soar-libraries
-		soar-robot-server;;
-	*)
-		soar-robot-server;;
-esac
+if [ $# -gt 1 ]; then
+	while [ $# -gt 0 ]; do
+		case "$1" in
+			"clean")
+				clean
+				exit;;
+			"april")
+				april;;
+			"copy")
+				copy-soar-libraries;;
+			"soar-robot-library")
+				soar-robot-library;;
+			"soar-robot-server")
+				soar-robot-server;;
+			"grrc")
+				grrc;;
+			"all")
+				april
+				copy-soar-libraries
+				soar-robot-library
+				grrc
+				soar-robot-server;;
+			*)
+				echo "target '$1' unrecognized"
+				exit 1
+		esac
+		shift
+	done
+else
+	soar-robot-server
+fi
