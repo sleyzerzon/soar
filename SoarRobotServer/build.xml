@@ -134,6 +134,7 @@
             <fileset dir="${platform_native_lib.dir}" includes="**/*.dll" />
             <fileset dir="${platform_native_lib.dir}" includes="**/*.so" />
             <fileset dir="${platform_native_lib.dir}" includes="**/*.sh" />
+            <fileset dir="${platform_native_lib.dir}" includes="**/*.command" />
         </copy>
 
         <!-- Clean up, delete libs.jar -->
