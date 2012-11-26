@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -59,9 +60,9 @@ public class CarryIL extends InputLinkElement
 
     private final SoarAgent agent;
 
-    public CarryIL(SoarAgent agent)
+    public CarryIL(SoarAgent agent, Identifier parentWme)
     {
-        super(agent, IOConstants.CARRY, agent.getSoarAgent().GetInputLink());
+        super(agent, IOConstants.CARRY, parentWme);
         this.agent = agent;
 
         PropertyManager properties = agent.getProperties();
@@ -87,8 +88,7 @@ public class CarryIL extends InputLinkElement
     {
         List<Integer> seen = Lists.newArrayListWithExpectedSize(objMap.size());
 
-		// FIXME JUSTIN
-        List<VirtualObject> carriedObjects = agent.getCarriedObjects();
+        Set<VirtualObject> carriedObjects = agent.getRobotOutput().getCarriedObjects();
         
         for (VirtualObject o : carriedObjects)
         {

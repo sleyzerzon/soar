@@ -28,7 +28,7 @@ import edu.umich.robot.events.control.AbstractEffectorEvent;
 import edu.umich.robot.events.control.EffectorDropObjectEvent;
 
 /**
- * Removes all messages from message list.
+ * Drop an object by id number
  * 
  * @author voigtjr@gmail.com
  */
@@ -36,16 +36,26 @@ public class DropObjectCommand extends AbstractEffectorCommand
 {
     static final String NAME = "drop-object";
 
+    private final int id;
+
     public DropObjectCommand(Identifier wme, SoarAgent agent)
+            throws SoarCommandError
     {
         super(wme, agent, LogFactory.getLog(DropObjectCommand.class));
 
-        addEvent(new EffectorDropObjectEvent(), AbstractEffectorEvent.class);
+        id = CommandParameters.requireInteger(wme, IOConstants.ID);
+
+        addEvent(new EffectorDropObjectEvent(id), AbstractEffectorEvent.class);
     }
 
     @Override
     protected boolean isCorresponding(AbstractEffectorEvent event)
     {
-        return event instanceof EffectorDropObjectEvent;
+        if (event instanceof EffectorDropObjectEvent)
+		{
+            EffectorDropObjectEvent e = (EffectorDropObjectEvent)event;
+            return e.getId() == id;
+		}
+		return false;
     }
 }

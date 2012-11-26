@@ -22,7 +22,7 @@
 package edu.umich.robot;
 
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Set;
 
 import edu.umich.robot.events.feedback.AbstractFeedbackEvent;
 import edu.umich.robot.laser.Laser;
@@ -105,7 +105,7 @@ public interface RobotOutput
      * 
      * @return Null if nothing is carried.
      */
-    SortedSet<VirtualObject> getCarriedObjects();
+    Set<VirtualObject> getCarriedObjects();
     
     /**
      * Register for feedback events from various actions the robot can take.

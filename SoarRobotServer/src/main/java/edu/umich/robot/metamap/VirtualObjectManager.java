@@ -23,9 +23,10 @@ package edu.umich.robot.metamap;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.HashMultimap;
 
 import edu.umich.robot.Robot;
 import edu.umich.robot.util.Pose;
@@ -65,7 +66,7 @@ class VirtualObjectManager
     
     private final List<VirtualObjectImpl> placed = Lists.newArrayList();
     
-    private final Multimap<Robot, VirtualObjectImpl> carried = TreeMultimap.create();
+    private final Multimap<Robot, VirtualObjectImpl> carried = HashMultimap.<Robot, VirtualObjectImpl>create();
     
     private final ObstacleBroadcaster obc = new ObstacleBroadcaster();
     
@@ -274,7 +275,7 @@ class VirtualObjectManager
 		VirtualObjectImpl voi = instances.get(Integer.valueOf(id));
         if (voi != null)
         {
-        	SortedSet<VirtualObjectImpl> vois = carried.get(robot);
+        	Collection<VirtualObjectImpl> vois = carried.get(robot);
 			if (vois.contains(voi))
 			{
 				pose_t rp = robot.getOutput().getPose().asLcmType();
@@ -336,9 +337,9 @@ class VirtualObjectManager
      * @param robot
      * @return
      */
-    SortedSet<VirtualObject> getCarried(Robot robot)
+    Set<VirtualObject> getCarried(Robot robot)
     {
-        return carried.get(robot);
+        return new HashSet<VirtualObject>(carried.get(robot));
     }
 
     /**
