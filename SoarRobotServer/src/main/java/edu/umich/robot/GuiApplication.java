@@ -100,7 +100,6 @@ import edu.umich.robot.events.ControllerActivatedEvent;
 import edu.umich.robot.events.ControllerDeactivatedEvent;
 import edu.umich.robot.events.RobotAddedEvent;
 import edu.umich.robot.events.RobotRemovedEvent;
-import edu.umich.robot.gp.Gamepad;
 import edu.umich.robot.util.Configs;
 import edu.umich.robot.util.Pose;
 import edu.umich.robot.util.events.RobotEvent;
@@ -274,8 +273,7 @@ public class GuiApplication
         
         Configs.toLog(logger, config);
 
-        controller = new Controller(config, new Gamepad());
-        controller.initializeGamepad();
+        controller = new Controller(config);
 
         viewer = new Viewer(config, frame);
         // This puts us in full 3d mode by default. The Viewer GUI doesn't

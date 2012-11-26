@@ -61,7 +61,6 @@ import edu.umich.robot.events.control.AbstractDriveEvent;
 import edu.umich.robot.events.control.DoorCloseEvent;
 import edu.umich.robot.events.control.DoorOpenEvent;
 import edu.umich.robot.events.control.DriveEStopEvent;
-import edu.umich.robot.gp.Gamepad;
 import edu.umich.robot.metamap.AreaDescription;
 import edu.umich.robot.metamap.AreaState;
 import edu.umich.robot.metamap.Metamap;
@@ -118,8 +117,6 @@ public class Controller
      * List of robot controller names, mapped to the controllers.
      */
     private final Map<String, RobotController> rcmap = new HashMap<String, RobotController>();
-
-    private final Gamepad gp;
 
     private final Soar soar;
 
@@ -183,12 +180,8 @@ public class Controller
      */
     private final Map<String, RobotData> simRobots = Maps.newConcurrentMap();
 
-    public Controller(Config config, Gamepad gp)
+    public Controller(Config config)
     {
-        this.gp = gp;
-        if (gp != null)
-            rcmap.put(gprc.getName(), gprc);
-        
         soar = new Soar(config.getChild("soar"));
         soar.registerForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_START, soarHandler, null);
         soar.registerForSystemEvent(smlSystemEventId.smlEVENT_SYSTEM_STOP, soarHandler, null);
@@ -241,12 +234,6 @@ public class Controller
                 events.fireEvent(new SoarStoppedEvent());
         }
     };
-
-    public void initializeGamepad()
-    {
-        if (gp != null)
-            gp.initializeGamepad(this);
-    }
 
     public void createSplinterRobot(String robotName, Pose pose, boolean collisions)
     {
@@ -393,18 +380,6 @@ public class Controller
 
     /**
      * <p>
-     * Tweak dead zone for a gamepad axis. See Gamepad.
-     * 
-     * @param component
-     * @param deadZonePercent
-     */
-    public void setDeadZonePercent(String component, float deadZonePercent)
-    {
-        gp.setDeadZonePercent(component, deadZonePercent);
-    }
-
-    /**
-     * <p>
      * Select a robot by name. Does nothing if the currently selected robot is
      * selected again. Deactivates gamepad if a new robot is selected.
      * 
@@ -429,46 +404,6 @@ public class Controller
             }
             selectedRobot = name;
             System.out.println(selectedRobot);
-        }
-    }
-
-    /**
-     * <p>
-     * Toggle whether or not the gamepad is controlling the currently selected
-     * robot.
-     */
-    public void toggleGamepadOverride()
-    {
-        if (gp == null)
-            return;
-        
-        if (selectedRobot == null)
-        {
-            if (robots.getAll().isEmpty())
-                return;
-
-            for (Robot robot : robots.getAll())
-            {
-                selectRobot(robot.getName());
-                break;
-            }
-        }
-
-        synchronized (rcmap)
-        {
-            if (gamepadOverride)
-            {
-                fireGamepadControlEvent(DriveEStopEvent.INSTANCE);
-                robots.popController(selectedRobot);
-                gp.setRobotOutput(null);
-                gamepadOverride = false;
-            }
-            else
-            {
-                robots.pushController(selectedRobot, gprc);
-                gp.setRobotOutput(robots.get(selectedRobot).getOutput());
-                gamepadOverride = true;
-            }
         }
     }
 
@@ -559,21 +494,6 @@ public class Controller
 
     /**
      * <p>
-     * Used to fire gamepad control events.
-     * 
-     * @param event
-     *            The event instance to fire.
-     */
-    public void fireGamepadControlEvent(AbstractControlEvent event)
-    {
-        if (event instanceof AbstractDriveEvent)
-            gprc.fireEvent(event, AbstractDriveEvent.class);
-        else
-            gprc.fireEvent(event, event.getClass());
-    }
-
-    /**
-     * <p>
      * Add a listener for an event type.
      * 
      * @param <T>
@@ -624,8 +544,6 @@ public class Controller
             return;
         soar.shutdown();
         server.stop();
-        if (gp != null)
-            gp.shutdown();
         for (SuperdroidHardware s : superdroids)
             s.shutdown();
         for (SplinterHardware s : splinters)
