@@ -113,7 +113,7 @@ public class HeadlessApplication
      */
     public boolean go()
     {
-        Controller controller = new Controller(config, null);
+        Controller controller = new Controller(config);
 
         try {
             controller.getSoarProperties().set(SoarProperties.SPAWN_DEBUGGERS, Boolean.FALSE);
