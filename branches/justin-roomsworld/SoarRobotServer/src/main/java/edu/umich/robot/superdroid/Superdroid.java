@@ -24,7 +24,7 @@ package edu.umich.robot.superdroid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -274,7 +274,7 @@ public class Superdroid implements Robot, LidarChangedListener, PoseChangedListe
             return new Pose(pose.getPose());
         }
 
-        public SortedSet<VirtualObject> getCarriedObjects()
+        public Set<VirtualObject> getCarriedObjects()
         {
             return metamap.getCarried(Superdroid.this);
         }
@@ -367,8 +367,8 @@ public class Superdroid implements Robot, LidarChangedListener, PoseChangedListe
             }
             else if (event instanceof EffectorDropObjectEvent)
             {
-                boolean result = metamap.dropObject(this);
-                fireEffectorResultEvent(result, (EffectorDropObjectEvent)event);
+                boolean result = metamap.dropObject(this, ((EffectorDropObjectEvent) event).getId());
+                fireEffectorResultEvent(result, (EffectorDropObjectEvent) event);
             }
             else if (event instanceof EffectorDiffuseObjectEvent)
             {

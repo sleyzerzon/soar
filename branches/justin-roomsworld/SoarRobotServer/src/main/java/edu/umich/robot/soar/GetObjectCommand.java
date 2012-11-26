@@ -47,15 +47,15 @@ public class GetObjectCommand extends AbstractEffectorCommand
 
         addEvent(new EffectorGetObjectEvent(id), AbstractEffectorEvent.class);
     }
-    
+
     @Override
     protected boolean isCorresponding(AbstractEffectorEvent event)
     {
         if (event instanceof EffectorGetObjectEvent)
-        {
+		{
             EffectorGetObjectEvent e = (EffectorGetObjectEvent)event;
             return e.getId() == id;
-        }
-        return false;
+		}
+		return false;
     }
 }

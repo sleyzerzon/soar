@@ -26,21 +26,21 @@ package edu.umich.robot.events.control;
  */
 public class EffectorGetObjectEvent implements AbstractEffectorEvent
 {
-    private final int id;
+	private final int id;
 
-    public EffectorGetObjectEvent(int id)
-    {
-        this.id = id;
-    }
+	public EffectorGetObjectEvent(int id)
+	{
+		this.id = id;
+	}
 
-    public int getId()
-    {
-        return id;
-    }
-    
-    @Override
-    public String toString()
-    {
-        return String.format("%s(%d)", this.getClass().getSimpleName(), id);
-    }
+	public int getId()
+	{
+		return id;
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s(%d)", this.getClass().getSimpleName(), id);
+	}
 }

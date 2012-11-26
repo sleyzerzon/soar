@@ -22,7 +22,7 @@
 package edu.umich.robot.splinter;
 
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -258,7 +258,7 @@ public class Splinter implements Robot
             return metamap.getVisibleObjects(Splinter.this);
         }
 
-        public SortedSet<VirtualObject> getCarriedObjects()
+        public Set<VirtualObject> getCarriedObjects()
         {
             return metamap.getCarried(Splinter.this);
         }
@@ -349,8 +349,8 @@ public class Splinter implements Robot
             }
             else if (event instanceof EffectorDropObjectEvent)
             {
-                boolean result = metamap.dropObject(this);
-                fireEffectorResultEvent(result, (EffectorDropObjectEvent)event);
+                boolean result = metamap.dropObject(this, ((EffectorDropObjectEvent) event).getId());
+                fireEffectorResultEvent(result, (EffectorDropObjectEvent) event);
             }
             else if (event instanceof EffectorDiffuseObjectEvent)
             {

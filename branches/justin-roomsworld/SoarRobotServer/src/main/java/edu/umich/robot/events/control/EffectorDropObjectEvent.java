@@ -26,11 +26,21 @@ package edu.umich.robot.events.control;
  */
 public class EffectorDropObjectEvent implements AbstractEffectorEvent
 {
+	private final int id;
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s()", this.getClass().getSimpleName());
-    }
+	public EffectorDropObjectEvent(int id)
+	{
+		this.id = id;
+	}
 
+	public int getId()
+	{
+		return id;
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s(%d)", this.getClass().getSimpleName(), id);
+	}
 }

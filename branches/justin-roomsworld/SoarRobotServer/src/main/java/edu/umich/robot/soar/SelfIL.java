@@ -75,8 +75,7 @@ public class SelfIL extends InputLinkElement
         this.output = agent.getRobotOutput();
         properties = agent.getProperties();
 
-		// FIXME JUSTIN
-		carry = new CarryIL(agent, IOConstants.CARRY, agent.getSoarAgent().GetInputLink(), agent.getRobotOutput().getVisibleObjects());
+		carry = new CarryIL(agent, getRoot());
 
         areaId = IntWme.newInstance(getRoot(), IOConstants.AREA);
         headlight = StringWme.newInstance(getRoot(), IOConstants.HEADLIGHT);
