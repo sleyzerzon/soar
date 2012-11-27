@@ -1,14 +1,3 @@
- 
-sp {selection*apply*state*evaluation
-   :default
-   (state <s> ^name selection
-              ^operator <o>)
-   (<o> ^name evaluate-operator
-        ^superoperator <ob>)
-  -{(<s> ^evaluation.superoperator <ob>)}
--->
-   (<s> ^evaluation <e>)
-   (<e> ^superoperator <ob>)}
 
 sp {selection*apply*state*evaluation*path-current
    :default
@@ -21,7 +10,8 @@ sp {selection*apply*state*evaluation*path-current
         ^current-location)
 -->
    (<e> ^path-cost 0
-        ^current-location <loc>)}
+        ^current-location <loc>)
+}
 
 ### JEL Added to reset the path cost whenever return to the selection
 ##   space  - otherwise path is maintained across multiple selections
