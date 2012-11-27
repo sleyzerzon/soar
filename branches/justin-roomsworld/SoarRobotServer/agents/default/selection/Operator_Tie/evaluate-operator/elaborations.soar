@@ -133,6 +133,18 @@ sp {evaluate-operator*elaborate*numeric-evaluation*from-subgoal
 -->
    (<e> ^numeric-value <v>)}
 
+sp {evaluate-operator*elaborate*expected-evaluation*from-subgoal
+   :default
+   (state <ss> ^superstate <s>
+               ^desired <eb>
+               ^expected-value <v>)
+   (<s> ^operator <so>
+        ^evaluation <e>)
+   (<so> ^name evaluate-operator
+         ^evaluation <e>
+         ^evaluation.desired <eb>)
+-->
+   (<e> ^expected-value <v>)}
 
 ###
 ###      7.3.2.1. State Copying
@@ -504,7 +516,7 @@ sp {evaluate-operator*elaborate*operator*add-attribute-to-duplicate-operator*nln
 ###
 
 ### If the state is marked with ^success <d>, the goal succeeds.
-#
+
 #sp {monitor*goal*success
 #   :default
 #   (state <s> ^top-state <ts>
@@ -519,7 +531,6 @@ sp {evaluate-operator*elaborate*operator*add-attribute-to-duplicate-operator*nln
 ### If the state is marked with ^failure <d>, the goal fails.
 
 #sp {monitor*goal*failure
-#  #interrupt
 #   :default
 #   (state <s> ^top-state <ts>
 #              ^name <gname>

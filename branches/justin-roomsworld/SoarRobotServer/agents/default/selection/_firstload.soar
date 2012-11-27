@@ -4,10 +4,13 @@
 ## File            : default/selection.soar
 ## Author          : John Laird
 ## Created on      : Mon Feb 27 16:15:34 1989  
-## Last Modified On: 31 Aug. 2009
+## Last Modified On: March 1, 2012
 ## 
-## Contents:     Default productions for selection problem space for Soar 9.0
+## Contents:     Default productions for selection problem space for Soar 9.3
 ##
+###########################################################################
+##  Change made for Soar 9.3
+##   1. Added expected-value as a result - these get translated into numeric preferences
 #########################################################################
 ##  Change made for Soar 9.0 
 ##   Added exhaustion-failure so could make sure no attempts to chunk over it.
@@ -40,6 +43,7 @@
 ###               ^operator-selection not-indifferent
 ###               ^found-value true)
 ###    (<e> ^numeric-value  novalue
+###         ^expected-value
 ###         ^symbolic-value novalue/success/failure
 ###         ^value true
 ###         ^operator (identifier of operator being evaluated)

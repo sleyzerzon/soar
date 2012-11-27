@@ -14,7 +14,7 @@ sp {selection*elaborate*name*selection
 sp {selection*elaborate*evaluation*value
    :default
    (state <s> ^evaluation <e>)
-   (<e> ^ << numeric-value symbolic-value >>)
+   (<e> ^ << numeric-value symbolic-value expected-value >>)
 -->
    (<e> ^value true)}
 
@@ -29,9 +29,23 @@ sp {selection*elaborate*evaluation*desired
 ###     7.3.3   Computing evaluations
 ###
 ###
-###     7.3.3.1 Computing numeric evaluations
+###     7.3.3.1 Converting expected-values to numeric preferences
 ###
-### This is domain specific, so there are no default productions for this.
+
+### If two operators have equal evaluations they are indifferent.
+
+sp {selection*evaluation*expected-values
+   :default
+   (state <s> ^name selection
+              ^superstate <ss>
+              ^evaluation <e1>)
+   (<ss> ^desired <d>)
+   (<e1> ^superoperator <x>
+         ^expected-value <v>
+         ^desired <d>)
+-->
+   (<ss> ^operator <x> = <v>)}
+
 
 ###
 ###     7.3.3.2 Comparing numeric evaluations
@@ -271,7 +285,7 @@ sp {selection*elaborate*state*found-value-true
    :default
    (state <s> ^name selection
               ^evaluation <e>)
-   (<e> ^ << numeric-value symbolic-value >> <> novalue)
+   (<e> ^ << numeric-value symbolic-value expected-value >> <> novalue)
 -->
    (<s> ^found-value true)}
 
@@ -292,8 +306,6 @@ sp {selection*compare*novalue-evaluation-always-worse
          ^desired <d>)
 -->
    (<ss> ^operator <o2> > <o1>)}
-
-
 
 ### Print the evaluation of any operator that has a name (which doesn't
 ### get states).
