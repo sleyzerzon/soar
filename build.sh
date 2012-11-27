@@ -73,7 +73,7 @@ fi
 # navigate to RoomsWorld base
 cd "$basedir"
 
-if [ $# -gt 1 ]; then
+if [ $# -gt 0 ]; then
 	while [ $# -gt 0 ]; do
 		case "$1" in
 			"clean")
