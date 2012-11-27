@@ -4,7 +4,7 @@ sp {clean-house*propose*deposit-object
               ^io.input-link.self.area <> -1
               ^current-mission <cm>
              -^no-storage-area yes
-              ^io.input-link.self.carry)
+              ^io.input-link.self.carry.object)
    (<cm> ^status executing
          ^name clean-rooms)
 -->

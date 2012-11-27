@@ -2,7 +2,7 @@ sp {deposit-object*propose*move-to-room-center
    #interrupt
    (state <s> ^name deposit-object
               ^quiescence t
-              ^io.input-link.self.carry
+              ^io.input-link.self.carry.object
               ^current-location.storage-area yes)
 -->
    (<s> ^operator <op> + =)
