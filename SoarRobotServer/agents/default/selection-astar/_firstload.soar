@@ -29,4 +29,6 @@
 ##   Evaluation should hold best total-estimated-cost to date - (from look-aheads)
 ##    initialized with path cost + estimated cost in subgoal, 
 ##    How update estimated cost??
+##
+## Modify 3/1/2011: Add compare evaluations to selection space to avoid some race conditions with computing final-cost and total-estimated-cost
 
