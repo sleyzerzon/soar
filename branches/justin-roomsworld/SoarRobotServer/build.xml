@@ -156,6 +156,10 @@
         <copy todir="${platform_release.dir}/agents">
             <fileset dir="agents" />
         </copy>
+        <chmod perm="755">
+			<fileset dir="${platform_release.dir}" includes="**/*.command" />
+			<fileset dir="${platform_release.dir}" includes="**/*.sh" />
+        </chmod>
         <zip destfile="${platform_release_zip.file}" basedir="${platform_release.dir}" />
     </target>
 
