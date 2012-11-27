@@ -3,7 +3,7 @@ sp {move-to-room-center*propose*drop-block
    (state <s> ^name move-to-room-center
               ^collision true
               ^io.input-link.self  <self>)
-   (<self> ^carry <id>
+   (<self> ^carry.object.id <id>
            ^stopped yes)
 -->
    (<s> ^operator <op> + =, >)
@@ -14,7 +14,7 @@ sp {move-to-room-center*propose*drop-block
 
 sp {apply*drop-block
    (state <s> ^operator <op>
-              ^io.input-link.self.carry <id>
+              ^io.input-link.self.carry.object.id <id>
               ^top-state <ts>)
    (<op> ^name drop-block)
    (<ts> ^retrieved-object <ro>)

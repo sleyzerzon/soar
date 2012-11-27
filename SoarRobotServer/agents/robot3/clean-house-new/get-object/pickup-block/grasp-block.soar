@@ -4,7 +4,6 @@ sp {pickup-block*propose*grasp-block
               ^object <obj>
               ^object-in-range-lined-up yes
               ^io.input-link.self <self>)
-   (<self> -^carry)
    (<obj> ^id <id>
           ^type block)
 -->

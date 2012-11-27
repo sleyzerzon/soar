@@ -5,7 +5,6 @@ sp {pickup-block*propose*grasp-ied
               ^io.input-link.self <self>)
    (<obj> ^id <id>
           ^type ied)
-   (<self> -^carry)
 -->
    (<s> ^operator <op> + =)
    (<op> ^name grasp-ied

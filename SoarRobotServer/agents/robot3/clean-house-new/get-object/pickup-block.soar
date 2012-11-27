@@ -9,7 +9,6 @@ sp {get-object*propose*pickup-block
              ^color <color>)
    (<input> ^self <self>
             ^objects.object <obj1>)
-  -(<self> ^carry)
    (<obj1> ^type {<> player}
            ^visible true
            ^id <oid>)
