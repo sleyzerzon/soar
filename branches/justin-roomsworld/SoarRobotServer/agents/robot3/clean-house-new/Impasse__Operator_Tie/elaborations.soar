@@ -26,15 +26,15 @@ sp {selection*elaborate*evaluation*total-estimated-cost
    :default
    (state <s> ^name selection
               ^evaluation <e>)
-  -(<s> ^superstate.desired.location.gateway-x)  ##JEL 2/11
-                                                 (<e> ^estimated-cost <ec>
-        #^path-cost { <> 0 <pc> }) ###JEL 2/11 - why test <> 0?
-                                                      ^path-cost <pc>)
+  -(<s> ^superstate.desired.location.gateway-x) ##JEL 2/11
+   (<e> ^estimated-cost { <> 0 <ec> }
+        ^path-cost <pc>)
 -->
-   (write (crlf) |Total Estmated Cost: | (+  <ec> <pc>) | : | <e> | path: | <pc> | Estimated Cost: | <ec> )
-   (<e> ^total-estimated-cost (+  <ec> <pc>))
+   (write (crlf) |Total Estmated Cost: | (+ <ec> <pc>) | : | <e> | path: | <pc> | Estimated Cost: | <ec> )
+   (<e> ^total-estimated-cost (+ <ec> <pc>))
 }
 
+# FIXME JUSTIN this should never fire - there's never a ^temp-x without a ^gateway-x (grep temp-x)
 ## Special for rooms without gateways
 sp {selection*elaborate*evaluation*total-estimated-cost*no-gateways
    :default
@@ -44,19 +44,19 @@ sp {selection*elaborate*evaluation*total-estimated-cost*no-gateways
              -^top-state.current-location <cloc>
               ^superstate.desired.location <dloc>)
    (<e> ^current-location <cloc>
-       -^updated-estimate true)  ## JEL 2/11/
+       -^updated-estimate true) ## JEL 2/11/
    (<cloc> ^x <cx> ^y <cy> ^id <cid>)
-                          (<dloc> ^temp-x <dx>
-                                  ^temp-y <dy>
-                                  ^id <did>
-                                 -^gateway-x # JEL 3/6/11 - another rule fires in this case.
-                                 -^x)
+   (<dloc> ^temp-x <dx>
+           ^temp-y <dy>
+           ^id <did>
+          -^gateway-x # JEL 3/6/11 - another rule fires in this case.
+          -^x)
 -->
-###(write (crlf) |current x | <cx> | y | <cy>)
-###(write (crlf) |desired x | <dx> | y | <dy>)
-###(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
+  #(write (crlf) |current x | <cx> | y | <cy>)
+  #(write (crlf) |desired x | <dx> | y | <dy>)
+  #(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
    (write (crlf) |Estimated Cost No Gateways: | (compute-range <cx> <cy> <dx> <dy>) )
-   (<e> ^estimated-cost (compute-range <cx> <cy> <dx> <dy>)  )
+   (<e> ^estimated-cost (compute-range <cx> <cy> <dx> <dy>))
 }
 
 #sp {selection*elaborate*evaluation*total-estimated-cost*gateways
@@ -66,22 +66,22 @@ sp {selection*elaborate*evaluation*total-estimated-cost*no-gateways
 #              ^superstate.desired.location <dloc>)
 #   (<e> ^current-location <cloc>
 #        ^path-cost <pc>) # JEL 2/11
-#     #  -^updated-estimate true) ## JEL 2/11/
+#      #-^updated-estimate true) ## JEL 2/11/
 #   (<cloc> ^x <cx> ^y <cy> ^id <cid>)
 #  -(<cloc> ^gateway.to <did>)
 #  -(<dloc> ^x <xdx> ^y <xdy>)
 #   (<dloc> ^gateway-x <dx> ^gateway-y <dy> ^id <did>)
 #-->
-####(write (crlf) |current x | <cx> | y | <cy>)
-####(write (crlf) |desired x | <dx> | y | <dy>)
-####(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
-#   #(write (crlf) |Total Estimated Cost: | (+  (compute-range <cx> <cy> <dx> <dy>) <pc>))
-#   (<e> ^total-estimated-cost (+  (compute-range <cx> <cy> <dx> <dy>) <pc>)  # JEL 2/11
-#        ^estimated-cost (compute-range <cx> <cy> <dx> <dy>)  )
+#  #(write (crlf) |current x | <cx> | y | <cy>)
+#  #(write (crlf) |desired x | <dx> | y | <dy>)
+#  #(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
+#  #(write (crlf) |Total Estimated Cost: | (+ (compute-range <cx> <cy> <dx> <dy>) <pc>))
+#   (<e> ^total-estimated-cost (+ (compute-range <cx> <cy> <dx> <dy>) <pc>) # JEL 2/11
+#        ^estimated-cost (compute-range <cx> <cy> <dx> <dy>))
 #}
 
 sp {selection*elaborate*evaluation*total-estimated-cost*gateways
-#   :interrupt
+  #:interrupt
    :default
    (state <s> ^name selection
               ^evaluation <e>
@@ -94,30 +94,30 @@ sp {selection*elaborate*evaluation*total-estimated-cost*gateways
   -(<dloc> ^x <xdx> ^y <xdy>)
    (<dloc> ^gateway-x <dx> ^gateway-y <dy> ^id <did>)
 -->
-###(write (crlf) |current x | <cx> | y | <cy>)
-###(write (crlf) |desired x | <dx> | y | <dy>)
-###(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
- #  (write (crlf) |e | <e>)
+  #(write (crlf) |current x | <cx> | y | <cy>)
+  #(write (crlf) |desired x | <dx> | y | <dy>)
+  #(write (crlf) |range:    | (compute-range <cx> <cy> <dx> <dy>))
+  #(write (crlf) |e | <e>)
    (write (crlf) |Estimated Cost Gateways: |(compute-range <cx> <cy> <dx> <dy>))
-   (<e> #^total-estimated-cost (+  (compute-range <cx> <cy> <dx> <dy>) <pc>)  # JEL 2/11
-           ^estimated-cost (compute-range <cx> <cy> <dx> <dy>)  )
+   (<e> #^total-estimated-cost (+ (compute-range <cx> <cy> <dx> <dy>) <pc>) # JEL 2/11
+        ^estimated-cost (compute-range <cx> <cy> <dx> <dy>))
 }
 
 sp {selection*elaborate*evaluation*total-estimated-costX
    :default
    (state <s> ^name selection
               ^evaluation <e>)
-   (<s> ^superstate.desired.location.gateway-x)  ##JEL 2/11
-                                                 (<e> ^estimated-cost <ec>
-     #   ^path-cost { <> 0 <pc> }) ###JEL 2/11 - why test <> 0?
-                                                      ^path-cost <pc>)
+   (<s> ^superstate.desired.location.gateway-x) ##JEL 2/11
+   (<e> ^estimated-cost <ec>
+        ^path-cost <pc>)
+       #^path-cost { <> 0 <pc> }) ###JEL 2/11 - why test <> 0?
 -->
-   (write (crlf) |Total Estmated Cost: | <e> | | (+  <ec> <pc>) | : | <e> | path: | <pc> | Estimated Cost: | <ec> )
-   (<e> ^total-estimated-cost (+  <ec> <pc>))
+   (write (crlf) |Total Estmated Cost: | <e> | | (+ <ec> <pc>) | : | <e> | path: | <pc> | Estimated Cost: | <ec> )
+   (<e> ^total-estimated-cost (+ <ec> <pc>))
 }
 
 sp {selection*elaborate*evaluation*total-estimated-cost*gateways*achieved
- #  :interrupt
+  #:interrupt
    :default
    (state <s> ^name selection
               ^evaluation <e>
@@ -130,6 +130,6 @@ sp {selection*elaborate*evaluation*total-estimated-cost*gateways*achieved
 -->
    (write (crlf) |Achieved desired location. | <dloc> | id | <did> )
    (write (crlf) |Estimated Cost: 0|)
-   (<e> #^total-estimated-cost <pc>  #JEL 2-28 no need for total as it will be computed by other rules
-           ^estimated-cost 0 )
+   (<e> #^total-estimated-cost <pc> #JEL 2-28 no need for total as it will be computed by other rules
+        ^estimated-cost 0 )
 }
