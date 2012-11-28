@@ -51,6 +51,7 @@ import edu.umich.robot.radio.RadioMessage;
 import edu.umich.robot.util.WallClock;
 import edu.umich.robot.util.events.RobotEvent;
 import edu.umich.robot.util.events.RobotEventListener;
+import edu.umich.robot.util.properties.DefaultPropertyProvider;
 import edu.umich.robot.util.properties.PropertyManager;
 
 /**
@@ -63,6 +64,8 @@ public class Soar implements RobotEventListener, RadioHandler
     private static final Log logger = LogFactory.getLog(Soar.class);
 
     private final PropertyManager properties = new PropertyManager();
+
+    private final DefaultPropertyProvider<Boolean> debuggers = new DefaultPropertyProvider<Boolean>(SoarProperties.SPAWN_DEBUGGERS);
 
     private final Kernel kernel;
 
@@ -172,6 +175,12 @@ public class Soar implements RobotEventListener, RadioHandler
         kernel.RegisterForAgentEvent(
                 smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED, sa
                         .getAgentHandler(), null);
+
+        if (propc.hasKey(SoarProperties.SPAWN_DEBUGGERS.getName()))
+		{
+            debuggers.set(Boolean.valueOf(propc.requireBoolean(SoarProperties.SPAWN_DEBUGGERS.getName())));
+		}
+        properties.setProvider(SoarProperties.SPAWN_DEBUGGERS, debuggers);
 
         if (properties.get(SoarProperties.SPAWN_DEBUGGERS))
         {

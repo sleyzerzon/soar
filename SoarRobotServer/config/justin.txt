@@ -8,7 +8,8 @@ seek
 	properties
 	{
 		default-storage-area-id = ["20"];
-		mission = delivery;
+		mission = "DELIVERY";
+		spawn-debuggers = "false";
 	}
 }
 
@@ -48,6 +49,9 @@ metadata
 
 	objects
 	{
+		#placed = [ green-cube,              3.8,  -1.2,
+		#           blue-short-burn-sphere,  9.0,  -2.2  ];
+
 		green-cube 
 		{
 			size = [ .25, .25 ];
@@ -77,3 +81,5 @@ metadata
 		}
 	}
 }
+
+viewer.walls.obstacles.wall_texture_path = "common/wall.jpg";
