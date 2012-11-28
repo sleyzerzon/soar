@@ -140,7 +140,7 @@ public class AgentProperties
     
     public static enum Mission 
     {
-        CLEAN_ROOMS, RANDOM_WALK, PATROL, TOUCH_OBJECTS;
+        CLEAN_ROOMS, RANDOM_WALK, PATROL, TOUCH_OBJECTS, DELIVERY;
         
         @Override
         public String toString() 
