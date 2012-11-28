@@ -18,6 +18,7 @@ source chase.soar
 pushd chase
 source chase_source.soar
 popd
+source delivery.soar
 source deposit-object.soar
 pushd deposit-object
 source deposit-object_source.soar
