@@ -163,7 +163,6 @@ public class Application
         config.setStrings(prefix + "image_path", config.requireStrings("image_path"));
         config.setStrings(prefix + "image_origin", config.requireStrings("image_origin"));
         config.setStrings(prefix + "meters_per_pixel", config.requireStrings("meters_per_pixel"));
-        config.setString(prefix + "wall_texture_path", "../common/wall.jpg");
     }
     
 }
