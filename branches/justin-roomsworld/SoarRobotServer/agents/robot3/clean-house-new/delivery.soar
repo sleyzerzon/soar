@@ -1,0 +1,30 @@
+
+# DELIVERY PROBLEM SPACE
+
+sp {robot*propose*delivery
+   (state <s> ^name robot
+             -^io.input-link.self.area -1
+              ^current-mission <cm>)
+   (<cm> ^name delivery
+         ^status executing)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name delivery)
+}
+
+# ELABORATIONS
+
+#sp {delivery*elaborate
+#   (state <s> ^name delivery)
+#-->
+#}
+
+# OPERATORS
+
+sp {delivery*propose*random-walk
+   "random walk fallback"
+   (state <s> ^name delivery)
+-->
+   (<s> ^operator <op> + = <)
+   (<op> ^name random-walk)
+}

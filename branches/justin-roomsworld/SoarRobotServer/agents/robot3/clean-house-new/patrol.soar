@@ -5,6 +5,7 @@ sp {robot*propose*circuit-patrol
    (<s> ^operator <op> + =)
    (<op> ^name patrol)
 }
+
 sp {robot*propose*patrol
    (state <s> ^name robot
               ^current-mission.name patrol )
@@ -12,6 +13,7 @@ sp {robot*propose*patrol
    (<s> ^operator <op> + =)
    (<op> ^name patrol)
 }
+
 sp {apply*circuit-patrol*set-next-area-id
    (state <s> ^operator.name patrol
               ^current-mission <cm>)
