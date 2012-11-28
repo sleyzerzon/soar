@@ -191,18 +191,7 @@ public class ViewerApplication
         config.setString("viewer.walls.class", "april.viewer.ViewWalls");
         Application.addImageData(config, "viewer.walls.obstacles.");
         
-//        config.setString("viewer.floor.class", "april.viewer.ViewFloor"); // need to add floor to viewobjects list
-//        addImageData(config, "viewer.floor.obstacles.");
-
         config.setString("viewer.areas.class", "april.viewer.ViewAreaDescriptions");
-
-//        config.setString("viewer.skybox.class", "april.viewer.ViewSkybox"); // need to add skybox to viewobjects list
-//        config.setString("viewer.skybox.north_image", "north.jpg");
-//        config.setString("viewer.skybox.south_image", "south.jpg");
-//        config.setString("viewer.skybox.east_image", "east.jpg");
-//        config.setString("viewer.skybox.west_image", "west.jpg");
-//        config.setString("viewer.skybox.up_image", "top.jpg");
-//        config.setString("viewer.skybox.down_image", "floor.jpg");
     }
     
     private void addPositionInfo(Config config, String prefix,

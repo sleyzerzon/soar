@@ -927,21 +927,8 @@ public class GuiApplication
         
         config.setString("viewer.walls.class", "edu.umich.robot.april.ViewWalls");
         Application.addImageData(config, "viewer.walls.obstacles.");
-        
-        // The following code enables other viewing options.
-        
-//        config.setString("viewer.floor.class", "edu.umich.robot.april.ViewFloor"); // need to add floor to viewobjects list
-//        addImageData(config, "viewer.floor.obstacles.");
 
         config.setString("viewer.areas.class", "edu.umich.robot.april.ViewAreaDescriptions");
-
-        config.setString("viewer.skybox.class", "edu.umich.robot.april.ViewSkybox"); // need to add skybox to viewobjects list
-        config.setString("viewer.skybox.north_image", "../common/north.jpg");
-        config.setString("viewer.skybox.south_image", "../common/south.jpg");
-        config.setString("viewer.skybox.east_image", "../common/east.jpg");
-        config.setString("viewer.skybox.west_image", "../common/west.jpg");
-        config.setString("viewer.skybox.up_image", "../common/top.jpg");
-        config.setString("viewer.skybox.down_image", "../common/floor.jpg");
     }
     
     /**
