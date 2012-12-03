@@ -21,10 +21,21 @@ sp {robot*propose*delivery
 
 # OPERATORS
 
-sp {delivery*propose*random-walk
+sp {delivery*propose*patrol
    "random walk fallback"
    (state <s> ^name delivery)
 -->
    (<s> ^operator <op> + = <)
-   (<op> ^name random-walk)
+   (<op> ^name patrol
+         ^first-area <a01>)
+   (<a01> ^next <a02>
+          ^id 0)
+   (<a02> ^next <a03>
+          ^id 19)
+   (<a03> ^next <a04>
+          ^id 20)
+   (<a04> ^next <a05>
+          ^id 30)
+   (<a05> ^next nil
+          ^id 35)
 }

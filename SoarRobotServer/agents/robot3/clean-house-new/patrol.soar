@@ -1,24 +1,21 @@
 sp {robot*propose*circuit-patrol
    (state <s> ^name robot
-              ^current-mission.type << patrol linear-patrol circuit-patrol >> )
+              ^current-mission <cm>)
+   (<cm> ^type << patrol linear-patrol circuit-patrol >> 
+         ^first-area <fa>)
 -->
    (<s> ^operator <op> + =)
-   (<op> ^name patrol)
+   (<op> ^name patrol
+         ^first-area <fa>)
 }
 
 sp {robot*propose*patrol
    (state <s> ^name robot
-              ^current-mission.name patrol )
+              ^current-mission <cm>)
+   (<cm> ^name patrol
+         ^first-area <fa>)
 -->
    (<s> ^operator <op> + =)
-   (<op> ^name patrol)
-}
-
-sp {apply*circuit-patrol*set-next-area-id
-   (state <s> ^operator.name patrol
-              ^current-mission <cm>)
-   (<cm> -^next-area
-          ^first-area <area>)
--->
-   (<cm> ^next-area <area>)
+   (<op> ^name patrol
+         ^first-area <fa>)
 }
