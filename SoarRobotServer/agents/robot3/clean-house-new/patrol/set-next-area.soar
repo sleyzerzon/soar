@@ -1,0 +1,15 @@
+sp {patrol*propose*set-next-area
+   (state <s> ^name patrol
+             -^next-area)
+-->
+   (<s> ^operator <o> + =, >)
+   (<o> ^name set-next-area)
+}
+
+sp {patrol*apply*set-next-area
+   (state <s> ^name patrol
+              ^operator.name set-next-area
+              ^superstate.operator.first-area <fa>)
+-->
+   (<s> ^next-area <fa>)
+}
