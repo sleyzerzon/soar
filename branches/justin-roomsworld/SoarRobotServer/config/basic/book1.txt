@@ -1,7 +1,8 @@
 splinters = [seek];
-seek {
+seek
+{
 	position = [0, 0];
-	#productions = "agents/robot3/clean-house-new.soar";
+	productions = "agents/robot3/clean-house-new.soar";
 }
 
 image_path = "../common/book1.png";
@@ -32,7 +33,7 @@ metadata
 	19= [17,19, 7, 5];
 
 	doors = [3,5,6,7,8,11,13,14,15,16];	# gateways auto-generated
-	
+
 	// Movable objects
 	objects
 	{
@@ -52,7 +53,7 @@ metadata
 			shape = cube;
 			type = block;
 		}
-	
+
 		blue-short-burn-sphere 
 		{
 			size = [ .25, .25 ];
@@ -67,6 +68,4 @@ metadata
 			type = block;
 		}
 	}
-	
 }
-

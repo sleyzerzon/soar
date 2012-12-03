@@ -22,13 +22,13 @@ metadata
 	9 = [ 2,65,18,13];
 
 	doors = [3, 4, 6, 7, 8];	# gateways auto-generated
-	
+
 	// Movable objects
 	objects
 	{
 		placed = [ green-short-sulfur-cube, 7.9, 4.7,
                    blue-short-burn-sphere, 15.3, 5.5 ];
-		
+
 		green-short-sulfur-cube 
 		{
 			size = [ .3, .3 ];
@@ -42,7 +42,7 @@ metadata
 			shape = cube;
 			type = block;
 		}
-		
+
 		blue-short-burn-sphere 
 		{
 			size = [ .45, .45 ];
@@ -56,7 +56,7 @@ metadata
 			shape = sphere;
 			type = block;
 		}
-		
+
 		red-short-burn-cube 
 		{
 			size = [ .3, .3 ];
