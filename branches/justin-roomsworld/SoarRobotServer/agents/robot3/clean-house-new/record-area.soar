@@ -29,7 +29,7 @@ sp {apply*record-area*room*wall*not*open
    (<area> ^wall <nw1>
            ^visited yes
                     no -
-           ^cleaned no)    ### NO JEL
+           ^cleaned yes)    ### NO JEL
    (<nw1>  ^x <x> ^y <y> ^direction <dir> )
 }
 

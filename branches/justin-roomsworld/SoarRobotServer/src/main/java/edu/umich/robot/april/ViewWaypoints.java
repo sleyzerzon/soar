@@ -52,7 +52,7 @@ public class ViewWaypoints implements ViewObject, LCMSubscriber
             points.add(new double[] { waypoints.waypoints[i].xLocal, waypoints.waypoints[i].yLocal });
         }
         VisWorld.Buffer vb = viewer.getVisWorld().getBuffer("WAYPOINTS");
-        vb.addBuffered(new VisData(points, new VisDataPointStyle(new Color(255, 255, 0), 4)));
+        vb.addBuffered(new VisData(points, new VisDataPointStyle(new Color(0, 255, 255), 4)));
         vb.switchBuffer();
     }
 }

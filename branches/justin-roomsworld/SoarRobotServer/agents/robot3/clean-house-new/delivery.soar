@@ -29,13 +29,21 @@ sp {delivery*propose*patrol
    (<op> ^name patrol
          ^first-area <a01>)
    (<a01> ^next <a02>
-          ^id 0)
-   (<a02> ^next <a03>
-          ^id 19)
-   (<a03> ^next <a04>
           ^id 20)
-   (<a04> ^next <a05>
+   (<a02> ^next <a03>
+          ^id 25)
+   (<a03> ^next <a04>
           ^id 30)
-   (<a05> ^next nil
+   (<a04> ^next <a05>
           ^id 35)
+   (<a05> ^next <a06>
+          ^id 40)
+   (<a06> ^next <a07>
+          ^id 0)
+   (<a07> ^next <a08>
+          ^id 5)
+   (<a08> ^next <a09>
+          ^id 10)
+   (<a09> ^next nil
+          ^id 15)
 }

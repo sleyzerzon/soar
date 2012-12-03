@@ -12,6 +12,6 @@ sp {apply*next-area
               ^next-area <na>)
    (<na> ^next <next>)
 -->
-   (<cm> ^next-area <na> -
-                    <next>)
+   (<s> ^next-area <na> -
+                   <next>)
 }

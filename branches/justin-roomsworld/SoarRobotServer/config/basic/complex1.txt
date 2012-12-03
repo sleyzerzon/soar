@@ -271,3 +271,5 @@ metadata
 
 	}
 }
+
+viewer.walls.obstacles.wall_texture_path = "common/wall.jpg";
