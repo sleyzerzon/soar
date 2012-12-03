@@ -21,7 +21,7 @@ sp {apply*instr-confirmed
 
 sp {apply*instr-confirmed*done
    (state <s> ^operator <op>
-              ^superstate.operator <ss-op>)   
+              ^superstate.operator <ss-op>)
    (<op> ^name instr-confirmed)
 -->
    (<ss-op> ^processed true)

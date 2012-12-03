@@ -61,7 +61,8 @@ sp {apply*record-smem-new-gateway*retrieve
                          yes)
    (<c-area> ^neighbor-area <cp>)
    (<cp> ^neighbor-area <c-area>)
-   (<cmd> ^store <c-area> <cp> <gateway>)}
+   (<cmd> ^store <c-area> <cp> <gateway>)
+}
 
 sp {apply*record-smem-new-gateway*retrieve*fail*room
    (state <s> ^operator <o>
@@ -85,13 +86,13 @@ sp {apply*record-smem-new-gateway*retrieve*fail*room
    (<c-area> ^neighbor-area <cp>)
    (<cp> ^neighbor-area <c-area>
          ^type door
-         ^cleaned yes 
+         ^cleaned yes
          ^visited no
          ^gateway-x <x>
          ^gateway-y <y>
          ^id <to>)
-   (<cmd> ^store <c-area> <cp> <gateway>)}
-
+   (<cmd> ^store <c-area> <cp> <gateway>)
+}
 
 sp {apply*record-smem-new-gateway*retrieve*fail*door
   #interrupt
@@ -118,4 +119,5 @@ sp {apply*record-smem-new-gateway*retrieve*fail*door
          ^cleaned no
          ^visited no
          ^id <to>)
-   (<cmd> ^store <c-area> <cp> <gateway>)}
+   (<cmd> ^store <c-area> <cp> <gateway>)
+}

@@ -32,7 +32,8 @@ sp {robot*apply*init-robot*areas
 -->
    (<s> ^areas.area <area>)
    (<area> ^id <id>
-           ^type <type>)}
+           ^type <type>)
+}
 
 sp {apply*init-robot*delivery
    (state <s> ^operator <op>

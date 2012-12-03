@@ -26,8 +26,8 @@ sp {apply*instr-avoid*unknown
          ^room <id>)
    (<ts> ^areas <areas>
          ^avoids <avoids>)
-  -{(<areas> ^area <area>)
-    (<area> ^id <id>)}
+  -{ (<areas> ^area <area>)
+     (<area> ^id <id>) }
   -(<avoids> ^<id> true)
 -->
    (<avoids> ^<id> true)

@@ -20,9 +20,9 @@ sp {apply*update-object-data
          ^object <obj>)
    (<obj> ^area <area>)
 -->
-   (<obj> ^in-storage-room no - 
+   (<obj> ^in-storage-room no -
                            yes
-          ^area <area> - 
+          ^area <area> -
                 <ca>)
 }
 

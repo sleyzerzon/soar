@@ -9,8 +9,8 @@ sp {instruction*propose*msg
    (<self> ^name <name>)
    (<m> ^id <id>
        -^from <name>)
-  -{(<ol> ^remove-message <rm>)
-    (<rm> ^id <id>)}
+  -{ (<ol> ^remove-message <rm>)
+     (<rm> ^id <id>) }
 -->
    (<s> ^operator <op> +)
    (<op> ^name msg

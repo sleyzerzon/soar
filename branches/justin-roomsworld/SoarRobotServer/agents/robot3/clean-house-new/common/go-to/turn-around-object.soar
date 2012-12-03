@@ -64,8 +64,8 @@ sp {go-to*elaborate*turn-around-object
 -->
 ###(write (crlf) |ID | <id1> )
 ###(write (crlf) | Yaw: | <yaw> |, Relative-Bearing | <rb> |, Sum: | (mod (+ <yaw> <rb>) 360))
-   (<op1> ^actions.set-heading.yaw (mod (+ <yaw> <rb>) 360))}
-
+   (<op1> ^actions.set-heading.yaw (mod (+ <yaw> <rb>) 360))
+}
 
 sp {go-to*apply*turn-around-object
    (state <s> ^name go-to
@@ -75,5 +75,3 @@ sp {go-to*apply*turn-around-object
 -->
 ###(write (crlf) |Selected ID | <id1> )
 }
-
-

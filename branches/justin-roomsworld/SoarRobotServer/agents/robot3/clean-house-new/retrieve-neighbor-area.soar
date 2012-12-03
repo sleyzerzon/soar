@@ -13,7 +13,6 @@ sp {clean-house*propose*retrieve-neighbor-area
          ^area <na>)
 }
 
-
 sp {apply*retrieve-neighbor-area*query
    (state <s> ^smem.command <cmd>
               ^operator <o>)
@@ -23,7 +22,6 @@ sp {apply*retrieve-neighbor-area*query
  ####(write (crlf) |Retrieve Neighbor area | <na> | :| (cmd stats -d ))
    (<cmd> ^retrieve <na>)
 }
-
 
 #sp {apply*clean-up*retrieve*monitor
 #   (state <s> ^smem <smem>)

@@ -86,7 +86,8 @@ sp {apply*goto-not-clean-area*smem*query
 -->
    (<cmd> ^query <q>)
    (<q> ^type room
-        ^cleaned no)}
+        ^cleaned no)
+}
 
 sp {apply*goto-not-clean-area*smem*result
  #interrupt
@@ -98,7 +99,8 @@ sp {apply*goto-not-clean-area*smem*result
           ^success <q>)
 -->
 ###(write (crlf) |Retrieved dirty area | <cp> )
-   (<s> ^area <cp>)}
+   (<s> ^area <cp>)
+}
 
 sp {apply*goto-not-clean-area*smem*operator
    (state <s> ^operator <o>
@@ -106,7 +108,8 @@ sp {apply*goto-not-clean-area*smem*operator
    (<o> ^name goto-not-clean-area)
 -->
 ###(write (crlf) |Retrieved area | <area> )
-   (<o> ^area <area>)}
+   (<o> ^area <area>)
+}
 
 sp {apply*goto-not-clean-area*smem*result*failure
    #interrupt
@@ -118,7 +121,8 @@ sp {apply*goto-not-clean-area*smem*result*failure
            ^result.failure <q>)
 -->
 ###(write (crlf) |Failed to find dirty area |)
-   (<o> ^no-dirty-area-found true)}
+   (<o> ^no-dirty-area-found true)
+}
 
 sp {get-object*compare*goto-not-clean-area
    (state <s> ^operator <op1> +)
@@ -127,5 +131,3 @@ sp {get-object*compare*goto-not-clean-area
 -->
    (<s> ^operator <op1> -)
 }
-
-

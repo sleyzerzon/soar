@@ -30,7 +30,6 @@ sp {apply*instr-allow*unknown
    (<avoids> ^<id> true -)
 }
 
-
 sp {apply*instr-allow*done
    (state <s> ^operator <op>
               ^superstate.operator <ss-op>)

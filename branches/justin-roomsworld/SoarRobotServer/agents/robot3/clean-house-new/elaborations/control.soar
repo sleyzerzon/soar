@@ -23,7 +23,6 @@ sp {clean-house*compare*record*retrieve
    (<s> ^operator <op1> > <op2>)
 }
 
-
 sp {clean-house*compare*record-object*remove-object
    (state <s> ^name robot
               ^operator <op1> +

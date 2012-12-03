@@ -7,7 +7,7 @@ sp {get-object*elaborate*substate*objects
            ^type <type>)
    (<obj> -^in-storage-room yes
            ^color <color>
-           ^type <type>)           
+           ^type <type>)
 -->
    (<s> ^object <obj>)
 }
@@ -15,7 +15,7 @@ sp {get-object*elaborate*substate*objects
 sp {get-object*elaborate*substate*retrieved-objects
    (state <s> ^name get-object
               ^top-state.retrieved-object <obj>)
-   (<obj> -^in-storage-room yes)           
+   (<obj> -^in-storage-room yes)
 -->
    (<s> ^object <obj>)
 }
@@ -35,14 +35,14 @@ sp {get-object*elaborate*state
               ^retrieved-objects failed)
    (<ss> ^current-mission <cm>)
    (<cm> ^status <status>)
-  -{(<ss> ^areas.area <area>)
-    (<area> -^cleaned yes
-            -^avoid true
-            -^storage-area yes)}
-  -{(<ss> ^areas.area <area>)
-    (<area> -^visited yes
-            -^avoid true
-            -^storage-area yes)}              
+  -{ (<ss> ^areas.area <area>)
+     (<area> -^cleaned yes
+             -^avoid true
+             -^storage-area yes) }
+  -{ (<ss> ^areas.area <area>)
+     (<area> -^visited yes
+             -^avoid true
+             -^storage-area yes) }
 -->
    (<cm> ^status terminated
                  <status> -)

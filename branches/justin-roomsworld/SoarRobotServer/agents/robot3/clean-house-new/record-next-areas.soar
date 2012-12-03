@@ -20,7 +20,8 @@
 #   (<s> ^operator <o> + =)
 #   (<o> ^name record-next-areas
 #        ^next1 <narea>
-#        ^next2 <ca>)}
+#        ^next2 <ca>)
+#}
 
 ## Use neighbor instead - should be cheaper
 sp {clean-house*propose-record-next-areas*wm
@@ -38,7 +39,8 @@ sp {clean-house*propose-record-next-areas*wm
    (<s> ^operator <o> + =)
    (<o> ^name record-next-areas
         ^next1 <narea>
-        ^next2 <ca>)}
+        ^next2 <ca>)
+}
 
 sp {clean-house*propose-record-next-areas*room-room*wm
    (state <s> ^name robot
@@ -57,7 +59,8 @@ sp {clean-house*propose-record-next-areas*room-room*wm
    (<s> ^operator <o> + =)
    (<o> ^name record-next-areas
         ^next1 <garea>
-        ^next2 <ca>)}
+        ^next2 <ca>)
+}
 
 sp {clean-house*propose-record-next-areas*room*door*room*smem
    (state <s> ^name robot
@@ -73,7 +76,8 @@ sp {clean-house*propose-record-next-areas*room*door*room*smem
    (<s> ^operator <o> + =)
    (<o> ^name record-next-areas
         ^next1 <nna>
-        ^next2 <ca>)}
+        ^next2 <ca>)
+}
 
 sp {clean-house*propose-record-next-areas*room*room*smem
    (state <s> ^name robot
@@ -88,7 +92,8 @@ sp {clean-house*propose-record-next-areas*room*room*smem
    (<s> ^operator <o> + =)
    (<o> ^name record-next-areas
         ^next1 <na>
-        ^next2 <ca>)}
+        ^next2 <ca>)
+}
 
 #sp {monitor*next-connections
 #   (state <s> ^superstate nil
@@ -96,7 +101,8 @@ sp {clean-house*propose-record-next-areas*room*room*smem
 #   (<ca> ^next <next> ^id <id>)
 #   (<next> ^id <nid>)
 #-->
-####(write (crlf) |**| <id> | ^next | <nid>)}
+####(write (crlf) |**| <id> | ^next | <nid>)
+#}
 #
 #sp {monitor*next-connections-no-id
 #   (state <s>  ^superstate nil
@@ -104,7 +110,8 @@ sp {clean-house*propose-record-next-areas*room*room*smem
 #   (<ca> ^next <next> ^id <id>)
 #   (<next> -^id <nid>)
 #-->
-####(write (crlf) |--| <id> | ^next | <next>)}
+####(write (crlf) |--| <id> | ^next | <next>)
+#}
 #
 #sp {monitor*next-connections2
 #   (state <s> ^superstate nil
@@ -112,7 +119,8 @@ sp {clean-house*propose-record-next-areas*room*room*smem
 #   (<ca> ^next <next> ^id <id>)
 #   (<next> ^next <ca> ^id <nid>)
 #-->
-####(write (crlf) |++| <nid> | ^next | <id>)}
+####(write (crlf) |++| <nid> | ^next | <id>)
+#}
 
 sp {apply*record-next-areas1
 # :interrupt

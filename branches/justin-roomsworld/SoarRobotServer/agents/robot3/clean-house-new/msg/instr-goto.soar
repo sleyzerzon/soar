@@ -22,5 +22,3 @@ sp {apply*instr-goto
 -->
    (<ss-op> ^processed true)
 }
-
-

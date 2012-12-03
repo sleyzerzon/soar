@@ -23,7 +23,8 @@ sp {apply*grasp-warn*avoid
    (<first> ^word |avoid|
             ^next <second>)
    (<second> ^word <area>
-             ^next nil)}
+             ^next nil)
+}
 
 sp {apply*grasp-warn*clear
    (state <s> ^operator <op>)

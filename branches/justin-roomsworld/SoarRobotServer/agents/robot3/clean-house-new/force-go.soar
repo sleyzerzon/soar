@@ -56,8 +56,3 @@ sp {apply*force-go*done
 -->
    (<gotos> ^<loc> <priority> -)
 }
-
-
-
-
-   

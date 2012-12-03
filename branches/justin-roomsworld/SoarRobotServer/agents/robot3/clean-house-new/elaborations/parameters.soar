@@ -30,50 +30,56 @@ sp {robot*elaborate*state*storage-area*displacement
 -->
    (<p> ^default-storage-displacement <dsd>)
    (<dsd> ^x 1
-          ^y 1)}
-
+          ^y 1)
+}
 
 #sp {robot*elaborate*state*storage-area
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^default-storage-area-id 24)}
+#   (<p> ^default-storage-area-id 24)
+#}
 #
 #sp {robot*elaborate*state*communication
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^communication false)}
+#   (<p> ^communication false)
+#}
 #
 #sp {robot*elaborate*state*areas-held
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^areas-held-in wm)}
+#   (<p> ^areas-held-in wm)
+#}
 #
 #sp {robot*elaborate*state*object-held
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^objects-held-in wm)}
+#   (<p> ^objects-held-in wm)
+#}
 #
 #sp {robot*elaborate*state*planning
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^look-ahead-planning yes)}
+#   (<p> ^look-ahead-planning yes)
+#}
 #
 #sp {robot*elaborate*state*search-control
 #   (state <s> ^name robot
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^search-control-go-to-gateway yes)}
+#   (<p> ^search-control-go-to-gateway yes)
+#}
 #
 #
 #sp {robot*elaborate*state*delete
@@ -81,5 +87,5 @@ sp {robot*elaborate*state*storage-area*displacement
 #              ^parameters <p>
 #              ^superstate nil)
 #-->
-#   (<p> ^delete-old-areas false)}  ## bug if true and areas wm - detect-no-storage
-#
+#   (<p> ^delete-old-areas false)
+#}  ## bug if true and areas wm - detect-no-storage

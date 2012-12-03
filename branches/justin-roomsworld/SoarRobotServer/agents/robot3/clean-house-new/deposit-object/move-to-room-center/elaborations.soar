@@ -1,6 +1,5 @@
 ## If collision sensor is on, mark that there is a collision
 
-
 ## If there is an object that is within 2 and I'm headed for it, mark that there is a collision
 
 sp {move-to-room-center*elaborate*collision-object

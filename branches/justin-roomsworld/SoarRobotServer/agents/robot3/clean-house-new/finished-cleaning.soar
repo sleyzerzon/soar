@@ -12,23 +12,22 @@ sp {clean-house*propose*finished-cleaning
          ^object <object>)
    (<object> ^type <obj-type>
              ^color <color>)
-  -{(<areas> ^area <area>)
-    (<area> -^cleaned yes
-            -^avoid true
-            -^storage-area yes)}
-  -{(<areas> ^area <area1>)
-    (<area1> -^visited yes
-            -^avoid true
-            -^storage-area yes)}
-  -{(<bs> ^object <b>)
-    (<b> ^type <obj-type>
-         ^color <color>
-         ^in-storage-room no)}
+  -{ (<areas> ^area <area>)
+     (<area> -^cleaned yes
+             -^avoid true
+             -^storage-area yes) }
+  -{ (<areas> ^area <area1>)
+     (<area1> -^visited yes
+             -^avoid true
+             -^storage-area yes) }
+  -{ (<bs> ^object <b>)
+     (<b> ^type <obj-type>
+          ^color <color>
+          ^in-storage-room no) }
 -->
    (<s> ^operator <op> + =, >)
    (<op> ^name finished-cleaning)
 }
-
 
 sp {clean-house*propose*finished-cleaning*smem
    (state <s> ^name robot

@@ -1,4 +1,4 @@
-## Move to record-area 
+## Move to record-area
 
 sp {clean-house*propose*record-storage-area
    (state <s> ^name robot
@@ -25,9 +25,8 @@ sp {clean-house*propose*record-storage-area
 #   (<d> ^location <narea>)
 #   (<narea> ^cleaned yes no -
 #            ^storage-area yes
-#            ^store yes)}
-#
-#
+#            ^store yes)
+#}
 
 sp {apply*record-storage*area*wm
 #interrupt
@@ -50,9 +49,8 @@ sp {apply*record-storage*area*wm
             ^storage-area yes
             ^cleaned yes)
    (<narea> ^cleaned yes no -
-            ^storage-area yes)}
-
-
+            ^storage-area yes)
+}
 
 sp {apply*record-storage*area*smem
 #interrupt
@@ -76,4 +74,5 @@ sp {apply*record-storage*area*smem
             ^storage-area yes
             ^cleaned yes)
    (<narea> ^cleaned yes no -
-            ^storage-area yes)}
+            ^storage-area yes)
+}

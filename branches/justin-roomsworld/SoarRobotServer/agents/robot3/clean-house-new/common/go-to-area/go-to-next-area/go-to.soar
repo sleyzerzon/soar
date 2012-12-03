@@ -30,7 +30,6 @@ sp {go-to-next-area*propose*go-to*gate-way-area*incomplete
          ^gateway-area-id <id>)
 }
 
-
 sp {go-to-next-area*propose*go-to*wall
  #interrupt
    (state <s> ^name go-to-next-area
@@ -47,7 +46,6 @@ sp {go-to-next-area*propose*go-to*wall
          ^gateway-area-id <id>
          ^cross-doorway no)  #JEL changed from yes because some rooms need to go through middle of wall.
 }
-
 
 sp {apply*go-to*next-area-gate-way
  #interrupt
@@ -76,7 +74,6 @@ sp {apply*go-to*next-area-gate-way*remove
 -->
    (<na> ^previous-area <pa> -)
 }
-
 
 sp {apply*record-previous-area
   # :interrupt

@@ -5,7 +5,8 @@ sp {go-to-area*propose*retrieve-destination*smem
    (<pa> -^id <id>)
 -->
    (<s> ^operator <op> +, =, >)
-   (<op> ^name retrieve-destination)}
+   (<op> ^name retrieve-destination)
+}
 
 sp {apply*retrieve-destination
    (state <s> ^operator <op>

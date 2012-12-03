@@ -9,7 +9,7 @@ sp {deposit-object*propose*find-block-in-area
    (<s> ^operator <op> + =, >)
    (<op> ^name find-block-in-area)
  }
- 
+
  sp {deposit-object*compare*find-block-in-area
    (state <s> ^name deposit-object
               ^operator <op1> +
