@@ -85,18 +85,15 @@
     </target>
 
     <target name="move_native_osx" if="platform_osx">
-        <copy todir="${jar.dir}">
-        </copy>
+		<copy todir="${jar.dir}" />
     </target>
 
     <target name="move_native_win_32" if="platform_win_32">
-        <copy todir="${jar.dir}">
-        </copy>
+		<copy todir="${jar.dir}" />
     </target>
 
     <target name="move_native_win_64" if="platform_win_64">
-        <copy todir="${jar.dir}">
-        </copy>
+		<copy todir="${jar.dir}" />
     </target>
     <target name="move_native_linux_32" if="platform_linux_32">
         <!-- TODO implement -->
