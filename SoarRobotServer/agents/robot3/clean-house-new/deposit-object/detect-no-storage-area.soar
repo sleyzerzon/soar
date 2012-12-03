@@ -4,9 +4,8 @@ sp {deposit-object*propose*detect-no-storage-area
    (<ts> -^areas.area.storage-area yes
           ^parameters.areas-held-in wm
           ^parameters.delete-old-areas false)
-  -{(<ts> ^areas.area <area>)
-    (<area> -^visited yes)}
-
+  -{ (<ts> ^areas.area <area>)
+     (<area> -^visited yes) }
 -->
    (<s> ^operator <op> + =)
    (<op> ^name detect-no-storage-area)

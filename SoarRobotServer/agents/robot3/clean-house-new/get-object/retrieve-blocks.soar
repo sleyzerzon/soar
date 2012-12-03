@@ -58,7 +58,8 @@ sp {apply*retrieve-block*smem*retrieved
 ###(write (crlf) |Retrieved object success | <cp> | :| (cmd stats -d ))
    (<s> ^retrieved-objects success
         ^object <cp>)
-   (<ts> ^retrieved-object <cp>)}
+   (<ts> ^retrieved-object <cp>)
+}
 
 sp {apply*record-object*return
    (state <s> ^operator <op>
@@ -103,9 +104,9 @@ sp {get-object*propose*retrieve-objects*epmem
              -^retrieved-objects
               ^top-state.parameters.objects-held-in epmem
               ^current-location.cleaned yes)
-  -{(<s> ^top-state.objects.object <obj>)
-    (<obj> ^in-storage-room no
-           ^area)}
+  -{ (<s> ^top-state.objects.object <obj>)
+     (<obj> ^in-storage-room no
+            ^area) }
 -->
    (<s> ^operator <op> + =, >)
    (<op> ^name retrieve-objects)
@@ -243,7 +244,8 @@ sp {apply*retrieve-objects*retrieve*epmem*failed
           ^success <q>)
 -->
    (<s> ^retrieved-objects failed)
-   (<cmd> ^query <q> -)}
+   (<cmd> ^query <q> -)
+}
 
 sp {apply*record-object*return*epmem
    (state <s> ^operator <op>

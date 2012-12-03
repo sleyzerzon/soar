@@ -8,8 +8,8 @@
 #   (<ts> ^areas <areas>)
 #   (<areas> ^area <a2>)
 #   (<a2> ^id <id2>)
-#  -{(<areas> ^area <a1>)
-#    (<a1> ^id <id1>)}
+#  -{ (<areas> ^area <a1>)
+#     (<a1> ^id <id1>) }
 #-->
 #   (<s> ^operator <op> + =)
 #   (<op> ^name connected-do

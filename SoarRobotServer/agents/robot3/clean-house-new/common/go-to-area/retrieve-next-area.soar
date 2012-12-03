@@ -9,7 +9,8 @@ sp {go-to-area*propose*retrieve-next-area*previous-area*smem
 ##(write (crlf) |Propose retrieve previous area | <pa> | :| (cmd stats -d ))
    (<s> ^operator <op> +, =, <)
    (<op> ^name retrieve-next-area
-         ^area <pa>)}
+         ^area <pa>)
+}
 
 sp {go-to-area*propose*retrieve-next-area*next*smem
  #interrupt
@@ -23,7 +24,8 @@ sp {go-to-area*propose*retrieve-next-area*next*smem
 ###(write (crlf) |Propose retrieve next area | <pa> | :| (cmd stats -d ))
   (<s> ^operator <op> +, =, >)
    (<op> ^name retrieve-next-area
-         ^area <pa>)}
+         ^area <pa>)
+}
 
 sp {go-to-area*propose*retrieve-next-area*neighbor*smem
    (state <s> ^type go-to-area
@@ -36,7 +38,8 @@ sp {go-to-area*propose*retrieve-next-area*neighbor*smem
   ###(write (crlf) |Propose retrieve neighbor area | <pa> | :| (cmd stats -d ))
    (<s> ^operator <op> +, =, >)
    (<op> ^name retrieve-next-area
-         ^area <pa>)}
+         ^area <pa>)
+}
 
 sp {apply*retrieve-next-area
  #interrupt
@@ -59,7 +62,6 @@ sp {apply*retrieve-next-area*success
 -->
    (<s> ^retrieved <area>)
 }
-
 
 sp {apply*retrieve-next-area*failure
  #interrupt

@@ -7,11 +7,11 @@ sp {grasp-ied*propose*grasp-help
    (<ts> ^labels <ls>
          ^diffusing <dh>)
   -(<dh> ^force)
-  -{(<b> ^type <label-name>)
-    (<ls> ^label <l>)
-    (<l> ^name <label-name>)
-    (<dh> ^heuristic <h>)
-    (<h> ^label <label-name>)}
+  -{ (<b> ^type <label-name>)
+     (<ls> ^label <l>)
+     (<l> ^name <label-name>)
+     (<dh> ^heuristic <h>)
+     (<h> ^label <label-name>) }
 -->
    (<s> ^operator <op> + >)
    (<op> ^name grasp-help)

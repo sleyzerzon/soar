@@ -73,7 +73,8 @@ smem -s merge add
 #              ^current-location <loc>)
 #   (<loc> ^id <id>)
 #-->
-##(write (crlf) |Current location: | <loc> | ID: | <id> )}
+##(write (crlf) |Current location: | <loc> | ID: | <id> )
+#}
 
 sp {detect-error
    :interrupt
@@ -109,14 +110,14 @@ sp {detect-error*smem
    (interrupt)
 }
 
-
 #sp {watch-operators
 #   (state <s> ^operator.name { <name> <<  get-object goto-unvisited-area retrieve-objects record-object re-record-object record-area retrieve-neighbor-area go-to-seen-block >> })
 #-->
 ####(write (crlf) |Operator: | <name> |: | (cmd stats -d))
 #}
+
 #deposit-object
-#
+
 sp {interrupt-wall-gateway
    :o-support
    :interrupt
@@ -183,7 +184,6 @@ sp {interrupt-double-gateway
 #   (interrupt)
 #}
 
-#
 ###### JELJEL Try to cause blow up in matches
 #sp {explode1
 #   (state <s> ^superstate nil
@@ -215,7 +215,7 @@ sp {interrupt-double-gateway
 ####(write (crlf) |Room 41/42/43.|)
 #   (interrupt)
 #}
-# #
+#
 #sp {deposit-object*propose*find-block-in-areassss*next
 #   :interrupt
 #   (state <s> ^current-location <ca>
@@ -224,6 +224,3 @@ sp {interrupt-double-gateway
 #-->
 ####(write (crlf) |Room 43 store:|  <store>)
 #}
-
-
-

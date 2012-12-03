@@ -1,7 +1,7 @@
 sp {robot*propose*circuit-patrol
    (state <s> ^name robot
               ^current-mission <cm>)
-   (<cm> ^type << patrol linear-patrol circuit-patrol >> 
+   (<cm> ^type << patrol linear-patrol circuit-patrol >>
          ^first-area <fa>)
 -->
    (<s> ^operator <op> + =)

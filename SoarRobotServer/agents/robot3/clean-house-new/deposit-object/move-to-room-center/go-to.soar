@@ -7,7 +7,7 @@ sp {move-to-room-center*propose*go-to
           ^y <dy>)
    (<cl> ^wall <wallsouth>
          ^wall <wallwest>)
-   (<wallsouth> ^direction south 
+   (<wallsouth> ^direction south
                 ^y <y>)
    (<wallwest> ^direction west
                ^x <x>)

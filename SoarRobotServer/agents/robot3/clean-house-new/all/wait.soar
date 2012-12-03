@@ -6,6 +6,5 @@ sp {top-state*propose*wait
              -^operator.name wait)
 -->
    (<s> ^operator <q>)
-   (<q> ^name wait)}
-
-
+   (<q> ^name wait)
+}

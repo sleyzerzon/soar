@@ -16,7 +16,8 @@ sp {apply*assign-area-object
    (<area> ^id <area-id>)
    (<block> ^area-id <area-id>)
 -->
-   (<block> ^area <area>)}
+   (<block> ^area <area>)
+}
 
 sp {apply*assign-area-object*smem
   # :interrupt
@@ -28,8 +29,9 @@ sp {apply*assign-area-object*smem
             -^area <area>)
 -->
    (<cmd> ^query <q>)
-   (<q> ^id <id>)}
+   (<q> ^id <id>)
 #        ^type room)}  JEL - sometimes it gets the door instead of room for an object
+}
 
 sp {apply*assign-area-object*smem*retrieved
    (state <s> ^operator.name assign-area-object
@@ -46,4 +48,5 @@ sp {apply*assign-area-object*smem*retrieved
    (<object> ^area-id <id>
             -^area <area>)
 -->
-   (<object> ^area <cp>)}
+   (<object> ^area <cp>)
+}

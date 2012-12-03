@@ -12,7 +12,8 @@ sp {Impasse__Operator_Tie*elaborate*state*stop
 #   (<out> ^stop
 #          ^set-velocity <sv>)
 #-->
-#   (<out> ^set-velocity <sv> -)}
+#   (<out> ^set-velocity <sv> -)
+#}
 
 sp {Impasse__Operator_Tie*elaborate*learn*on
 #:interrupt

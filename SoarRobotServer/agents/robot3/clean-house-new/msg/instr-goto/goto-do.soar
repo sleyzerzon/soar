@@ -37,8 +37,8 @@
 #   (<ts> ^areas <areas>
 #         ^pending <p>
 #         ^io.output-link <out>)
-#  -{(<areas> ^area <a>)
-#    (<a> ^id <id>)}
+#  -{ (<areas> ^area <a>)
+#     (<a> ^id <id>) }
 #-->
 #   (<p> ^goto <g>)
 #   (<g> ^<id> <priority>)

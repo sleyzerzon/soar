@@ -5,7 +5,7 @@ sp {go-to-area*elaborate*destination-area
 -->
    (<s> ^destination-area <area>
         ^desired.location <area>)
-   }
+}
 
 sp {go-to-area*elaborate*problem-space
    (state <s> ^type go-to-area
@@ -17,4 +17,5 @@ sp {go-to-area*elaborate*problem-space
         ^one-level-attributes destination-area type
         ^two-level-attributes top-state
         #^dont-copy current-location
-                            )}
+                            )
+}

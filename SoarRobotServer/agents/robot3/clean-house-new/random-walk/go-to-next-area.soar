@@ -55,7 +55,6 @@ sp {apply*go-to-next-area*add-second-remove-last
          ^last-destination <d> -)
 }
 
-
 sp {apply*go-to-next-area*update-second-remove-last
    (state <s> ^operator <op>
               ^top-state <ts>)

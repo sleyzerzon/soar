@@ -51,8 +51,8 @@ sp {apply*find-storage-area*destination*area
    (<ts> ^storage-area <area>
         -^destination-area <area>)
 -->
-   (<ts> ^destination-area <area>)}
-
+   (<ts> ^destination-area <area>)
+}
 
 ############SMEM
 
@@ -92,7 +92,8 @@ sp {apply*find-storage-area*smem*query
        -^area)
 -->
    (<cmd> ^query <q>)
-   (<q> ^visited no)}
+   (<q> ^visited no)
+}
 
 sp {apply*find-storage-area*smem*result
    (state <s> ^operator <o>
@@ -105,7 +106,8 @@ sp {apply*find-storage-area*smem*result
           ^success <q>)
 -->
 ###(write (crlf) |Retrieved not visited area | <cp> )
-   (<s> ^area <cp>)}
+   (<s> ^area <cp>)
+}
 
 sp {apply*find-storage-area*smem*operator
    (state <s> ^operator <o>
@@ -113,8 +115,8 @@ sp {apply*find-storage-area*smem*operator
    (<o> ^name goto-storage-area)
 -->
 ###(write (crlf) |Retrieved area | <area> )
-   (<o> ^area <area>)}
-
+   (<o> ^area <area>)
+}
 
 sp {deposit-object*compare*goto-unvisited-area*with*area
    (state <s> ^name deposit-object

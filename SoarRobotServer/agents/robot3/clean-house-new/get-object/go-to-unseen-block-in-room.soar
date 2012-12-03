@@ -12,7 +12,7 @@ sp {get-object*propose*go-to-unseen-block-in-room
          ^destination <block>
          ^range <r>)
 }
-  
+
 sp {get-object*compare*pickup*prefer*visible
    (state <s> ^name get-object
               ^operator <op1> +

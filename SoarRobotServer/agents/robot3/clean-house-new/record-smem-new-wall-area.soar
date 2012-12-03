@@ -57,7 +57,8 @@ sp {apply*record-smem-new-wall*retrieve
                       yes)
    (<c-area> ^neighbor-area <cp>)
    (<cp> ^neighbor-area <c-area>)
-   (<cmd> ^store <c-area> <cp> <wall>)}
+   (<cmd> ^store <c-area> <cp> <wall>)
+}
 
 sp {apply*record-smem-new-wall*retrieve*fail
 #  :interrupt
@@ -83,7 +84,8 @@ sp {apply*record-smem-new-wall*retrieve*fail
          ^temp-x <x>   ## JEL
          ^temp-y <y>
          ^type room
-         ^cleaned no 
+         ^cleaned no
          ^visited no
          ^id <to>)
-   (<cmd> ^store <c-area> <cp> <wall>)}
+   (<cmd> ^store <c-area> <cp> <wall>)
+}

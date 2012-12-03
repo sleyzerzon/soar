@@ -52,7 +52,7 @@ sp {go-to-area*propose*go-to-gateway*in-doorway-area
    (<new-area> ^id <new-area-id>
               -^avoid true)
 -->
-   (<s> ^operator <op> + =)  
+   (<s> ^operator <op> + =)
    (<op> ^name go-to
          ^destination <gw>
          ^cross-doorway yes)
@@ -70,7 +70,7 @@ sp {go-to-area*propose*go-to-gateway*in-doorway-area*noprevious
    (<new-area> ^id <new-area-id>
               -^avoid true)
 -->
-   (<s> ^operator <op> + =)  
+   (<s> ^operator <op> + =)
    (<op> ^name go-to
          ^destination <gw>
          ^cross-doorway yes)
@@ -163,7 +163,6 @@ sp {go-to-area*propose*go-to-waypoint
          ^gateway-area-id <daid>)
 }
 
-
 sp {go-to-area*propose*go-to-waypoint*wall
    (state <s> ^type go-to-area
               ^top-state.parameters.search-control-go-to-gateway yes
@@ -199,8 +198,6 @@ sp {go-to-area*propose*go-to-waypoint*wall
 #         ^cross-doorway yes)
 #}
 
-
-
 ############### Random
 
 sp {go-to-area*propose*go-to-gateway*cross-doorway-area*no-sc
@@ -221,7 +218,6 @@ sp {go-to-area*propose*go-to-gateway*cross-doorway-area*no-sc
          ^cross-doorway yes)
 }
 
-
 ### IF final destination is the next area
 sp {go-to-area*propose*go-to-waypoint*door*no-sc
    (state <s> ^type go-to-area
@@ -229,7 +225,7 @@ sp {go-to-area*propose*go-to-waypoint*door*no-sc
               ^destination-area.id <daid>
               ^current-location <ca>)
    (<ca> ^gateway <gw>
-         ^type door)  
+         ^type door)
    (<gw> ^to <daid>)
 -->
    (<s> ^operator <op> +, =,)

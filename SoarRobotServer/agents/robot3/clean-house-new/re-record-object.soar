@@ -48,7 +48,6 @@ sp {apply*re-recorded-block*area
    (<block> ^area <area> - <ca>)
 }
 
-
 sp {apply*re-recorded-block*save-object-in-storage-area
    (state <s> ^operator <op>
               ^top-state.parameters.objects-held-in  << epmem smem >>
@@ -59,7 +58,7 @@ sp {apply*re-recorded-block*save-object-in-storage-area
    (<block> ^id <id>)
 -->
    (<ca> ^object-id <id>)
-} 
+}
 
 sp {apply*re-record-object*store-new
    (state <s> ^operator <op>

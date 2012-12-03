@@ -25,7 +25,7 @@ sp {clean-house-new*propose*record-label*compare
    (<op2> ^name {<> record-label <> msg})
 -->
    (<s> ^operator <op1> > <op2>)
-} 
+}
 
 sp {clean-house-new*propose*record-label*multiple
    (state <s> ^name robot
@@ -35,7 +35,7 @@ sp {clean-house-new*propose*record-label*multiple
    (<op2> ^name record-label)
 -->
    (<s> ^operator <op1> = <op2>)
-}  
+}
 
 sp {apply*record-label*match
    (state <s> ^operator <op>)
@@ -56,5 +56,3 @@ sp {apply*record-label*tried
 -->
    (<label> ^tried <id>)
 }
-
-

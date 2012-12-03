@@ -1,4 +1,4 @@
-### 
+###
 
 sp {apply*go-to-next-area*internal
    (state <s> ^name evaluate-operator
@@ -35,14 +35,10 @@ sp {apply*go-to-next-area*internal
 #   (<op> ^name go-to-next-area
 #         ^next-waypoint <nloc>)
 #   -{ (<cloc> ^id <cid> ^x <cx> ^y <cy>)
-#      (<nloc> ^id <nid> ^x <nx> ^y <ny>)}
+#      (<nloc> ^id <nid> ^x <nx> ^y <ny>) }
 #-->
 #   #(dont-learn <s>)
 #   (write (crlf) |Move from area: | <cloc> | to | <nloc> | missing x y.|)
 #   (<ts> ^current-location <c-wp> -
 #                           <next-wp>)
 #}
-
-
-
-

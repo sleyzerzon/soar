@@ -22,7 +22,7 @@ sp {apply*record-smem-current-area*remove-old-area
 -->
    (<s> ^current-location <area> -)
 }
-  
+
 ## Do we have this area already stored?
 
 sp {apply*record-smem-current-area*query
@@ -54,7 +54,8 @@ sp {apply*record-smem-current-area*retrieve
 ###(write (crlf) |Record SMEM current Area Retrieved area | <cp> | id | <area-id> |: | (cmd stats -d))
    (<s> ^current-location <cp>)
    (<cp> ^visited no -
-                  yes)}
+                  yes)
+}
 
 # Did not find it. Mark it for storage
 
@@ -96,7 +97,8 @@ sp {apply*record-smem-current-area*retrieve*monitor
 ###(write (crlf) |Record SMEM current Retrieved area | <cp> | id | <area-id> | type: |<type> |: | (cmd stats -d))
    (<s> ^current-location <cp>)
    (<cp> ^visited no -
-                  yes)}
+                  yes)
+}
 
 ###### Success but not filled in
 sp {apply*record-smem-current-area*store-walls*empty
@@ -155,7 +157,7 @@ sp {apply*record-smem-current-area*store-walls*empty*wall-connection
            ^direction <dir>
            ^connected no)
 }
-      
+
 sp {apply*record-smem-current-area-gateway*empty
    (state <s> ^operator <op>
               ^smem <smem>
@@ -229,7 +231,7 @@ sp {apply*record-smem-current-area*store-walls*wall-connector
           ^direction <dir>
           ^connected no)
 }
-      
+
 sp {apply*record-smem-current-area-gateway
    (state <s> ^operator <op>
               ^smem <smem>

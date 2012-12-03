@@ -9,29 +9,29 @@
 
 ## 12-7-10 comment out pending gotos diffusing labels avoids
 
-## Support for using SMEM for maintaining block information. 
+## Support for using SMEM for maintaining block information.
 ## Store block information with record-object
 ##    First test to see if already exists in smem by doing a query
 ##    If it doesn't then store it.
-## Delete objects not in current area in remove-objects 
+## Delete objects not in current area in remove-objects
 ## Retrieve using get-object/retrieve-blocks which will retrieve blocks that aren't in storage room
 ##    that have the right color
 ## Finished-cleaning is disabled - should fail in get-object and then do finish-cleaning
 ##   fail to get object in another room - fail to get unvisited room
 ##
 
-## Support for using SMEM for maintaining area information. 
+## Support for using SMEM for maintaining area information.
 ## Store area information with record-smem-current-area record-smem-new-gateway-area
 ##  Maintain storage area on top state once found
 ##    First test to see if already exists in smem by doing a query
 ##    If it doesn't then store it.
 ###   Also store gateways and walls.
 ##  Retreive when enter area - retrieve-current-area-gateways retrieve-current-area-wall
-##    
-##      Delete areas not current area in delete- 
+##
+##      Delete areas not current area in delete-
 ##     If goto-not-clean-area selected - then search for not cleaned room.
 ##     If fail to find a not-clean area then halt (similar to finished-cleaning)
 ##     If goto-storage-are selected then query for it
-##          if retrieve success 
+##          if retrieve success
 ##                 visited - just go to it
-##                 not visited 
+##                 not visited

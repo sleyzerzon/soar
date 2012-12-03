@@ -30,7 +30,8 @@ sp {go-to-area*propose*go-to-waypoint*room*destination
 -->
    (<s> ^operator <op> +, =, >)
    (<op> ^name go-to-next-area
-         ^next-waypoint <na>)}
+         ^next-waypoint <na>)
+}
 
 sp {go-to-area*propose*go-to-next-area*planning*prefer-next
    (state <s> ^type go-to-area

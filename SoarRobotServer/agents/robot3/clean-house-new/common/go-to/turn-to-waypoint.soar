@@ -14,7 +14,6 @@ sp {go-to*propose*turn-to-waypoint
   # (exec player-print |Rotating to | <yaw>)
 }
 
-
 sp {go-to*propose*turn-to-waypoint*in-range
    (state <s> ^name go-to
               ^destination-in-range yes

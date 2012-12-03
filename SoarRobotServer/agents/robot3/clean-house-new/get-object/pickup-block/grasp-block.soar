@@ -21,7 +21,6 @@ sp {apply*grasp-block
    (<out> ^get-object.id <id>)
 }
 
-
 sp {apply*grasp-block*remove-block-from-objects
    (state <s> ^operator.name grasp-block
               ^top-state.parameters.objects-held-in epmem

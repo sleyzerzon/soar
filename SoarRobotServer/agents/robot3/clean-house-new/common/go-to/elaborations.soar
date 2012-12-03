@@ -75,11 +75,11 @@ sp {go-to*elaborate*set-waypoint*false
    (<d> ^id <id>)
 #        ^x <x>
 #        ^y <y>)
-  -{(<s> ^top-state.io.input-link.waypoints.waypoint <wp>)
-    (<wp> ^id <id>
-#          ^x <x>
-#          ^y <y>
-              )}
+  -{ (<s> ^top-state.io.input-link.waypoints.waypoint <wp>)
+     (<wp> ^id <id>
+#           ^x <x>
+#           ^y <y>
+              ) }
 -->
    (<s> ^set-waypoint false)
 }
@@ -214,7 +214,6 @@ sp {go-to*elaborate*yaw-aligned*true*doorway*west-pos
  ##(write (crlf) |Oriented in doorway|)
 }
 
-
 #
 ########################################## Object in the way must move around
 #
@@ -233,7 +232,8 @@ sp {go-to*elaborate*yaw-aligned*true*doorway*west-pos
 #-->
 #   (<s> ^object-gateway-diff <ogd>)
 #   (<ogd> ^difference (- <oao> <gwao>)
-#          ^id <oid>)}
+#          ^id <oid>)
+#}
 #
 #sp {move-directly-to-gateway*elaborate*compute*object-vs-gateway-angle-off*obj-less
 #   (state <s> ^name move-directly-to-gateway
@@ -250,7 +250,8 @@ sp {go-to*elaborate*yaw-aligned*true*doorway*west-pos
 #-->
 #   (<s> ^object-gateway-diff <ogd>)
 #   (<ogd> ^difference (- <gwao> <oao>)
-#          ^id <oid>)}
+#          ^id <oid>)
+#}
 #
 #sp {move-directly-to-gateway*elaborate*state*obstacle*no-neg
 #   (state <s> ^name move-directly-to-gateway
@@ -286,7 +287,8 @@ sp {go-to*elaborate*yaw-aligned*true*doorway*west-pos
 #   (<ogd> ^obstacle yes
 #          ^id <oid>)
 #-->
-#   (<ogd> ^against-wall <south>)}
+#   (<ogd> ^against-wall <south>)
+#}
 #
 #sp {move-directly-to-gateway*elaborate*object-wall*less-than
 #   (state <s> ^name move-directly-to-gateway
@@ -312,6 +314,5 @@ sp {go-to*elaborate*yaw-aligned*true*doorway*west-pos
 #   (<ogd> ^obstacle yes
 #          ^id <oid>)
 #-->
-#   (<ogd> ^against-wall <south>)}
-#
-            
+#   (<ogd> ^against-wall <south>)
+#}

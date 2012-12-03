@@ -12,7 +12,7 @@ sp {clean-house*propose*record-area
      #    ^actions.stop <stop>
          ^area <area>)
 }
- 
+
 # Set cleaned -> yes to eliminate spin.
 sp {apply*record-area*room*wall*not*open
    (state <s> ^operator <op>
@@ -70,7 +70,7 @@ sp {apply*record-area*door*wall
    (<area> ^wall <nw1>
            ^visited yes
                     no -
-           ^cleaned yes)  
+           ^cleaned yes)
   (<nw1>  ^x <x> ^y <y> ^direction <dir> )
 }
 
@@ -84,8 +84,8 @@ sp {apply*record-area-gateway
          ^area <area>)
    (<area> ^id <aid>)
    (<gateway> ^x <x> ^y <y> ^direction <dir> ^id <wid1> ^to { <> <wid1> <> <aid> <tid> })
-#  -{(<area> ^gateway <prev-gw>)
-#    (<prev-gw> ^to <tid>)}
+#  -{ (<area> ^gateway <prev-gw>)
+#     (<prev-gw> ^to <tid>) }
 -->
    (<area> ^gateway <ngateway>)
    (<ngateway> ^x <x> ^y <y> ^direction <dir> ^id <wid1> ^to <tid>)
@@ -124,7 +124,6 @@ sp {apply*record-area-gateway*initialize*connected-area*door
            ^neighbor-area <ca>)
    (<ca> ^neighbor-area <area>)
 }
-
 
 ## Record location as x, y of gateway to door
 sp {apply*record-area-gateway*initialize*connected-area
@@ -227,7 +226,8 @@ sp {apply*record-area*in-gateway
         ^area <narea>)
 -->
    (<narea> ^cleaned yes
-                     no -)}
+                     no -)
+}
 
 ## Remove old areas if random
 sp {clean-house*apply*record-area*remove
@@ -240,7 +240,7 @@ sp {clean-house*apply*record-area*remove
 -->
    (<areas> ^area <area> -)
 }
-   
+
 sp {clean-house*compare*record-area
    (state <s> ^name robot
               ^operator <op1> +

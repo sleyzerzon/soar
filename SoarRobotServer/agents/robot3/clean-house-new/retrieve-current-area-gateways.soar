@@ -13,7 +13,6 @@ sp {clean-house*propose*retrieve-current-area-gateways
          ^gateway <gateway>)
 }
 
-
 sp {apply*retrieve-current-area-gateways*query
    (state <s> ^smem.command <cmd>
               ^operator <o>)

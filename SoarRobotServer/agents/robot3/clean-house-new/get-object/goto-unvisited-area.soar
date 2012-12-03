@@ -22,8 +22,9 @@ sp {get-object*elaborate*goto-unvisited-area
          ^area.id <did>)
    (<gw> ^to <did>)
 -->
-   (<op> ^gateway <gw>)}
-   
+   (<op> ^gateway <gw>)
+}
+
 ## If going to a neighbor area
 sp {get-object*evaluate*goto-unvisited-area*not*neighbor
    (state <s> ^operator <op> +
@@ -46,7 +47,6 @@ sp {get-object*evaluate*goto-unvisited-area*neighbor
   ##(write (crlf) | id: | <id> | Range: | (compute-range <x> <y> <x2> <y2>) | inverse: |(* 10 (/ 1 (compute-range <x> <y> <x2> <y2>))))
    (<s> ^operator <op> =  (* 10 (/ 1 <dis> )))
 }
-
 
 #sp {get-object*evaluate*goto-unvisited-area*not*neighbor
 #   (state <s> ^operator <op> +
@@ -90,11 +90,11 @@ sp {get-object*evaluate*goto-unvisited-area*compare-operators
 #         ^area.id <did>)
 #   (<gw> ^to <did>
 #         ^distance <dis>)
-#  -{(<s> ^operator <o2> +
-#         ^top-state.io.input-link.area-description.gateway <gw2>)
-#    (<o2> ^area.id <did2>)
-#    (<gw2> ^id <did2>
-#           ^distance < <dis>)}
+#  -{ (<s> ^operator <o2> +
+#          ^top-state.io.input-link.area-description.gateway <gw2>)
+#     (<o2> ^area.id <did2>)
+#     (<gw2> ^id <did2>
+#            ^distance < <dis>) }
 #-->
 #  ##(write (crlf) | id: | <id> | Range: | (compute-range <x> <y> <x2> <y2>) | inverse: |(* 10 (/ 1 (compute-range <x> <y> <x2> <y2>))))
 #   (<s> ^operator <op> >)
@@ -125,6 +125,7 @@ sp {clean-house*compare*go-to-area*connected*closest*neighbor-no-door
 -->
    (<s> ^operator <op1> >)
 }
+
 #############SMEM
 
 sp {get-object*propose*goto-unvisited-area*smem*neighbor-area
@@ -166,7 +167,8 @@ sp {apply*goto-unvisited-area*smem*query
        -^area)
 -->
    (<cmd> ^query <q>)
-   (<q> ^visited no)}
+   (<q> ^visited no)
+}
 
 sp {apply*goto-unvisited-area*smem*result
  #interrupt
@@ -178,7 +180,8 @@ sp {apply*goto-unvisited-area*smem*result
           ^success <q>)
 -->
   #(write (crlf) |Retrieved unvisited area | <cp> )
-   (<s> ^area <cp>)}
+   (<s> ^area <cp>)
+}
 
 sp {apply*goto-unvisited-area*smem*operator
    (state <s> ^operator <o>
@@ -186,7 +189,8 @@ sp {apply*goto-unvisited-area*smem*operator
    (<o> ^name goto-unvisited-area)
 -->
   ##(write (crlf) |Retrieved area | <area> )
-   (<o> ^area <area>)}
+   (<o> ^area <area>)
+}
 
 sp {apply*goto-unvisited*smem*result*failure
    (state <s> ^operator.name goto-unvisited-area
@@ -196,7 +200,8 @@ sp {apply*goto-unvisited*smem*result*failure
            ^result.failure <q>)
 -->
   #(write (crlf) |Failed to find unvisited area |)
-   (<ts> ^all-visited true)}
+   (<ts> ^all-visited true)
+}
 
 sp {get-object*compare*goto-unvisited-area
    (state <s> ^name get-object
@@ -226,8 +231,8 @@ sp {get-object*compare*goto-unvisited-area*with*area
 #sp {apply*goto-unvisited
 #   (state <s> ^operator.name goto-unvisited-area)
 #-->
-#   (interrupt)}
-
+#   (interrupt)
+#}
 
 sp {apply*goto-unvisited*smem*record-destination
    (state <s> ^operator <o>
@@ -236,8 +241,8 @@ sp {apply*goto-unvisited*smem*record-destination
         ^area <area>)
    (<ts> ^parameters.areas-held-in smem)
 -->
-   (<ts> ^destination-area <area>)}
-
+   (<ts> ^destination-area <area>)
+}
 
 sp {apply*goto-unvisited*smem*record-destination*remove
    (state <s> ^operator <o>
@@ -247,4 +252,5 @@ sp {apply*goto-unvisited*smem*record-destination*remove
    (<ts> ^parameters.areas-held-in smem)
    (<ts> ^destination-area { <> <area> <oarea> })
 -->
-   (<ts> ^destination-area <oarea> -)}
+   (<ts> ^destination-area <oarea> -)
+}
