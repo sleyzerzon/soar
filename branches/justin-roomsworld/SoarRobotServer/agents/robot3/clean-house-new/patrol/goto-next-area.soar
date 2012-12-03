@@ -1,9 +1,8 @@
-sp {circuit-patrol*propose*goto-next-area
+sp {patrol*propose*goto-next-area
    (state <s> ^name patrol
              -^achieved-area true
-              ^top-state <ts>)
-   (<ts> ^current-mission.next-area.id <id>
-         ^areas.area <area>)
+              ^next-area.id <id>
+              ^top-state.areas.area <area>)
    (<area> ^id <id>)
 -->
    (<s> ^operator <op> + =, >)
@@ -12,12 +11,11 @@ sp {circuit-patrol*propose*goto-next-area
          ^area <area>)
 }
 
-sp {circuit-patrol*propose*goto-next-area*next-to
+sp {patrol*propose*goto-next-area*next-to
    (state <s> ^name patrol
              -^achieved-area true
-              ^top-state <ts>)
-   (<ts> ^current-mission.next-area.id <id>
-         ^current-location. << neighbor-area next >> <area>)
+              ^next-area.id <id>
+              ^top-state.current-location. << neighbor-area next >> <area>)
    (<area> ^id <id>)
 -->
    (<s> ^operator <op> + =, >)

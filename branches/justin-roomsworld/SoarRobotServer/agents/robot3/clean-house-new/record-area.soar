@@ -264,10 +264,12 @@ sp {clean-house*apply*record-area*send-text-message
    (<ol> ^send-message <sm>)
    (<sm> ^destination user
          ^first <w1>)
-   (<w1> ^word i-see
+   (<w1> ^word I
          ^next <w2>)
-   (<w2> ^word area
+   (<w2> ^word see
          ^next <w3>)
-   (<w3> ^word <area-id>
+   (<w3> ^word area
+         ^next <w4>)
+   (<w4> ^word <area-id>
          ^next nil)
 }
