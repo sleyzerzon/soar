@@ -2,7 +2,7 @@ superdroids = [seek];
 
 seek 
 {
-	position = [2, -2];
+	position = [19, -30.5];
 	productions = "agents/robot3/clean-house-new.soar";
 	simulated = true;
 	properties
