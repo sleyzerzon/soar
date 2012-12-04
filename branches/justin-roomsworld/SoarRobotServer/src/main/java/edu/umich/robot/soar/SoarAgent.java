@@ -126,6 +126,12 @@ public class SoarAgent implements RobotController, RadioHandler
 
     private final DefaultPropertyProvider<String[]> miscCommands = new DefaultPropertyProvider<String[]>(AgentProperties.MISC_COMMANDS);
 
+    private final DefaultPropertyProvider<String> methodEcologicalDoors = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
+
+    private final DefaultPropertyProvider<String> methodEcologicalEntry = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
+
+    private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
+
     private String productions;
     
     private final WallClock clock;
@@ -153,6 +159,11 @@ public class SoarAgent implements RobotController, RadioHandler
         properties.setProvider(AgentProperties.ANGLE_RESOLUTION, angleResolution);
         properties.setProvider(AgentProperties.TRANSLATION, translation);
         properties.setProvider(AgentProperties.OBJECT_LINGER_SECONDS, lingerSeconds);
+
+        properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
+        properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
+        properties.setProvider(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
+
         
         if (propc != null)
             setDefaults(propc);
@@ -241,6 +252,10 @@ public class SoarAgent implements RobotController, RadioHandler
         addSpProperty(AgentProperties.LOOK_AHEAD_PLANNING, lookAheadPlanning);
         addSpProperty(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY, searchControlGoToGateway);
         addSpProperty(AgentProperties.DELETE_OLD_AREAS, deleteOldAreas);
+
+        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
+        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
+        addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
         
         properties.addListener(AgentProperties.MISSION, new PropertyListener<Mission>()
                 {
@@ -292,6 +307,11 @@ public class SoarAgent implements RobotController, RadioHandler
             mission.set(Mission.valueOf(propc.requireString(AgentProperties.MISSION.getName())));
         if (propc.hasKey(AgentProperties.MISC_COMMANDS.getName()))
             miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
+
+        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
+            methodEcologicalDoors.set(propc.requireString(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
+        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
+            methodEcologicalEntry.set(propc.requireString(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
     }
     
     private void addSpProperty(PropertyKey<String> key, DefaultPropertyProvider<String> prov)

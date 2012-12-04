@@ -14,12 +14,62 @@ sp {robot*propose*delivery
 
 # ELABORATIONS
 
-#sp {delivery*elaborate
-#   (state <s> ^name delivery)
-#-->
-#}
+# tasks
+
+sp {delivery*elaborate
+   (state <s> ^name delivery
+              ^topstate.parameters <params>)
+-->
+    (<s> ^tasks <tasks>
+         ^parameters <params>)
+}
 
 # OPERATORS
+
+# retrieve-task
+
+sp {delivery*propose*retrieve-tasks*ecological-doors
+   (state <s> ^name delivery
+              ^parameters <params>
+              ^topstate.current-location.type door
+              ^tasks.task <task>)
+   (<params> ^tasks-held-in smem
+             ^method-ecological-doors yes)
+  -(<task> ^object
+           ^destination)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name retrieve-task
+         ^task <task>)
+}
+
+sp {delivery*propose*retrieve-tasks*ecological-entry
+   (state <s> ^name delivery
+              ^parameters <params>
+              ^topstate.current-location.type room
+              ^tasks.task <task>)
+   (<params> ^tasks-held-in smem
+             ^method-ecological-entry yes)
+  -(<task> ^object
+           ^destination)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name retrieve-task
+         ^task <task>)
+}
+
+sp {delivery*apply*retrieve-tasks*retrieve
+   (state <s> ^name delivery
+              ^operator <op>
+              ^parameters.tasks-held-in smem
+              ^smem.command <scmd>)
+   (<op> ^name retrieve-task
+         ^task <task>)
+-->
+   (<scmd> ^retrieve <task>)
+}
+
+# patrol
 
 sp {delivery*propose*patrol
    "random walk fallback"
