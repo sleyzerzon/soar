@@ -309,9 +309,11 @@ public class SoarAgent implements RobotController, RadioHandler
             miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
 
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
-            methodEcologicalDoors.set(propc.requireString(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
+            methodEcologicalDoors.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
-            methodEcologicalEntry.set(propc.requireString(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
+            methodEcologicalEntry.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()));
+        if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
+            tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
     }
     
     private void addSpProperty(PropertyKey<String> key, DefaultPropertyProvider<String> prov)
