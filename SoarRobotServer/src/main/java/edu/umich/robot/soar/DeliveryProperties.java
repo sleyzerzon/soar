@@ -28,12 +28,12 @@ import edu.umich.robot.util.properties.PropertyKey;
  */
 public class DeliveryProperties
 {
-    public static PropertyKey<String> METHOD_ECOLOGICAL_DOORS = 
+    public static final PropertyKey<String> METHOD_ECOLOGICAL_DOORS = 
         PropertyKey.builder("method-ecological-doors", String.class)
         .defaultValue("no")
         .build();
 
-    public static PropertyKey<String> METHOD_ECOLOGICAL_ENTRY = 
+    public static final PropertyKey<String> METHOD_ECOLOGICAL_ENTRY = 
         PropertyKey.builder("method-ecological-entry", String.class)
         .defaultValue("no")
         .build();

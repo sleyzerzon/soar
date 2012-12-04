@@ -10,6 +10,10 @@ seek
 		default-storage-area-id = ["20"];
 		mission = "DELIVERY";
 		spawn-debuggers = "false";
+
+		method-ecological-doors = "yes";
+		method-ecological-entry = "yes";
+		tasks-held-in = "smem";
 	}
 }
 
