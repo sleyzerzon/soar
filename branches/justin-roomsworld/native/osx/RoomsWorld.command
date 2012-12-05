@@ -1,4 +1,4 @@
 #!/bin/bash
 unset DYLD_LIBRARY_PATH
 cd $(dirname "$0")
-java -jar SoarRobotServer.jar
+java -jar SoarRobotServer.jar --config config/justin.txt

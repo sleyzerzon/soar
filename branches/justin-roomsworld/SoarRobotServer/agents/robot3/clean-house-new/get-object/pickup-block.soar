@@ -16,7 +16,7 @@ sp {get-object*propose*pickup-block
         ^type <type>
         ^color <color>)
 -->
-   (<s> ^operator <op> + =, >)
+   (<s> ^operator <op> + = >)
    (<op> ^name pickup-block
          ^id <oid>)
 }
