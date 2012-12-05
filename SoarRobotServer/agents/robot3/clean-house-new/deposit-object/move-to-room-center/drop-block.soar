@@ -1,12 +1,13 @@
 sp {move-to-room-center*propose*drop-block
  # :interrupt
    (state <s> ^name move-to-room-center
+              ^superstate.operator.object.id <id>
               ^collision true
               ^io.input-link.self  <self>)
    (<self> ^carry.object.id <id>
            ^stopped yes)
 -->
-   (<s> ^operator <op> + =, >)
+   (<s> ^operator <op> + = >)
    (<op> ^name drop-block
          ^actions <a>)
    (<a> ^drop-object.id <id>)
@@ -22,4 +23,3 @@ sp {apply*drop-block
 -->
    (<ts> ^retrieved-object <ro> -)
 }
-

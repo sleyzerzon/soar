@@ -1,6 +1,6 @@
 sp {clean-house*propose*goto-unvisited-area
 # :interrupt
-   (state <s> ^name delivery
+   (state <s> ^name get-object
               ^top-state.parameters.areas-held-in wm
               ^current-location <cur>
               ^top-state.areas.area <area>)
@@ -101,7 +101,8 @@ sp {get-object*evaluate*goto-unvisited-area*compare-operators
 #}
 
 sp {clean-house*compare*go-to-area*connected*closest
-   (state <s> ^current-location <ca>
+   (state <s> ^name {<> delivery}
+              ^current-location <ca>
               ^top-state.parameters.search-control-go-to-gateway yes
               ^operator <op1> +)
    (<op1> ^type go-to-area
@@ -114,7 +115,8 @@ sp {clean-house*compare*go-to-area*connected*closest
 }
 
 sp {clean-house*compare*go-to-area*connected*closest*neighbor-no-door
-   (state <s> ^current-location <ca>
+   (state <s> ^name {<> delivery}
+              ^current-location <ca>
               ^top-state.parameters.search-control-go-to-gateway yes
               ^operator <op1> +)
    (<op1> ^type go-to-area
@@ -130,7 +132,7 @@ sp {clean-house*compare*go-to-area*connected*closest*neighbor-no-door
 
 sp {get-object*propose*goto-unvisited-area*smem*neighbor-area
   #interrupt
-   (state <s> ^name delivery
+   (state <s> ^name get-object
              -^top-state.all-visited true
               ^top-state.current-location <cur>
               ^top-state.parameters.areas-held-in smem)
@@ -149,7 +151,7 @@ sp {get-object*propose*goto-unvisited-area*smem*neighbor-area
 
 sp {get-object*propose*goto-unvisited-area*smem
   #interrupt
-   (state <s> ^name delivery
+   (state <s> ^name get-object
              -^top-state.all-visited true
               ^top-state.parameters.areas-held-in smem)
 -->
@@ -204,7 +206,7 @@ sp {apply*goto-unvisited*smem*result*failure
 }
 
 sp {get-object*compare*goto-unvisited-area
-   (state <s> ^name delivery
+   (state <s> ^name get-object
               ^top-state.parameters.areas-held-in smem
               ^operator <op1> +
                         <op2> +)
@@ -216,7 +218,7 @@ sp {get-object*compare*goto-unvisited-area
 }
 
 sp {get-object*compare*goto-unvisited-area*with*area
-   (state <s> ^name delivery
+   (state <s> ^name get-object
               ^top-state.parameters.areas-held-in smem
               ^operator <op1> +
                         <op2> +)
