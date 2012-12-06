@@ -115,12 +115,6 @@ sp {delivery*propose*retrieve-task*ecological-doors
 #         ^task <task>)
 #}
 
-sp {retrieve-task*interrupt
-   (state <s> ^name retrieve-task)
--->
-   (interrupt)
-}
-
 sp {retrieve-task*propose*initialize
    (state <s> ^name retrieve-task
              -^to-be-retrieved
