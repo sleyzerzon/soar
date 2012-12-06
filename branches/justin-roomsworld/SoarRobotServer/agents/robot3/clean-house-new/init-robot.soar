@@ -18,8 +18,7 @@ sp {robot*apply*init-robot*directions
    (<d> ^storage-area-id <dsta>)
    (<ps> ^name clean-house
          ^default-state-copy yes
-         ^one-level-attributes areas current-location destination-area type
-         ^one-level-attributes visited-area)
+         ^one-level-attributes areas current-location destination-area type visited-area)
 }
 
 sp {robot*apply*init-robot*areas
@@ -40,7 +39,8 @@ sp {apply*init-robot*delivery
               ^parameters.mission delivery)
    (<op> ^name init-robot)
 -->
-   (<s> ^missions <mis>)
+   (<s> ^tasks <tasks>
+        ^missions <mis>)
    (<mis> ^mission <m1>)
    (<m1> ^name delivery
          ^status urgent)

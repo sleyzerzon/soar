@@ -152,6 +152,11 @@ public class SoarAgent implements RobotController, RadioHandler
         this.clock = clock;
         this.waypoints = new WaypointManager(getName());
         
+        if (propc != null)
+        {
+            setDefaults(propc);
+        }
+        
         properties.setProvider(AgentProperties.LENGTH_UNIT, lengthUnit);
         properties.setProvider(AgentProperties.LINEAR_SPEED_UNIT, linSpeedUnit);
         properties.setProvider(AgentProperties.ANGULAR_SPEED_UNIT, angSpeedUnit);
@@ -164,10 +169,6 @@ public class SoarAgent implements RobotController, RadioHandler
         properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
         properties.setProvider(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
 
-        
-        if (propc != null)
-            setDefaults(propc);
-        
         properties.addListener(AgentProperties.LEARN, new PropertyListener<LearnSetting>() {
             public void propertyChanged(PropertyChangeEvent<LearnSetting> event)
             {
@@ -266,7 +267,6 @@ public class SoarAgent implements RobotController, RadioHandler
         });
         properties.setProvider(AgentProperties.MISSION, mission);
 
-        
         properties.addListener(AgentProperties.MISC_COMMANDS, new PropertyListener<String[]>()
         {
             public void propertyChanged(PropertyChangeEvent<String[]> event)

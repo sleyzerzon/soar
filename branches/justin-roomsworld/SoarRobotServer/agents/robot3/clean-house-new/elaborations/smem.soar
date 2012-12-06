@@ -9,7 +9,9 @@
 
 sp {apply*clean-up*retrieve
    :o-support
-   (state <s> ^smem <smem>)
+   (state <s> ^name {<> delivery}
+             -^superstate.name delivery
+              ^smem <smem>)
    (<smem> ^result. << success failure >> <q>
            ^command <cmd>)
    (<cmd> ^retrieve <q>)
@@ -19,7 +21,9 @@ sp {apply*clean-up*retrieve
 
 sp {apply*clean-up*query
    :o-support
-   (state <s> ^smem <smem>)
+   (state <s> ^name {<> delivery}
+             -^superstate.name delivery
+              ^smem <smem>)
    (<smem> ^result. << success failure >> <q>
            ^command <cmd>)
    (<cmd> ^query <q>)
@@ -29,11 +33,12 @@ sp {apply*clean-up*query
 
 sp {apply*clean-up*store
    :o-support
-   (state <s> ^smem <smem>)
-   (<smem> ^command <cmd>
-          )# ^result.success <store>)
+   (state <s> ^name {<> delivery}
+             -^superstate.name delivery
+              ^smem <smem>)
+   (<smem> # ^result.success <store>
+           ^command <cmd>)
    (<cmd> ^store <store>)
 -->
    (<cmd> ^store <store> -)
 }
-

@@ -1,3 +1,13 @@
+# DUMMY TASKS
+
+smem --add {
+   (<task01> ^type task
+             ^object <object01>
+             ^destination <dest01>)
+   (<object01> ^color green
+               ^type block)
+   (<dest01> ^id 3)
+}
 
 # DELIVERY PROBLEM SPACE
 
@@ -18,69 +28,185 @@ sp {robot*propose*delivery
 
 sp {delivery*elaborate
    (state <s> ^name delivery
-              ^top-state.parameters <params>)
+              ^top-state <ts>)
+   (<ts> ^tasks <tasks>)
 -->
-   (<s> ^tasks <tasks>
-        ^parameters <params>)
-}
-
-sp {delivery*elaborate*dummy-tasks
-   (state <s> ^name delivery
-              ^tasks <tasks>)
--->
-   (<tasks> ^task <task>)
-   (<task> ^object <obj>
-           ^destination <dest>)
-   (<obj> ^color green
-          ^type block)
-   (<dest> ^id 40)
+   (<s> ^tasks <tasks>)
 }
 
 # OPERATORS
+
+# retrieve-all-tasks
+
+sp {delivery*propose*retrieve-all-tasks
+   (state <s> ^name delivery
+             -^top-state.all-tasks-retrieved
+              ^tasks)
+-->
+   (<s> ^operator <op> + = >)
+   (<op> ^name retrieve-all-tasks)
+}
+
+sp {delivery*apply*retrieve-all-tasks*first-query
+   (state <s> ^operator.name retrieve-all-tasks
+              ^smem.command <scmd>)
+-->
+   (<scmd> ^query.type task)
+}
+
+sp {delivery*apply*retrieve-all-tasks*next-query
+   (state <s> ^operator.name retrieve-all-tasks
+              ^smem <smem>
+              ^tasks <tasks>)
+   (<smem> ^command <scmd>
+           ^result <sres>)
+   (<sres> ^success
+           ^retrieved <task>)
+-->
+   (<tasks> ^task <task>)
+   (<scmd> ^prohibit <task>)
+}
+
+sp {delivery*apply*retrieve-all-tasks*done
+   (state <s> ^operator.name retrieve-all-tasks
+              ^smem <smem>
+              ^top-state <ts>)
+   (<smem> ^command <scmd>
+           ^result.failure)
+   (<scmd> ^{<cmd> << query prohibit >>} <arg>)
+-->
+   (<scmd> ^<cmd> <arg> -)
+   (<ts> ^all-tasks-retrieved yes)
+}
 
 # store-task
 
 # retrieve-task
 
-sp {delivery*propose*retrieve-tasks*ecological-doors
+sp {delivery*propose*retrieve-task*ecological-doors
    (state <s> ^name delivery
-              ^parameters <params>
-              ^top-state.current-location.type door
+              ^top-state <ts>
               ^tasks.task <task>)
+   (<ts> ^parameters <params>
+         ^current-location.type door)
    (<params> ^tasks-held-in smem
              ^method-ecological-doors yes)
-  -(<task> ^object
-           ^destination)
+   (<task> -^all-retrieved)
 -->
-   (<s> ^operator <op> + =)
+   (<s> ^operator <op> + = >)
    (<op> ^name retrieve-task
          ^task <task>)
 }
 
-sp {delivery*propose*retrieve-tasks*ecological-entry
-   (state <s> ^name delivery
-              ^parameters <params>
-              ^top-state.current-location.type room
-              ^tasks.task <task>)
-   (<params> ^tasks-held-in smem
-             ^method-ecological-entry yes)
-  -(<task> ^object
-           ^destination)
+#sp {delivery*propose*retrieve-task*ecological-entry
+# FIXME this rule will fire anytime the agent is in a room
+# need to be more discriminatory than this
+#   (state <s> ^name delivery
+#              ^top-state <ts>
+#              ^tasks.task <task>)
+#   (<ts> ^parameters <params>
+#         ^current-location.type door)
+#   (<params> ^tasks-held-in smem
+#             ^method-ecological-entry yes)
+#   (<task> -^<< object destination >>.<attr>)
+#-->
+#   (<s> ^operator <op> + = >)
+#   (<op> ^name retrieve-task
+#         ^task <task>)
+#}
+
+sp {retrieve-task*interrupt
+   (state <s> ^name retrieve-task)
 -->
-   (<s> ^operator <op> + =)
-   (<op> ^name retrieve-task
-         ^task <task>)
+   (interrupt)
 }
 
-sp {delivery*apply*retrieve-tasks*retrieve
-   (state <s> ^name delivery
+sp {retrieve-task*propose*initialize
+   (state <s> ^name retrieve-task
+             -^to-be-retrieved
+             -^retrieved)
+-->
+   (<s> ^operator <op> + = >)
+}
+
+sp {retrieve-task*apply*initialize
+   (state <s> ^name retrieve-task
+              ^superstate.operator.task <task>)
+-->
+   (<s> ^to-be-retrieved.lti <task>
+        ^retrieved <retrieved>)
+}
+
+sp {retrieve-task*propose*retrieve-lti
+   (state <s> ^name retrieve-task
+              ^to-be-retrieved.lti <lti>)
+-->
+   (<s> ^operator <op> + = >)
+   (<op> ^name retrieve-lti
+         ^lti <lti>)
+}
+
+sp {retrieve-task*apply*retrieve-lti*retrieve
+   (state <s> ^name retrieve-task
               ^operator <op>
-              ^parameters.tasks-held-in smem
-              ^smem.command <scmd>)
-   (<op> ^name retrieve-task
-         ^task <task>)
+              ^top-state.parameters.tasks-held-in smem
+              ^smem.command <scmd>
+             -^retrieved.lti <lti>)
+   (<op> ^name retrieve-lti
+         ^lti <lti>)
 -->
-   (<scmd> ^retrieve <task>)
+   (<scmd> ^retrieve <lti>)
+}
+
+sp {retrieve-task*apply*retrieve-lti*copy-children
+   (state <s> ^name retrieve-task
+              ^operator <op>
+              ^top-state.parameters.tasks-held-in smem
+              ^smem.result.retrieved <lti>
+              ^to-be-retrieved <to-be-retrieved>
+              ^retrieved <retrieved>)
+   (<op> ^name retrieve-lti
+         ^lti <lti>)
+   (<lti> ^<attr> <val>)
+   (<retrieved> -^lti <val>)
+-->
+   (<to-be-retrieved> ^lti <val>)
+}
+
+sp {retrieve-task*apply*retrieve-lti*remove-command
+   (state <s> ^name retrieve-task
+              ^operator <op>
+              ^top-state.parameters.tasks-held-in smem
+              ^smem <smem>
+              ^to-be-retrieved <to-be-retrieved>
+              ^retrieved <retrieved>)
+   (<op> ^name retrieve-lti
+         ^lti <lti>)
+   (<smem> ^command <scmd>
+           ^result.<< success failure bad-cmd >>)
+   (<scmd> ^retrieve <lti>)
+   (<to-be-retrieved> ^lti <lti>)
+-->
+   (<scmd> ^retrieve <lti> -)
+   (<to-be-retrieved> ^lti <lti> -)
+   (<retrieved> ^lti <lti>)
+}
+
+sp {retrieve-task*propose*done
+   (state <s> ^name retrieve-task
+             -^to-be-retrieved.lti
+              ^retrieved.lti)
+-->
+   (<s> ^operator <op> + = >)
+   (<op> ^name done)
+}
+
+sp {retrieve-task*apply*done
+   (state <s> ^name retrieve-task
+              ^operator.name done
+              ^superstate.operator.task <task>)
+-->
+   (<task> ^all-retrieved yes)
 }
 
 # pick up
@@ -209,7 +335,7 @@ sp {delivery*propose*goto-unvisited-area*smem
    (state <s> ^name get-object
               ^top-state <ts>)
    (<ts> -^all-visited true
-          ^parameters.areas-held-in smem)
+          ^top-state.parameters.areas-held-in smem)
 -->
    (<s> ^operator <op> + =)
    (<op> ^name goto-unvisited-area
