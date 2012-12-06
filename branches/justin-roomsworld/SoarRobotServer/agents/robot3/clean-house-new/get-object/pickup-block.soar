@@ -22,8 +22,7 @@ sp {get-object*propose*pickup-block
 }
 
 sp {get-object-hierarchical-pickup*compare*pickup-block
-   (state <s> ^name get-object
-              ^io.input-link.objects.object <obj1> { <> <obj1> <obj2> }
+   (state <s> ^io.input-link.objects.object <obj1> { <> <obj1> <obj2> }
               ^operator <op1> +
                         <op2> +)
    (<op1> ^name pickup-block
