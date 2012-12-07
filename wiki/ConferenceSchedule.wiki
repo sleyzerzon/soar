@@ -5,7 +5,7 @@
 Updated September 10, 2012
 
 || *Conference* || *Full Name* || *EIC* || *Conference Date* || *Location* || *Abstract Due* || *Paper Due* ||
-|| [http://www.aaai.org/Conferences/AAAI/aaai13.php AAAI] || National Conference on Artificial Intelligence || 0.99 || 2013-07-14 to 2013-07-18 || Bellevue, WA || 2013-01-19 || 2013-01-22 ||
+|| [http://www.aaai.org/Conferences/AAAI/aaai13.php AAAI] || AAAI Conference on Artificial Intelligence || 0.99 || 2013-07-14 to 2013-07-18 || Bellevue, WA || 2013-01-19 || 2013-01-22 ||
 || [http://aamas2013.cs.umn.edu/ AAMAS] || Autonomous Agents and Multi-Agent Systems || 0.76 || 2013-05-06 to 2013-05-10 || St. Paul, MN || 2012-10-08 || 2012-10-12 ||
 || [http://agi-conf.org/ AGI] || Artificial General Intelligence ||  || 2013-07-31 to 2013-08-03 || Beijing, China ||  ||  ||
 || AIIDE || Artificial Intelligence and Interactive Digital Entertainment ||  ||  ||  ||  ||  ||
