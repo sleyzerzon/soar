@@ -15,6 +15,7 @@ multi-attributes gateway 10
 multi-attributes wall 6
 multi-attributes evaluation 3
 multi-attributes mission 3
+multi-attributes task 20
 
 pushd ../../default
 source selection.soar
@@ -40,7 +41,7 @@ smem --set thresh 30
 #stats --track
 #Command-to-file stats.csv stats --cycle-csv
 #stats --max
-wma -s activation off
+#wma -s activation on
 #wma -s decay-rate .999
 #wma -s forgetting on
 ##wma -s criteria o-agent

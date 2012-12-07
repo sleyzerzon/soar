@@ -43,4 +43,14 @@ public class DeliveryProperties
         .defaultValue("wm") // acceptable values: wm smem
         .build();
 
+    public static final PropertyKey<Double> DECAY_RATE = 
+        PropertyKey.builder("decay-rate", Double.class)
+        .defaultValue(0.0)
+        .build();
+
+    public static final PropertyKey<Boolean> F = 
+        PropertyKey.builder("epmem-learning", Boolean.class) 
+        .defaultValue(Boolean.FALSE) 
+        .build();
+
 }

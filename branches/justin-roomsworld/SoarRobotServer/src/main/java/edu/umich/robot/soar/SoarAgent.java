@@ -132,6 +132,8 @@ public class SoarAgent implements RobotController, RadioHandler
 
     private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
 
+    private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
+
     private String productions;
     
     private final WallClock clock;
@@ -168,6 +170,18 @@ public class SoarAgent implements RobotController, RadioHandler
         properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
         properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
         properties.setProvider(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
+        properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
+            public void propertyChanged(PropertyChangeEvent<Double> event)
+            {
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting off");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s decay-rate " + event.getNewValue());
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting on");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forget-wme lti");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation on");
+            }
+        });
+        properties.setProvider(DeliveryProperties.DECAY_RATE, decayRate);
 
         properties.addListener(AgentProperties.LEARN, new PropertyListener<LearnSetting>() {
             public void propertyChanged(PropertyChangeEvent<LearnSetting> event)
@@ -314,6 +328,8 @@ public class SoarAgent implements RobotController, RadioHandler
             methodEcologicalEntry.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()));
         if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
             tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
+        if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
+            decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
     }
     
     private void addSpProperty(PropertyKey<String> key, DefaultPropertyProvider<String> prov)
