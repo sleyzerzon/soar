@@ -1,12 +1,18 @@
-# DUMMY TASKS
+# TASKS
 
-smem --add {
-   (<task01> ^type task
-             ^object <object01>
-             ^destination <dest01>)
-   (<object01> ^color green
-               ^type block)
-   (<dest01> ^id 3)
+#smem --add {
+#   (<task01> ^type task
+#             ^object <object01>
+#             ^destination <dest01>)
+#   (<object01> ^color green
+#               ^type block)
+#   (<dest01> ^id 3)
+#}
+
+sp {interrupt
+   (state <s> ^operator.name recursive-retrieve)
+-->
+   #(interrupt)
 }
 
 # DELIVERY PROBLEM SPACE
@@ -32,6 +38,18 @@ sp {delivery*elaborate
    (<ts> ^tasks <tasks>)
 -->
    (<s> ^tasks <tasks>)
+}
+
+# PREFERENCES
+
+sp {delivery*compare*pickup*putdown
+   (state <s> ^name delivery
+              ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name pickup-block)
+   (<o2> ^name move-to-room-center)
+-->
+   (<s> ^operator <o2> > <o1>)
 }
 
 # OPERATORS
@@ -81,12 +99,12 @@ sp {delivery*apply*retrieve-all-tasks*done
 
 # store-task
 
-# retrieve-task
+# recursive-retrieve
 
-sp {delivery*propose*retrieve-task*ecological-doors
+sp {delivery*propose*recursive-retrieve*ecological-doors
    (state <s> ^name delivery
               ^top-state <ts>
-              ^tasks.task <task>)
+              ^tasks.task <lti>)
    (<ts> ^parameters <params>
          ^current-location.type door)
    (<params> ^tasks-held-in smem
@@ -94,11 +112,11 @@ sp {delivery*propose*retrieve-task*ecological-doors
    (<task> -^all-retrieved)
 -->
    (<s> ^operator <op> + = >)
-   (<op> ^name retrieve-task
-         ^task <task>)
+   (<op> ^name recursive-retrieve
+         ^lti <lti>)
 }
 
-#sp {delivery*propose*retrieve-task*ecological-entry
+#sp {delivery*propose*recursive-retrieve*ecological-entry
 # FIXME this rule will fire anytime the agent is in a room
 # need to be more discriminatory than this
 #   (state <s> ^name delivery
@@ -111,55 +129,55 @@ sp {delivery*propose*retrieve-task*ecological-doors
 #   (<task> -^<< object destination >>.<attr>)
 #-->
 #   (<s> ^operator <op> + = >)
-#   (<op> ^name retrieve-task
+#   (<op> ^name recursive-retrieve
 #         ^task <task>)
 #}
 
-sp {retrieve-task*propose*initialize
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*propose*initialize
+   (state <s> ^name recursive-retrieve
              -^to-be-retrieved
              -^retrieved)
 -->
    (<s> ^operator <op> + = >)
+   (<op> ^name initialize)
 }
 
-sp {retrieve-task*apply*initialize
-   (state <s> ^name retrieve-task
-              ^superstate.operator.task <task>)
+sp {recursive-retrieve*apply*initialize
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator.lti <lti>)
 -->
-   (<s> ^to-be-retrieved.lti <task>
+   (<s> ^to-be-retrieved.lti <lti>
         ^retrieved <retrieved>)
 }
 
-sp {retrieve-task*propose*retrieve-lti
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*propose*retrieve
+   (state <s> ^name recursive-retrieve
               ^to-be-retrieved.lti <lti>)
 -->
    (<s> ^operator <op> + = >)
-   (<op> ^name retrieve-lti
+   (<op> ^name retrieve
          ^lti <lti>)
 }
 
-sp {retrieve-task*apply*retrieve-lti*retrieve
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*apply*retrieve*retrieve
+   (state <s> ^name recursive-retrieve
               ^operator <op>
-              ^top-state.parameters.tasks-held-in smem
               ^smem.command <scmd>
              -^retrieved.lti <lti>)
-   (<op> ^name retrieve-lti
+   (<op> ^name retrieve
          ^lti <lti>)
 -->
    (<scmd> ^retrieve <lti>)
 }
 
-sp {retrieve-task*apply*retrieve-lti*copy-children
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*apply*retrieve*copy-children
+   (state <s> ^name recursive-retrieve
               ^operator <op>
-              ^top-state.parameters.tasks-held-in smem
               ^smem.result.retrieved <lti>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>)
-   (<op> ^name retrieve-lti
+   (<op> ^name retrieve
          ^lti <lti>)
    (<lti> ^<attr> <val>)
    (<retrieved> -^lti <val>)
@@ -167,14 +185,13 @@ sp {retrieve-task*apply*retrieve-lti*copy-children
    (<to-be-retrieved> ^lti <val>)
 }
 
-sp {retrieve-task*apply*retrieve-lti*remove-command
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*apply*retrieve*remove-command
+   (state <s> ^name recursive-retrieve
               ^operator <op>
-              ^top-state.parameters.tasks-held-in smem
               ^smem <smem>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>)
-   (<op> ^name retrieve-lti
+   (<op> ^name retrieve
          ^lti <lti>)
    (<smem> ^command <scmd>
            ^result.<< success failure bad-cmd >>)
@@ -186,8 +203,8 @@ sp {retrieve-task*apply*retrieve-lti*remove-command
    (<retrieved> ^lti <lti>)
 }
 
-sp {retrieve-task*propose*done
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*propose*done
+   (state <s> ^name recursive-retrieve
              -^to-be-retrieved.lti
               ^retrieved.lti)
 -->
@@ -195,12 +212,12 @@ sp {retrieve-task*propose*done
    (<op> ^name done)
 }
 
-sp {retrieve-task*apply*done
-   (state <s> ^name retrieve-task
+sp {recursive-retrieve*apply*done
+   (state <s> ^name recursive-retrieve
               ^operator.name done
-              ^superstate.operator.task <task>)
+              ^superstate.operator.lti <lti>)
 -->
-   (<task> ^all-retrieved yes)
+   (<lti> ^all-retrieved yes)
 }
 
 # pick up
@@ -211,6 +228,8 @@ sp {delivery*propose*pickup-block
               ^tasks.task <task>)
    (<task> ^object <desc>)
    (<obj> ^id <id>)
+   # check that the object has not been forgotten
+   (<desc> ^<attr>)
    # check that the object is right for the task
   -{ (<desc> ^<attr> <val>)
     -(<obj> ^<attr> <val>) }
@@ -219,12 +238,6 @@ sp {delivery*propose*pickup-block
    (<op> ^name pickup-block
          ^task <task>
          ^id <id>)
-}
-
-sp {interrupt-pickup-block
-   (state <s> ^operator.name grasp-block)
--->
-   (interrupt)
 }
 
 sp {delivery*apply*pickup-block*store-object-id
@@ -247,6 +260,8 @@ sp {delivery*propose*move-to-room-center
               ^tasks.task <task>)
    (<task> ^object-id <id>
            ^destination <dest>)
+   # check that the destination has not been forgotten
+   (<dest> ^<attr>)
    # check that we are in the right location
   -{ (<dest> ^<attr> <val>)
     -(<room> ^<attr> <val>) }
@@ -254,14 +269,6 @@ sp {delivery*propose*move-to-room-center
    (<s> ^operator <op> + = >)
    (<op> ^name move-to-room-center
          ^object <obj>)
-}
-
-sp {interrupt-drop-block
-   (state <s> ^superstate.name delivery
-              ^name move-to-room-center
-              ^operator.name drop-block)
--->
-   (interrupt)
 }
 
 sp {move-to-room-center*apply*drop-block*complete-task

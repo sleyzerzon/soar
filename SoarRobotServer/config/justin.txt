@@ -14,7 +14,7 @@ seek
 		areas-held-in = "wm";
 		objects-held-in = "wm";
 		delete-old-areas = "false";
-		# FIXME forgetting
+		decay-rate = 0.999;
 
 		method-ecological-doors = "yes";
 		method-ecological-entry = "yes";
