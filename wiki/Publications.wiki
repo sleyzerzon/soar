@@ -3,6 +3,8 @@
 
 = 2012 =
 
+Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://downloads.hindawi.com/journals/mpe/2012/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
+
 Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
 Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm_2012_competence.pdf Competence-Preserving Retention of Learned Knowledge in Soar's Working and Procedural Memories]. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
