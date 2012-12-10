@@ -140,9 +140,8 @@ public class SoarAgent implements RobotController, RadioHandler
     
     private static final String SP_PARAM = 
         "sp {robot*elaborate*state*%s\n"
-      + "    (state <s> ^name robot\n"
-      + "               ^parameters <p>\n"
-      + "               ^superstate nil)\n" 
+      + "    (state <s> ^superstate nil\n" 
+      + "               ^parameters <p>)\n"
       + "-->\n"
       + "    (<p> ^%s %s)\n" 
       + "}\n";

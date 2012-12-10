@@ -287,93 +287,49 @@ sp {move-to-room-center*apply*drop-block*complete-task
    (<tasks> ^task <task> -)
 }
 
-# patrol
+# circuit
 
-sp {delivery*propose*patrol
-   (state <s> ^name delivery)
+sp {delivery*propose*circuit
+   (state <s> ^name delivery
+              ^current-location.id <id>)
 -->
    (<s> ^operator <op> + = <)
-   (<op> ^name patrol
-         ^first-area <a01>)
+   (<op> ^name circuit
+         ^area <a01> <a02> <a03> <a04> <a05> <a06> <a07> <a08> <a09> <a10>)
    (<a01> ^next <a02>
-          ^id 20)
-   (<a02> ^next <a03>
-          ^id 25)
-   (<a03> ^next <a04>
-          ^id 30)
-   (<a04> ^next <a05>
-          ^id 35)
-   (<a05> ^next <a06>
-          ^id 40)
-   (<a06> ^next <a07>
-          ^id 45)
-   (<a07> ^next <a08>
           ^id 0)
-   (<a08> ^next <a09>
+   (<a02> ^next <a03>
           ^id 5)
-   (<a09> ^next <a10>
+   (<a03> ^next <a04>
           ^id 10)
-   (<a10> ^next nil
+   (<a04> ^next <a05>
           ^id 15)
+   (<a05> ^next <a06>
+          ^id 20)
+   (<a06> ^next <a07>
+          ^id 25)
+   (<a07> ^next <a08>
+          ^id 30)
+   (<a08> ^next <a09>
+          ^id 35)
+   (<a09> ^next <a10>
+          ^id 40)
+   (<a10> ^next <a01>
+          ^id 45)
 }
 
-# goto-unvisited-area
-
-sp {delivery*propose*goto-unvisited-area*wm
-   (state <s> ^name delivery
-              ^top-state.parameters.areas-held-in wm
-              ^top-state.areas.area <area>)
-   (<area> -^visited yes
-            ^id <id>)
+sp {circuit*propose*go-to-area
+   (state <s> ^name circuit
+              ^superstate.operator <sop>
+              ^top-state.current-location.id <area-id>)
+   (<sop> ^name circuit
+          ^area <area>)
+   (<area> ^next <next-area>
+           ^id <area-id>)
+   (<next-area> ^id <next-id>)
 -->
-   (<s> ^operator <op> + =)
-   (<op> ^name goto-unvisited-area
+   (<s> ^operator <op> + = >)
+   (<op> ^name go-to-area
          ^type go-to-area
-         ^area <area>)
-}
-
-sp {delivery*propose*goto-unvisited-area*smem
-   (state <s> ^name get-object
-              ^top-state <ts>)
-   (<ts> -^all-visited true
-          ^top-state.parameters.areas-held-in smem)
--->
-   (<s> ^operator <op> + =)
-   (<op> ^name goto-unvisited-area
-         ^type go-to-area
-         ^storage-area no)
-}
-
-sp {delivery*propose*goto-unvisited-area*elaborate*connected-direct
-   (state <s> ^name delivery
-              ^current-location.neighbor-area <area>
-              ^top-state.parameters.search-control-go-to-gateway yes
-              ^operator <op> +)
-   (<op> ^name goto-unvisited-area
-         ^area <area>)
--->
-   (<op> ^connected yes)
-}
-
-sp {delivery*propose*goto-unvisited-area*elaborate*connected-gateway
-   (state <s> ^name delivery
-              ^current-location.gateway.to <id>
-              ^top-state.parameters.search-control-go-to-gateway yes
-              ^operator <op> +)
-   (<op> ^name goto-unvisited-area
-         ^area.id <id>)
--->
-   (<op> ^connected yes)
-}
-
-sp {delivery*compare*go-to-unvisited-area*connected
-   (state <s> ^name delivery
-              ^operator <op1> +
-              ^operator <op2> +)
-   (<op1> ^name goto-unvisited-area
-          ^connected yes)
-   (<op2> ^name goto-unvisited-area
-         -^connected yes)
--->
-   (<s> ^operator <op1> > <op2>)
+         ^area <next-area>)
 }
