@@ -3,7 +3,11 @@
 
 = 2012 =
 
-Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://downloads.hindawi.com/journals/mpe/2012/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
+Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
+
+Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
+
+Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
 
 Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
