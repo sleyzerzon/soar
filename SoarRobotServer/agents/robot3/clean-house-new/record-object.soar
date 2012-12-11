@@ -24,26 +24,13 @@ sp {apply*record-object*wm*storage
               ^objects <b>)
    (<op> ^name record-object
          ^object <obj>)
-   (<obj> ^x <x>
-          ^y <y>
-          ^id <id>
-          ^type <type>
-          ^color <color>
-          ^height <height>
-          ^smell <smell>
-          ^shape <shape>)
+   (<obj> ^<attr> <val>)
 -->
    (<b> ^object <nb>)
-   (<nb> ^x <x> ^y <y>
-         ^id <id>
+   (<nb> ^<attr> <val>
          ^in-storage-room yes
          ^area <area>
-         ^class object
-         ^type <type>
-         ^color <color>
-         ^height <height>
-         ^shape <shape>
-         ^smell <smell>)
+         ^class object)
 }
 
 sp {apply*record-object*wm*storage*no
@@ -54,25 +41,13 @@ sp {apply*record-object*wm*storage*no
               ^objects <b>)
    (<op> ^name record-object
          ^object <obj>)
-   (<obj> ^x <x> ^y <y>
-          ^id <id>
-          ^type <type>
-          ^color <color>
-          ^height <height>
-          ^smell <smell>
-          ^shape <shape>)
+   (<obj> ^<attr> <val>)
 -->
    (<b> ^object <nb>)
-   (<nb> ^x <x> ^y <y>
-         ^id <id>
+   (<nb> ^<attr> <val>
          ^in-storage-room no
          ^area <area>
-         ^class object
-         ^type <type>
-         ^color <color>
-         ^height <height>
-         ^shape <shape>
-         ^smell <smell>)
+         ^class object)
 }
 
 ## Test to see if already know block exists
