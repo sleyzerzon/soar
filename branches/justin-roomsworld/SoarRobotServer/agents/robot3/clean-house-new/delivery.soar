@@ -295,7 +295,7 @@ sp {delivery*propose*circuit
 -->
    (<s> ^operator <op> + = <)
    (<op> ^name circuit
-         ^area <a01> <a02> <a03> <a04> <a05> <a06> <a07> <a08> <a09> <a10>)
+         ^area <a01> <a02> <a03> <a04> <a05> <a06> <a07> <a08> <a09> <a10> <a11> <a12>)
    (<a01> ^next <a02>
           ^id 0)
    (<a02> ^next <a03>
@@ -314,8 +314,12 @@ sp {delivery*propose*circuit
           ^id 35)
    (<a09> ^next <a10>
           ^id 40)
-   (<a10> ^next <a01>
+   (<a10> ^next <a11>
           ^id 45)
+   (<a11> ^next <a12>
+          ^id 50)
+   (<a12> ^next <a01>
+          ^id 55)
 }
 
 sp {circuit*propose*go-to-area
