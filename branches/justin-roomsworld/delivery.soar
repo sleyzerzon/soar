@@ -14,7 +14,8 @@
 # TASKS
 
 sp {interrupt
-   (state <s> ^operator.name recursive-retrieve)
+   (state <s> ^operator.name record-area-wm
+              ^io.input-link.area-description.id 15)
 -->
    #(interrupt)
 }
@@ -72,37 +73,40 @@ sp {delivery*elaborate*constants
 
 # default
 
+sp {elaborate*topstate*topstate
+   (state <s> ^superstate nil)
+-->
+   (<s> ^topstate <s>)
+}
+
+sp {elaborate*state*inherited*defaults
+   (state <s> ^superstate.{<attr> << io topstate >>} <val>)
+-->
+   (<s> ^<attr> <val>)
+}
+
 sp {elaborate*state*state-name
    (state <s> ^superstate.operator.name <name>)
 -->
    (<s> ^name <name>)
 }
 
-sp {elaborate*state*topstate*base-case
-   (state <s> ^superstate nil)
--->
-   (<s> ^topstate <s>)
-}
+# domain-specific inherited attributes
 
-sp {elaborate*state*topstate*recursive-step
-   (state <s> ^superstate.topstate <ts>)
--->
-   (<s> ^topstate <ts>)
-}
+sp {elaborate*state*inherited*domain
+   (state <s> ^superstate.{<attr> << parameters constants areas objects tasks >>} <val>)
 
-sp {elaborate*state*io
-   (state <s> ^superstate.io <io>)
 -->
-   (<s> ^io <io>)
+   (<s> ^<attr> <val>)
 }
 
 # navigation
 
 sp {elaborate*state*current-area
-   (state <s> ^io.input-link <il>)
-   (<il> ^self.area <area-id>
-         ^area-description <area>)
-   (<area> ^id <area-id>)
+   (state <s> ^io.input-link.area-description.id <id>
+              ^areas.area <area>)
+   (<area> ^id <id>
+           ^stored yes)
 -->
    (<s> ^current-area <area>)
 }
@@ -122,17 +126,151 @@ sp {elaboroate*state*waypoint
 
 sp {elaborate*state*arrived
    (state <s> ^name <name>
-              ^topstate.parameters.distance-tolerance <distance-tol>
-              ^destination.waypoint <waypoint>)
-   (<waypoint> ^id <id>
-               ^distance {<= <distance-tol>})
+              ^parameters.distance-tolerance <distance-tol>
+              ^destination.waypoint.distance {<= <distance-tol>})
 -->
    (<s> ^arrived yes)
 }
 
 # PREFERENCES
 
+sp {elaborate*operator*movement
+   (state <s> ^operator <o> +)
+   (<o> ^name << patrol go-to-adjacent-area go-to-coord turn-to-coord drive-to-coord >>)
+-->
+   (<o> ^type movement)
+}
+
+sp {elaborate*operator*record
+   (state <s> ^operator <o> +)
+   (<o> ^name << record-area-wm >>)
+-->
+   (<o> ^type record)
+}
+
+sp {delivery*compare*record*movement
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^type record)
+   (<o2> ^type movement)
+-->
+   (<s> ^operator <o1> > <o2>)
+}
+
 # OPERATORS
+
+# record-area-wm
+
+sp {delivery*propose*record-area-wm
+   (state <s> ^name delivery
+             -^current-area
+              ^parameters.areas-held-in wm)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name record-area-wm)
+}
+
+sp {record-area-wm*propose*create-neighbor-area
+   (state <s> ^name record-area-wm
+              ^io.input-link.area-description <description>
+             -^areas.area.id <to>)
+   (<description> ^id <id>
+                  ^gateway.to {<to> <> <id>})
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name create-neighbor-area
+        ^area-id <to>)
+}
+
+sp {record-area-wm*apply*create-neighbor-area
+   (state <s> ^name record-area-wm
+              ^operator <o>
+              ^areas <areas>)
+   (<o> ^name create-neighbor-area
+        ^area-id <id>)
+-->
+   (<areas> ^area.id <id>)
+}
+
+sp {record-area-wm*propose*copy-curent-area
+   (state <s> ^name record-area-wm
+              ^io.input-link.area-description <description>
+              ^areas <areas>)
+   (<description> ^id <id>)
+  -{ (<description> ^gateway.to {<to> <> <id>})
+    -(<areas> ^area.id <to>) }
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name copy-current-area)
+}
+
+sp {record-area-wm*apply*copy-current-area*create-area
+   (state <s> ^name record-area-wm
+              ^operator.name copy-current-area
+              ^io.input-link.area-description <description>
+              ^areas <areas>)
+   (<description> ^id <id>
+                  ^type <type>)
+  -(<areas> ^area.id <id>)
+-->
+   (<s> ^area <area>)
+   (<areas> ^area <area>)
+   (<area> ^id <id>
+           ^type <type>
+           ^class area)
+}
+
+sp {record-area-wm*apply*copy-current-area*link-area
+   (state <s> ^name record-area-wm
+              ^operator.name copy-current-area
+              ^io.input-link.area-description <description>
+              ^areas.area <area>)
+   (<description> ^id <id>
+                  ^type <type>)
+   (<area> ^id <id>)
+-->
+   (<s> ^area <area>)
+   (<area> ^type <type>
+           ^class area)
+}
+
+sp {record-area-wm*apply*copy-current-area*gateway
+   (state <s> ^name record-area-wm
+              ^operator.name copy-current-area
+              ^io.input-link.area-description.gateway <cgateway>
+              ^areas.area <to-area>
+              ^area <area>)
+   (<area> ^id <id>
+          -^gateway.id <gid>)
+   (<to-area> ^id <to>)
+   (<cgateway> ^id <gid>
+               ^to {<to> <> <id>}
+               ^x <x>
+               ^y <y>)
+-->
+   (<area> ^gateway <gateway>)
+   (<to-area> ^gateway <gateway>)
+   (<gateway> ^id <gid>
+              ^class coord
+              ^type gateway
+              ^to <area>
+              ^to <to-area>
+              ^x <x>
+              ^y <y>)
+}
+
+sp {record-area-wm*apply*copy-current-area*done
+   (state <s> ^name record-area-wm
+              ^operator.name copy-current-area
+              ^io.input-link.area-description <description>
+              ^area <area>)
+   (<area> ^id <id>)
+  -{ (<description> ^gateway <gateway>)
+     (<gateway> ^to {<to> <> <id>})
+    -(<area> ^gateway.to.id <to>) }
+-->
+   (<area> ^stored yes)
+}
 
 # patrol
 
@@ -189,26 +327,13 @@ sp {go-to-adjacent-area*elaborate*destination
               ^current-area <area>)
    (<area> ^gateway <gateway>
            ^id <id>)
-   (<gateway> ^to <id>
-              ^to <next-id>
+   (<gateway> ^to.id <next-id>
               ^x <x>
               ^y <y>)
 -->
    (<s> ^destination <destination>)
    (<destination> ^x <x>
                   ^y <y>)
-}
-
-sp {go-to-adjacent-area*elaborate*gateway
-   (state <s> ^name go-to-adjacent-area
-              ^current-area <area>
-              ^superstate.operator.area-id <next-id>)
-   (<area> ^gateway <gateway>
-           ^id <id>)
-   (<gateway> ^to <id>
-              ^to <next-id>)
--->
-   (<s> ^gateway <gateway>)
 }
 
 sp {go-to-adjacent-area*propose*go-to-gateway
@@ -226,10 +351,17 @@ sp {go-to-adjacent-area*propose*go-to-gateway
 
 sp {go-to-adjacent-area*propose*enter-area
    (state <s> ^name go-to-adjacent-area
+              ^superstate.operator.area-id <next-id>
               ^arrived yes
+              ^current-area <area>
+              ^io.input-link.area-description.gateway <gateway>
               ^destination.waypoint <waypoint>
-              ^gateway.direction <direction>
-              ^topstate.constants.direction-delta.<direction> <dir-delta>)
+              ^constants.direction-delta.<direction> <dir-delta>)
+   (<area> ^gateway.to.id <next-id>
+           ^id <id>)
+   (<gateway> ^to <id>
+              ^to <next-id>
+              ^direction <direction>)
    (<waypoint> ^x <x>
                ^y <y>)
    (<dir-delta> ^x <delta-x>
@@ -256,7 +388,7 @@ sp {go-to-coord*elaborate*destination
 
 sp {go-to-coord*propose*turn-to-waypoint
    (state <s> ^name go-to-coord
-              ^topstate.parameters.heading-tolerance <heading-tol>
+              ^parameters.heading-tolerance <heading-tol>
               ^destination.waypoint <waypoint>)
    (<waypoint> ^yaw <yaw>
                ^abs-relative-bearing {> <heading-tol>})
@@ -268,7 +400,7 @@ sp {go-to-coord*propose*turn-to-waypoint
 
 sp {go-to-coord*propose*drive-to-waypoint
    (state <s> ^name go-to-coord
-              ^topstate.parameters <params>
+              ^parameters <params>
               ^destination.waypoint <waypoint>)
    (<params> ^distance-tolerance <distance-tol>
              ^linear-velocity <velocity>
@@ -298,7 +430,7 @@ sp {propose*add-waypoint
                    ^y <y>)
 }
 
-sp {elaborate*operator*remove-waypoint
+sp {propose*remove-waypoint
    (state <s> ^name <name>
               ^io.input-link.waypoints.waypoint <waypoint>
               ^destination <destination>)
