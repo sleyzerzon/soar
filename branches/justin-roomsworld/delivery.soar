@@ -29,26 +29,44 @@ sp {propose*init-agent
    (<o> ^name init-agent)
 }
 
-sp {apply*init-agent
+sp {apply*init-agent*parameters
    (state <s> ^operator.name init-agent)
 -->
    (<s> ^name delivery
         ^tasks <tasks>
         ^areas <areas>
-        ^objects <objects>
-        ^parameters <params>
-        ^constants <constants>)
-   (<params>
-             ^distance-tolerance 1.0
-             ^heading-tolerance 0.7
-             ^linear-velocity 0.7)
-   (<constants> ^direction-yaw <d-yaw>)
-   (<d-yaw> ^north 270
-            ^south 90
-            ^east 0
-            ^west 180)
+        ^objects <objects>)
 }
 
+sp {delivery*elaborate*parameters
+   (state <s> ^name delivery)
+-->
+   (<s> ^parameters <params>)
+   (<params> ^distance-tolerance 1.0
+             ^heading-tolerance 1.5
+             ^linear-velocity 0.7)
+}
+
+sp {delivery*elaborate*constants
+   (state <s> ^name delivery
+              ^parameters <params>)
+   (<params> ^distance-tolerance <distance-tol>)
+-->
+   (<s> ^constants <constants>)
+   (<constants> ^direction-delta <dir-delta>)
+   (<dir-delta> ^north <dir-delta-north>
+                ^south <dir-delta-south>
+                ^east <dir-delta-east>
+                ^west <dir-delta-west>)
+   (<dir-delta-north> ^x 0.0
+                      ^y (+ 0.5 <distance-tol>))
+   (<dir-delta-south> ^x 0.0
+                      ^y (- -0.5 <distance-tol>))
+   (<dir-delta-east> ^x (+ 0.5 <distance-tol>)
+                     ^y 0.0)
+   (<dir-delta-west> ^x (- -0.5 <distance-tol>)
+                     ^y 0.0)
+}
 
 # ELABORATIONS
 
@@ -90,34 +108,40 @@ sp {elaborate*state*current-area
 }
 
 sp {elaboroate*state*waypoint
-   (state <s> ^superstate nil
-              ^io.input-link.waypoints.waypoint <waypoint>)
-   (<waypoint> ^x <x>
+   (state <s> ^name <name>
+              ^io.input-link.waypoints.waypoint <waypoint>
+              ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
+   (<waypoint> ^id <name>
+               ^x <x>
                ^y <y>)
 -->
-   (<s> ^destination <waypoint>)
+   (<destination> ^waypoint <waypoint>)
 }
 
 sp {elaborate*state*arrived
-   (state <s> ^superstate nil
+   (state <s> ^name <name>
               ^topstate.parameters.distance-tolerance <distance-tol>
-              ^destination <destination>)
-   (<destination> ^id <id>
-                  ^distance {<= <distance-tol>})
+              ^destination.waypoint <waypoint>)
+   (<waypoint> ^id <id>
+               ^distance {<= <distance-tol>})
 -->
-   (<s> ^arrived <id>)
+   (<s> ^arrived yes)
 }
 
 # PREFERENCES
 
 # OPERATORS
 
+# patrol
+
 sp {delivery*propose*patrol
    (state <s> ^name delivery)
 -->
    (<s> ^operator <o> +)
    (<o> ^name patrol
-        ^area <a01> <a02> <a03> <a04> <a05> <a06> <a07> <a08> <a09> <a10>)
+        ^area <a01> <a02> <a03> <a04> <a05> <a06> <a07> <a08> <a09> <a10> <a11> <a12>)
    (<a01> ^next <a02>
           ^id 0)
    (<a02> ^next <a03>
@@ -136,33 +160,63 @@ sp {delivery*propose*patrol
           ^id 35)
    (<a09> ^next <a10>
           ^id 40)
-   (<a10> ^next <a01>
+   (<a10> ^next <a11>
           ^id 45)
+   (<a11> ^next <a12>
+          ^id 50)
+   (<a12> ^next <a01>
+          ^id 55)
 } 
 
-# go-to-area
-
-sp {go-to-area*compare*go-to-coord*enter-area
-   (state <s> ^name go-to-area
-              ^operator <o1> +
-              ^operator <o2> +)
-   (<o1> ^name go-to-coord)
-   (<o2> ^name enter-area)
+sp {patrol*propose*go-to-adjacent-area
+   (state <s> ^name patrol
+              ^superstate.operator.area <area>
+              ^current-area.id <id>)
+   (<area> ^id <id>
+           ^next <next-area>)
+   (<next-area> ^id <next-id>)
 -->
-   (<s> ^operator <o1> > <o2>)
+   (<s> ^operator <o> +)
+   (<o> ^name go-to-adjacent-area
+        ^area-id <next-id>)
 }
 
-sp {go-to-area*propose*go-to-coord
-   (state <s> ^name go-to-area
-              ^current-area.id <id>
+# go-to-adjacent-area
+
+sp {go-to-adjacent-area*elaborate*destination
+   (state <s> ^name go-to-adjacent-area
               ^superstate.operator.area-id <next-id>
-              ^io.input-link.area-description.gateway <gateway>)
-   (<area> ^next.id <next-id>
+              ^current-area <area>)
+   (<area> ^gateway <gateway>
            ^id <id>)
    (<gateway> ^to <id>
               ^to <next-id>
               ^x <x>
               ^y <y>)
+-->
+   (<s> ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
+}
+
+sp {go-to-adjacent-area*elaborate*gateway
+   (state <s> ^name go-to-adjacent-area
+              ^current-area <area>
+              ^superstate.operator.area-id <next-id>)
+   (<area> ^gateway <gateway>
+           ^id <id>)
+   (<gateway> ^to <id>
+              ^to <next-id>)
+-->
+   (<s> ^gateway <gateway>)
+}
+
+sp {go-to-adjacent-area*propose*go-to-gateway
+   (state <s> ^name go-to-adjacent-area
+              ^destination.waypoint <waypoint>
+             -^arrived)
+   (<waypoint> ^x <x>
+               ^y <y>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name go-to-coord
@@ -170,62 +224,42 @@ sp {go-to-area*propose*go-to-coord
         ^y <y>)
 }
 
-sp {go-to-area*propose*enter-area
-   (state <s> ^name go-to-area
-              ^current-area.id <id>
-              ^superstate.operator.area-id <next-id>
-              ^io.input-link.area-description.gateway <gateway>
-              ^arrived)
-   (<area> ^next.id <next-id>
-           ^id <id>)
-   (<gateway> ^direction <direction>
-              ^to <id>
-              ^to <next-id>
-              ^x <x>
-              ^y <y>)
+sp {go-to-adjacent-area*propose*enter-area
+   (state <s> ^name go-to-adjacent-area
+              ^arrived yes
+              ^destination.waypoint <waypoint>
+              ^gateway.direction <direction>
+              ^topstate.constants.direction-delta.<direction> <dir-delta>)
+   (<waypoint> ^x <x>
+               ^y <y>)
+   (<dir-delta> ^x <delta-x>
+                ^y <delta-y>)
 -->
+   (<s> ^operator <o> +)
+   (<o> ^name go-to-coord
+        ^x (+ <x> <delta-x>)
+        ^y (+ <y> <delta-y>))
 }
 
 # go-to-coord
 
-sp {go-to-coord*elaborate*gensym
-   (state <s> ^name go-to-coord)
--->
-   (<s> ^gensym (make-constant-symbol))
-}
-
-sp {go-to-coord*propose*remove-waypoint
+sp {go-to-coord*elaborate*destination
    (state <s> ^name go-to-coord
-              ^io.input-link.waypoints.waypoint.id {<old-sym> <> <gensym>}
-              ^superstate.operator.gensym <gensym>)
--->
-   (<s> ^operator <o> +)
-   (<o> ^name remove-waypoint
-        ^actions.remove-waypoint.id destination)
-}
-
-sp {go-to-coord*propose*add-waypoint
-   (state <s> ^name go-to-coord
-              ^superstate.operator <so>
-             -^io.input-link.waypoints.waypoint)
+              ^superstate.operator <so>)
    (<so> ^x <x>
-         ^y <y>
-         ^gensym <gensym>)
+         ^y <y>)
 -->
-   (<s> ^operator <o> +)
-   (<o> ^name add-waypoint
-        ^actions.add-waypoint <add-waypoint>)
-   (<add-waypoint> ^id <gensym>
-                   ^x <x>
-                   ^y <y>)
+   (<s> ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
 }
 
 sp {go-to-coord*propose*turn-to-waypoint
    (state <s> ^name go-to-coord
               ^topstate.parameters.heading-tolerance <heading-tol>
-              ^destination <waypoint>)
+              ^destination.waypoint <waypoint>)
    (<waypoint> ^yaw <yaw>
-               ^relative-bearing {> <heading-tol>})
+               ^abs-relative-bearing {> <heading-tol>})
 -->
    (<s> ^operator <o> +)
    (<o> ^name turn-to-waypoint
@@ -235,31 +269,48 @@ sp {go-to-coord*propose*turn-to-waypoint
 sp {go-to-coord*propose*drive-to-waypoint
    (state <s> ^name go-to-coord
               ^topstate.parameters <params>
-              ^destination <waypoint>)
+              ^destination.waypoint <waypoint>)
    (<params> ^distance-tolerance <distance-tol>
              ^linear-velocity <velocity>
              ^heading-tolerance <heading-tol>)
-   (<waypoint> ^relative-bearing {<= <heading-tol>}
+   (<waypoint> ^abs-relative-bearing {<= <heading-tol>}
                ^distance {<remaining> > <distance-tol>})
 -->
    (<s> ^operator <o> +)
    (<o> ^name drive-to-waypoint
         ^actions.set-linear-velocity.linear-velocity <velocity>)
-   (write <remaining>)
 }
 
-sp {go-to-coord*propose*stop
-   (state <s> ^name go-to-coord
-              ^topstate.parameters <params>
-              ^destination <waypoint>)
-   (<params> ^distance-tolerance <distance-tol>
-             ^heading-tolerance <heading-tol>)
-   (<waypoint> ^relative-bearing {<= <heading-tol>}
-               ^distance {<= <distance-tol>})
+# waypoints
+
+sp {propose*add-waypoint
+   (state <s> ^name <name>
+             -^io.input-link.waypoints.waypoint.id <name>
+              ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
 -->
-   (<s> ^operator <o> +)
-   (<o> ^name stop
-        ^actions.stop <stop>)
+   (<s> ^operator <o> + >)
+   (<o> ^name add-waypoint
+        ^actions.add-waypoint <add-waypoint>)
+   (<add-waypoint> ^id <name>
+                   ^x <x>
+                   ^y <y>)
+}
+
+sp {elaborate*operator*remove-waypoint
+   (state <s> ^name <name>
+              ^io.input-link.waypoints.waypoint <waypoint>
+              ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
+   (<waypoint> ^id <name>)
+  -(<waypoint> ^x <x>
+               ^y <y>)
+-->
+   (<s> ^operator <o> + >)
+   (<o> ^name remove-waypoint
+        ^actions.remove-waypoint.id <name>)
 }
 
 # output commands
