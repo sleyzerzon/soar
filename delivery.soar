@@ -54,7 +54,8 @@ sp {delivery*elaborate*constants
    (<params> ^distance-tolerance <distance-tol>)
 -->
    (<s> ^constants <constants>)
-   (<constants> ^direction-delta <dir-delta>)
+   (<constants> ^direction-delta <dir-delta>
+                ^direction-opposite <dir-op>)
    (<dir-delta> ^north <dir-delta-north>
                 ^south <dir-delta-south>
                 ^east <dir-delta-east>
@@ -67,6 +68,10 @@ sp {delivery*elaborate*constants
                      ^y 0.0)
    (<dir-delta-west> ^x (- -0.5 <distance-tol>)
                      ^y 0.0)
+   (<dir-op> ^north south
+             ^south north
+             ^east west
+             ^west east)
 }
 
 # ELABORATIONS
@@ -239,17 +244,19 @@ sp {record-area-wm*apply*copy-current-area*gateway
               ^operator.name copy-current-area
               ^io.input-link.area-description.gateway <cgateway>
               ^areas.area <to-area>
-              ^area <area>)
+              ^area <area>
+              ^constants.direction-opposite.<direction> <opposite>)
    (<area> ^id <id>
-          -^gateway.id <gid>)
+          -^<direction>.id <gid>)
    (<to-area> ^id <to>)
    (<cgateway> ^id <gid>
                ^to {<to> <> <id>}
+               ^direction <direction>
                ^x <x>
                ^y <y>)
 -->
-   (<area> ^gateway <gateway>)
-   (<to-area> ^gateway <gateway>)
+   (<area> ^<direction> <gateway>)
+   (<to-area> ^<opposite> <gateway>)
    (<gateway> ^id <gid>
               ^class coord
               ^type gateway
@@ -266,8 +273,9 @@ sp {record-area-wm*apply*copy-current-area*done
               ^area <area>)
    (<area> ^id <id>)
   -{ (<description> ^gateway <gateway>)
-     (<gateway> ^to {<to> <> <id>})
-    -(<area> ^gateway.to.id <to>) }
+     (<gateway> ^to {<to> <> <id>}
+                ^direction <direction>)
+    -(<area> ^<direction>.to.id <to>) }
 -->
    (<area> ^stored yes)
 }
@@ -322,11 +330,11 @@ sp {patrol*propose*go-to-adjacent-area
 # go-to-adjacent-area
 
 sp {go-to-adjacent-area*elaborate*destination
+   # TODO this can cause multiple destinations to be specified
+   # if there are two gateways to the same room
    (state <s> ^name go-to-adjacent-area
               ^superstate.operator.area-id <next-id>
-              ^current-area <area>)
-   (<area> ^gateway <gateway>
-           ^id <id>)
+              ^current-area.<< north south east west >> <gateway>)
    (<gateway> ^to.id <next-id>
               ^x <x>
               ^y <y>)
@@ -353,15 +361,9 @@ sp {go-to-adjacent-area*propose*enter-area
    (state <s> ^name go-to-adjacent-area
               ^superstate.operator.area-id <next-id>
               ^arrived yes
-              ^current-area <area>
-              ^io.input-link.area-description.gateway <gateway>
+              ^current-area.{<direction> << north south east west >>}.to.id <next-id>
               ^destination.waypoint <waypoint>
               ^constants.direction-delta.<direction> <dir-delta>)
-   (<area> ^gateway.to.id <next-id>
-           ^id <id>)
-   (<gateway> ^to <id>
-              ^to <next-id>
-              ^direction <direction>)
    (<waypoint> ^x <x>
                ^y <y>)
    (<dir-delta> ^x <delta-x>
