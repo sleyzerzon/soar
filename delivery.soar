@@ -13,11 +13,33 @@
 
 # TASKS
 
+smem --add {
+   (<task01> ^type task
+             ^object <object01>
+             ^destination <dest01>)
+   (<object01> ^color green
+               ^type block)
+   (<dest01> ^id 3)
+}
+
 sp {interrupt
    (state <s> ^operator.name record-area-wm
               ^io.input-link.area-description.id 15)
 -->
    #(interrupt)
+}
+
+sp {delivery*elaborate*tasks
+   (state <s> ^name delivery
+              ^tasks <tasks>)
+-->
+   (<tasks> ^task <task01>)
+   (<task01> ^type task
+             ^object <object01>
+             ^destination <dest01>)
+   (<object01> ^color green
+               ^type block)
+   (<dest01> ^id 3)
 }
 
 # DELIVERY PROBLEM SPACE
@@ -30,7 +52,7 @@ sp {propose*init-agent
    (<o> ^name init-agent)
 }
 
-sp {apply*init-agent*parameters
+sp {apply*init-agent
    (state <s> ^operator.name init-agent)
 -->
    (<s> ^name delivery
@@ -45,7 +67,9 @@ sp {delivery*elaborate*parameters
    (<s> ^parameters <params>)
    (<params> ^distance-tolerance 1.0
              ^heading-tolerance 1.5
-             ^linear-velocity 0.7)
+             ^linear-velocity 0.7
+             ^storage-delta-x 1
+             ^storage-delta-y 1)
 }
 
 sp {delivery*elaborate*constants
@@ -54,24 +78,28 @@ sp {delivery*elaborate*constants
    (<params> ^distance-tolerance <distance-tol>)
 -->
    (<s> ^constants <constants>)
-   (<constants> ^direction-delta <dir-delta>
-                ^direction-opposite <dir-op>)
-   (<dir-delta> ^north <dir-delta-north>
-                ^south <dir-delta-south>
-                ^east <dir-delta-east>
-                ^west <dir-delta-west>)
-   (<dir-delta-north> ^x 0.0
-                      ^y (+ 0.5 <distance-tol>))
-   (<dir-delta-south> ^x 0.0
-                      ^y (- -0.5 <distance-tol>))
-   (<dir-delta-east> ^x (+ 0.5 <distance-tol>)
-                     ^y 0.0)
-   (<dir-delta-west> ^x (- -0.5 <distance-tol>)
-                     ^y 0.0)
-   (<dir-op> ^north south
-             ^south north
-             ^east west
-             ^west east)
+   (<constants> ^gateway-deltas <deltas>
+                ^direction-opposites <opposites>
+                ^operator-preferences <preferences>)
+   (<deltas> ^north <delta-north>
+             ^south <delta-south>
+             ^east <delta-east>
+             ^west <delta-west>)
+   (<delta-north> ^x 0.0
+                  ^y (+ 0.5 <distance-tol>))
+   (<delta-south> ^x 0.0
+                  ^y (- -0.5 <distance-tol>))
+   (<delta-east> ^x (+ 0.5 <distance-tol>)
+                 ^y 0.0)
+   (<delta-west> ^x (- -0.5 <distance-tol>)
+                 ^y 0.0)
+   (<opposites> ^north south
+                ^south north
+                ^east west
+                ^west east)
+   (<preferences> ^record 1
+                  ^task 2
+                  ^movement 3)
 }
 
 # ELABORATIONS
@@ -98,7 +126,7 @@ sp {elaborate*state*state-name
 
 # domain-specific inherited attributes
 
-sp {elaborate*state*inherited*domain
+sp {elaborate*state*inherited*roomsworld
    (state <s> ^superstate.{<attr> << parameters constants areas objects tasks >>} <val>)
 
 -->
@@ -139,13 +167,6 @@ sp {elaborate*state*arrived
 
 # PREFERENCES
 
-sp {elaborate*operator*movement
-   (state <s> ^operator <o> +)
-   (<o> ^name << patrol go-to-adjacent-area go-to-coord turn-to-coord drive-to-coord >>)
--->
-   (<o> ^type movement)
-}
-
 sp {elaborate*operator*record
    (state <s> ^operator <o> +)
    (<o> ^name << record-area-wm >>)
@@ -153,16 +174,105 @@ sp {elaborate*operator*record
    (<o> ^type record)
 }
 
-sp {delivery*compare*record*movement
+sp {elaborate*operator*task
+   (state <s> ^operator <o> +)
+   (<o> ^name << perform-pick-up-task pick-up-object put-down-object >>)
+-->
+   (<o> ^type task)
+}
+
+sp {elaborate*operator*movement
+   (state <s> ^operator <o> +)
+   (<o> ^name << patrol go-to-adjacent-area go-to-coord turn-to-coord drive-to-coord >>)
+-->
+   (<o> ^type movement)
+}
+
+sp {delivery*compare*operator-types
    (state <s> ^operator <o1> +
-              ^operator <o2> +)
-   (<o1> ^type record)
-   (<o2> ^type movement)
+              ^operator <o2> +
+              ^constants.operator-preferences <preferences>)
+   (<o1> ^type <o1-type>)
+   (<o2> ^type <o2-type>)
+   (<preferences> ^<o1-type> <o1-rank>
+                  ^<o2-type> {<o2-rank> > <o1-rank>})
 -->
    (<s> ^operator <o1> > <o2>)
 }
 
 # OPERATORS
+
+# perform-pick-up-task
+
+sp {delivery*propose*perform-pick-up-task
+   (state <s> ^name delivery
+              ^io.input-link.objects.object <obj>
+              ^tasks.task <task>)
+   (<task> ^object <desc>
+          -^object-id)
+   (<obj> ^id <id>)
+   # check that the object has not been forgotten (FIXME use forgotten metadata)
+   # check that the object is right for the task
+  -{ (<desc> ^<attr> <val>)
+    -(<obj> ^<attr> <val>) }
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name perform-pick-up-task
+        ^task <task>
+        ^object <obj>)
+}
+
+sp {delivery*apply*perform-pick-up-task
+   (state <s> ^name delivery
+              ^operator <op>)
+   (<op> ^name perform-pick-up-task
+         ^task <task>
+         ^object.id <id>)
+   (<task> -^object-id)
+-->
+   (<task> ^object-id <id>)
+}
+
+sp {perform-pick-up-task*propose*pick-up-object
+   (state <s> ^name perform-pick-up-task
+              ^superstate.operator <so>)
+   (<so> ^task <task>
+         ^object <obj>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name pick-up-object
+        ^object <obj>)
+}
+
+
+# perform-put-down-task
+
+sp {delivery*propose*perform-put-down-task
+   (state <s> ^name delivery
+              ^io.input-link.self.carry.object <obj>
+              ^top-state.current-area <area>
+              ^tasks.task <task>)
+   (<task> ^object-id <obj-id>
+           ^destination <dest>)
+   (<obj> ^id <obj-id>)
+   # check that the destination has not been forgotten (FIXME use forgotten metadata)
+   # check that we are in the right location
+  -{ (<dest> ^<attr> <val>)
+    -(<area> ^<attr> <val>) }
+-->
+   (<s> ^operator <op> +)
+   (<op> ^name perform-put-down-task
+         ^object <obj>)
+}
+
+sp {perform-put-down-task*propose*put-down-object
+   (state <s> ^name perform-put-down-task
+              ^superstate.operator.object <obj>)
+-->
+   (<s> ^operator <op> +)
+   (<op> ^name put-down-object
+         ^object <obj>)
+}
 
 # record-area-wm
 
@@ -212,31 +322,42 @@ sp {record-area-wm*propose*copy-curent-area
 sp {record-area-wm*apply*copy-current-area*create-area
    (state <s> ^name record-area-wm
               ^operator.name copy-current-area
-              ^io.input-link.area-description <description>
+              ^io.input-link.area-description.id <id>
               ^areas <areas>)
-   (<description> ^id <id>
-                  ^type <type>)
   -(<areas> ^area.id <id>)
 -->
-   (<s> ^area <area>)
    (<areas> ^area <area>)
-   (<area> ^id <id>
-           ^type <type>
-           ^class area)
+   (<area> ^id <id>)
 }
 
 sp {record-area-wm*apply*copy-current-area*link-area
    (state <s> ^name record-area-wm
               ^operator.name copy-current-area
-              ^io.input-link.area-description <description>
-              ^areas.area <area>)
-   (<description> ^id <id>
-                  ^type <type>)
+              ^areas.area <area>
+              ^io.input-link.area-description <description>)
    (<area> ^id <id>)
+   (<description> ^id <id>
+                  ^type <type>
+                  ^wall <north-wall>
+                  ^wall <south-wall>
+                  ^wall <east-wall>
+                  ^wall <west-wall>)
+   (<north-wall> ^direction north
+                 ^y <north-y>)
+   (<south-wall> ^direction south
+                 ^y <south-y>)
+   (<east-wall> ^direction east
+                ^x <east-x>)
+   (<west-wall> ^direction west
+                ^x <west-x>)
 -->
    (<s> ^area <area>)
    (<area> ^type <type>
-           ^class area)
+           ^class area
+           ^center-x (/ (+ <east-x> <west-x>) 2)
+           ^center-y (/ (+ <north-y> <south-y>) 2)
+           ^height (- <north-y> <south-y>)
+           ^width (- <east-x> <west-x>))
 }
 
 sp {record-area-wm*apply*copy-current-area*gateway
@@ -245,7 +366,7 @@ sp {record-area-wm*apply*copy-current-area*gateway
               ^io.input-link.area-description.gateway <cgateway>
               ^areas.area <to-area>
               ^area <area>
-              ^constants.direction-opposite.<direction> <opposite>)
+              ^constants.direction-opposites.<direction> <opposite>)
    (<area> ^id <id>
           -^<direction>.id <gid>)
    (<to-area> ^id <to>)
@@ -278,6 +399,101 @@ sp {record-area-wm*apply*copy-current-area*done
     -(<area> ^<direction>.to.id <to>) }
 -->
    (<area> ^stored yes)
+}
+
+# pick-up-object
+
+sp {pick-up-object*elaborate*destination
+   (state <s> ^name pick-up-object
+              ^superstate.operator.object <obj>)
+   (<obj> ^x <x>
+          ^y <y>)
+-->
+   (<s> ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
+}
+
+sp {pick-up-object*propose*go-to-object
+   (state <s> ^name pick-up-object
+              ^destination.waypoint <waypoint>
+             -^arrived)
+   (<waypoint> ^x <x>
+               ^y <y>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name go-to-coord
+        ^x <x>
+        ^y <y>)
+}
+
+sp {pick-up-object*propose*get-object
+   (state <s> ^name pick-up-object
+              ^arrived)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name get-object
+        ^actions.stop <stop>)
+}
+
+sp {pick-up-object*apply*get-object
+   (state <s> ^name pick-up-object
+              ^operator.name get-object
+              ^superstate.operator.object.id <id>
+              ^io.output-link <ol>
+              ^arrived)
+-->
+   (<ol> ^get-object.id <id>)
+}
+
+# put-down-object
+
+sp {put-down-object*elaborate*destination
+   (state <s> ^name put-down-object
+              ^parameters <params>
+              ^current-area <area>)
+   (<params> ^storage-delta-x <dx>
+             ^storage-delta-y <dy>)
+   (<area> ^center-x <x>
+           ^center-y <y>
+           ^height <height>
+           ^width <width>)
+-->
+   (<s> ^destination <destination>)
+   (<destination> ^x (+ (- <x> (/ <width> 2)) <dx>)
+                  ^y (+ (- <y> (/ <height> 2)) <dy>))
+}
+
+sp {put-down-object*propose*go-to-storage-coord
+   (state <s> ^name put-down-object
+              ^destination.waypoint <waypoint>
+             -^arrived)
+   (<waypoint> ^x <x>
+               ^y <y>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name go-to-coord
+        ^x <x>
+        ^y <y>)
+}
+
+sp {put-down-object*propose*drop-object
+   (state <s> ^name put-down-object
+              ^arrived)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name drop-object
+        ^actions.stop <stop>)
+}
+
+sp {put-down-object*apply*drop-object
+   (state <s> ^name put-down-object
+              ^operator.name get-object
+              ^superstate.operator.object.id <id>
+              ^io.output-link <ol>
+              ^arrived)
+-->
+   (<ol> ^drop-object.id <id>)
 }
 
 # patrol
@@ -363,11 +579,11 @@ sp {go-to-adjacent-area*propose*enter-area
               ^arrived yes
               ^current-area.{<direction> << north south east west >>}.to.id <next-id>
               ^destination.waypoint <waypoint>
-              ^constants.direction-delta.<direction> <dir-delta>)
+              ^constants.gateway-deltas.<direction> <deltas>)
    (<waypoint> ^x <x>
                ^y <y>)
-   (<dir-delta> ^x <delta-x>
-                ^y <delta-y>)
+   (<deltas> ^x <delta-x>
+             ^y <delta-y>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name go-to-coord
