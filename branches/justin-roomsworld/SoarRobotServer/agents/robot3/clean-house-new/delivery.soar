@@ -255,11 +255,12 @@ sp {delivery*apply*pickup-block*store-object-id
 
 sp {delivery*propose*move-to-room-center
    (state <s> ^name delivery
-              ^io.input-link.self.carry.object.id <id>
+              ^io.input-link.self.carry.object <obj>
               ^top-state.current-location <room>
               ^tasks.task <task>)
    (<task> ^object-id <id>
            ^destination <dest>)
+   (<obj> ^id <id>)
    # check that the destination has not been forgotten
    (<dest> ^<attr>)
    # check that we are in the right location
