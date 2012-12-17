@@ -19,7 +19,7 @@ smem --add {
              ^destination <dest01>)
    (<object01> ^color green
                ^type block)
-   (<dest01> ^id 3)
+   (<dest01> ^id 35)
 }
 
 sp {interrupt
@@ -28,19 +28,6 @@ sp {interrupt
 -->
    #(interrupt)
 }
-
-#sp {delivery*elaborate*tasks
-#   (state <s> ^name delivery
-#              ^tasks <tasks>)
-#-->
-#   (<tasks> ^task <task01>)
-#   (<task01> ^type task
-#             ^object <object01>
-#             ^destination <dest01>)
-#   (<object01> ^color green
-#               ^type block)
-#   (<dest01> ^id 3)
-#}
 
 # DELIVERY PROBLEM SPACE
 
@@ -56,9 +43,10 @@ sp {apply*init-agent
    (state <s> ^operator.name init-agent)
 -->
    (<s> ^name delivery
-        ^tasks <tasks>
         ^areas <areas>
-        ^objects <objects>)
+        ^ltis <ltis>
+        ^objects <objects>
+        ^tasks <tasks>)
 }
 
 sp {delivery*elaborate*parameters
@@ -137,12 +125,46 @@ sp {elaborate*state*inherited*roomsworld
 
 # memory
 
-sp {elaborate*state*forgotten-tasks
+# TODO these rules will not work on LTIs with cyclic references
+# or, for that matter, when we don't need the entire LTI tree
+
+sp {elaborate*state*forgettables-base
    (state <s> ^superstate nil
-              ^tasks.task.<< object destination >> <ident>)
-   (<ident> ^<attr>)
+              ^ltis <ltis>
+              ^tasks.task <task>)
 -->
-   (<ident> ^forgotten no)
+   (<ltis> ^lti <task>)
+}
+
+sp {elaborate*state*forgettables-recurse
+   (state <s> ^superstate nil
+              ^ltis <ltis>)
+   (<ltis> ^lti.<attr> {<ident> <=> <s>})
+-->
+   (<ltis> ^lti <ident>)
+}
+
+sp {elaborate*state*forgettables-status-base
+   (state <s> ^superstate nil
+              ^ltis.lti <lti>)
+   # there is at least one non-identifier child
+   # and no identifier children
+   (<lti> ^{<attr> <> forgotten}
+         -^<ident-attr> {<ident> <=> <s>})
+-->
+   (<lti> ^forgotten no)
+}
+
+sp {elaborate*state*forgettables-status-recurse
+   (state <s> ^superstate nil
+              ^ltis.lti <lti>)
+   # there is an identifier child
+   # and all identifier children have ^forgotten no
+   (<lti> ^<attr> {<=> <s>})
+  -{ (<lti> ^<ident-attr> {<ident> <=> <s>})
+    -(<ident> ^forgotten no) }
+-->
+   (<lti> ^forgotten no)
 }
 
 # navigation
@@ -188,7 +210,7 @@ sp {elaborate*operator*initialization
 
 sp {elaborate*operator*record
    (state <s> ^operator <o> +)
-   (<o> ^name << record-area-wm >>)
+   (<o> ^name << record-area-wm mark-object-picked-up mark-task-completed >>)
 -->
    (<o> ^type record)
 }
@@ -281,28 +303,38 @@ sp {delivery*propose*recursive-retrieve*ecological-doors
               ^tasks.task <task>)
    (<params> ^tasks-held-in smem
              ^method-ecological-doors yes)
-   (<task> -^all-retrieved)
+   (<task> -^forgotten no)
 -->
    (<s> ^operator <o> +)
    (<o> ^name recursive-retrieve
         ^lti <task>)
 }
 
-#sp {delivery*propose*recursive-retrieve*ecological-entry
-# FIXME this rule will fire anytime the agent is in a room
-# need to be more discriminatory than this
-#   (state <s> ^name delivery
-#              ^parameters <params>
-#              ^current-area.type door)
-#              ^tasks.task <task>)
-#   (<params> ^tasks-held-in smem
-#             ^method-ecological-entry yes)
-#   (<task> -^<< object destination >>.<attr>)
-#-->
-#   (<s> ^operator <op> + = >)
-#   (<op> ^name recursive-retrieve
-#         ^task <task>)
-#}
+sp {delivery*propose*recursive-retrieve*ecological-entry
+   # TODO this rule will fire anytime the agent is in a room
+   # need to be more discriminatory than this
+   (state <s> ^name delivery
+              ^parameters <params>
+              ^current-area.type room
+              ^tasks.task <task>)
+   (<params> ^tasks-held-in smem
+             ^method-ecological-entry yes)
+   (<task> -^forgotten no)
+-->
+   (<s> ^operator <op>)
+   (<op> ^name recursive-retrieve
+         ^task <task>)
+}
+
+sp {recursive-retrieve*elaborate*deeper
+   (state <s> ^name recursive-retrieve
+              ^to-be-retrieved <to-be-retrieved>
+              ^depth <depth>)
+   (<to-be-retrieved> ^{<attr> <=> 0}
+                     -^<depth>)
+-->
+   (<s> ^we-need-to-go-deeper (+ <attr> 1))
+}
 
 sp {recursive-retrieve*propose*initialize
    (state <s> ^name recursive-retrieve
@@ -314,18 +346,48 @@ sp {recursive-retrieve*propose*initialize
    (<o> ^name initialize)
 }
 
-sp {recursive-retrieve*apply*initialize
+sp {recursive-retrieve*apply*initialize*default-depth
    (state <s> ^name recursive-retrieve
               ^operator.name initialize
-              ^superstate.operator.lti <lti>)
+             -^superstate.operator.depth)
 -->
-   (<s> ^to-be-retrieved.lti <lti>
+   (<s> ^depth 9999)
+}
+
+sp {recursive-retrieve*apply*initialize*copy-depth
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator.depth <depth>)
+-->
+   (<s> ^depth <depth>)
+}
+
+sp {recursive-retrieve*apply*initialize*copy-path
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator <so>)
+   (<so> ^lti <lti>
+         ^path <path>)
+-->
+   (<s> ^mapping.node <node>)
+   (<node> ^path <path>
+           ^retrieved <lti>)
+}
+
+sp {recursive-retrieve*apply*initialize*create-sets
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator.lti <lti>
+              ^depth <depth>)
+-->
+   (<s> ^to-be-retrieved.<depth> <lti>
         ^retrieved <retrieved>)
 }
 
 sp {recursive-retrieve*propose*retrieve
    (state <s> ^name recursive-retrieve
-              ^to-be-retrieved.lti <lti>)
+              ^depth {<depth> > 0}
+              ^to-be-retrieved.<depth> <lti>)
 -->
    (<s> ^operator <op> + =)
    (<op> ^name retrieve
@@ -343,24 +405,49 @@ sp {recursive-retrieve*apply*retrieve*retrieve
    (<scmd> ^retrieve <lti>)
 }
 
-sp {recursive-retrieve*apply*retrieve*copy-children
+sp {recursive-retrieve*apply*retrieve*copy-children*no-path
    (state <s> ^name recursive-retrieve
               ^operator <op>
               ^smem.result.retrieved <lti>
+              ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
-              ^retrieved <retrieved>)
+              ^retrieved <retrieved>
+             -^mapping)
    (<op> ^name retrieve
          ^lti <lti>)
    (<lti> ^<attr> {<val> <=> <s>})
    (<retrieved> -^lti <val>)
 -->
-   (<to-be-retrieved> ^lti <val>)
+   (<to-be-retrieved> ^(- <depth> 1) <val>)
+}
+
+sp {recursive-retrieve*apply*retrieve*copy-children*path
+   (state <s> ^name recursive-retrieve
+              ^operator <op>
+              ^smem.result.retrieved <lti>
+              ^depth <depth>
+              ^to-be-retrieved <to-be-retrieved>
+              ^retrieved <retrieved>
+              ^mapping <mapping>)
+   (<op> ^name retrieve
+         ^lti <lti>)
+   (<lti> ^<attr> {<val> <=> <s>})
+   (<retrieved> -^lti <val>)
+   (<mapping> ^node <node>)
+   (<node> ^path.<attr> <ident>
+           ^retrieved <lti>)
+-->
+   (<to-be-retrieved> ^(- <depth> 1) <val>)
+   (<mapping> ^node <new-node>)
+   (<new-node> ^path <ident>
+               ^retrieved <val>)
 }
 
 sp {recursive-retrieve*apply*retrieve*remove-command
    (state <s> ^name recursive-retrieve
               ^operator <op>
               ^smem <smem>
+              ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>)
    (<op> ^name retrieve
@@ -368,28 +455,30 @@ sp {recursive-retrieve*apply*retrieve*remove-command
    (<smem> ^command <scmd>
            ^result.<< success failure bad-cmd >>)
    (<scmd> ^retrieve <lti>)
-   (<to-be-retrieved> ^lti <lti>)
+   (<to-be-retrieved> ^<depth> <lti>)
 -->
    (<scmd> ^retrieve <lti> -)
-   (<to-be-retrieved> ^lti <lti> -)
+   (<to-be-retrieved> ^<depth> <lti> -)
    (<retrieved> ^lti <lti>)
 }
 
-sp {recursive-retrieve*propose*done
+sp {recursive-retrieve*propose*go-deeper
    (state <s> ^name recursive-retrieve
-             -^to-be-retrieved.lti
-              ^retrieved)
+              ^retrieved
+              ^we-need-to-go-deeper <depth>
+              ^depth <depth>)
 -->
    (<s> ^operator <o> +)
-   (<o> ^name done)
+   (<o> ^name go-deeper)
 }
 
-sp {recursive-retrieve*apply*done
+sp {recursive-retrieve*apply*go-deeper
    (state <s> ^name recursive-retrieve
-              ^operator.name done
-              ^superstate.operator.lti <lti>)
+              ^operator.name go-deeper
+              ^depth <depth>)
 -->
-   (<lti> ^all-retrieved yes)
+   (<s> ^depth <depth> -
+        ^depth (- <depth> 1))
 }
 
 # perform-pick-up-task
@@ -398,30 +487,18 @@ sp {delivery*propose*perform-pick-up-task
    (state <s> ^name delivery
               ^io.input-link.objects.object <obj>
               ^tasks.task <task>)
-   (<task> ^object <desc>
-          -^object-id)
-   (<obj> ^id <id>)
+   (<task> ^object <desc>)
    # check that the object has not been forgotten
-   (<desc> ^forgotten no)
+   (<desc> ^forgotten no
+          -^id)
    # check that the object is right for the task
-  -{ (<desc> ^<attr> <val>)
+  -{ (<desc> ^{<attr> <> forgotten} <val>)
     -(<obj> ^<attr> <val>) }
 -->
    (<s> ^operator <o> +)
    (<o> ^name perform-pick-up-task
         ^task <task>
         ^object <obj>)
-}
-
-sp {delivery*apply*perform-pick-up-task
-   (state <s> ^name delivery
-              ^operator <op>)
-   (<op> ^name perform-pick-up-task
-         ^task <task>
-         ^object.id <id>)
-   (<task> -^object-id)
--->
-   (<task> ^object-id <id>)
 }
 
 sp {perform-pick-up-task*propose*pick-up-object
@@ -435,20 +512,55 @@ sp {perform-pick-up-task*propose*pick-up-object
         ^object <obj>)
 }
 
+# mark-object-picked-up
+
+sp {delivery*propose*mark-object-picked-up
+   (state <s> ^name delivery
+              ^tasks <tasks>
+              ^io.input-link.self.carry.object <obj>)
+   (<obj> ^id <id>)
+  -(<tasks> ^task.object.id <id>)
+   (<tasks> ^task <task>)
+   (<task> ^object <desc>)
+   # check that the object has not been forgotten
+   (<desc> ^forgotten no
+          -^id)
+   # check that the object is right for the task
+  -{ (<desc> ^{<attr> <> forgotten} <val>)
+    -(<obj> ^<attr> <val>) }
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name mark-object-picked-up
+        ^task <task>
+        ^object <obj>)
+}
+
+sp {delivery*apply*mark-object-picked-up
+   (state <s> ^name delivery
+              ^operator <o>)
+   (<o> ^name mark-object-picked-up
+        ^task.object <desc>
+        ^object.id <id>)
+-->
+   (<desc> ^id <id>)
+}
+
+# FIXME need to store this back to smem too
+
 # perform-put-down-task
 
 sp {delivery*propose*perform-put-down-task
    (state <s> ^name delivery
               ^io.input-link.self.carry.object <obj>
-              ^topstate.current-area <area>
+              ^current-area <area>
               ^tasks.task <task>)
-   (<task> ^object-id <obj-id>
+   (<task> ^object.id <id>
            ^destination <dest>)
-   (<obj> ^id <obj-id>)
+   (<obj> ^id <id>)
    # check that the destination has not been forgotten
    (<dest> ^forgotten no)
    # check that we are in the right location
-  -{ (<dest> ^<attr> <val>)
+  -{ (<dest> ^{<attr> <> forgotten} <val>)
     -(<area> ^<attr> <val>) }
 -->
    (<s> ^operator <op> +)
@@ -464,6 +576,40 @@ sp {perform-put-down-task*propose*put-down-object
    (<s> ^operator <op> +)
    (<op> ^name put-down-object
          ^object <obj>)
+}
+
+# mark-task-completed
+
+sp {delivery*propose*mark-task-completed
+   (state <s> ^name delivery
+              ^tasks.task <task>
+              ^io.input-link.objects.object <obj>
+              ^current-area <area>)
+   # check that the task has not been forgotten
+   (<task> ^object <desc>
+           ^destination <dest>
+           ^forgotten no)
+   # check that the object is right for the task
+  -{ (<desc> ^{<attr> <> forgotten} <val>)
+    -(<obj> ^<attr> <val>) }
+   # check that we are in the right location
+  -{ (<dest> ^{<attr> <> forgotten} <val>)
+    -(<area> ^<attr> <val>) }
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name mark-task-completed
+        ^task <task>)
+}
+
+sp {delivery*apply*mark-task-completed
+   (state <s> ^name delivery
+              ^operator <o>
+              ^tasks <tasks>)
+   (<tasks> ^task <task>)
+   (<o> ^name mark-task-completed
+        ^task <task>)
+-->
+   (<tasks> ^task <task> -)
 }
 
 # record-area-wm
