@@ -14,7 +14,7 @@ seek
 		areas-held-in = "wm";
 		objects-held-in = "wm";
 		delete-old-areas = "false";
-		decay-rate = 0.999;
+		decay-rate = 0.8;
 
 		method-ecological-doors = "yes";
 		method-ecological-entry = "yes";
@@ -32,8 +32,7 @@ meters_per_pixel = 1.0;
 
 metadata
 {
-	# rooms, clockwise from top left
-
+	# clockwise from top left
 	 0 = [ 1, 1, 9, 9];
 	 1 = [ 4,10, 3, 1];
 	 2 = [ 1,11,19, 9];
@@ -51,18 +50,19 @@ metadata
 
 	objects
 	{
+		# clockwise from top left
 		placed = [
-                   green-cube,  3,  -3,
-                   green-cube, 10, -15,
-		           green-cube, 28, -15,
-                   green-cube, 10, -25,
-                   green-cube, 16, -23,
-                   green-cube,  2, -30,
-                   green-cube,  3, -38,
-                   green-cube, 28, -35,
-                   green-cube, 25, -19,
-                   green-cube, 17,  -3,
-                   green-cube, 12,  -2,
+				green-cube,  3,  -3,
+				green-cube, 10, -15,
+				green-cube, 10, -25,
+				green-cube, 16, -23,
+				green-cube,  2, -30,
+				green-cube,  3, -38,
+				green-cube, 28, -35,
+				green-cube, 25, -19,
+				green-cube, 28, -15,
+				green-cube, 17,  -3,
+				green-cube, 12,  -2,
 		];
 
 		green-cube
