@@ -3,20 +3,18 @@ superdroids = [seek];
 seek
 {
 	position = [19, -30.5];
-	productions = "../../SoarRobotServer/agents/robot3/clean-house-new.soar";
+	productions = "../../delivery.soar";
 	simulated = true;
 	properties
 	{
-		default-storage-area-id = ["20"];
-		mission = "DELIVERY";
 		spawn-debuggers = "false";
 
 		areas-held-in = "wm";
 		objects-held-in = "wm";
 		delete-old-areas = "false";
-		decay-rate = 0.8;
+		decay-rate = 0.3;
 
-		method-ecological-doors = "yes";
+		method-ecological-doors = "no";
 		method-ecological-entry = "yes";
 		tasks-held-in = "smem";
 
@@ -52,39 +50,80 @@ metadata
 	{
 		# clockwise from top left
 		placed = [
-				green-cube,  3,  -3,
-				green-cube, 10, -15,
-				green-cube, 10, -25,
-				green-cube, 16, -23,
-				green-cube,  2, -30,
-				green-cube,  3, -38,
-				green-cube, 28, -35,
-				green-cube, 25, -19,
-				green-cube, 28, -15,
-				green-cube, 17,  -3,
-				green-cube, 12,  -2,
+				large-red-sphere,  3,  -3,
+				short-green-cube, 10, -15,
+				large-orange-tetrahedron, 10, -25,
+				large-orange-tetrahedron, 16, -23,
+				short-green-cube,  2, -30,
+				large-red-sphere,  3, -38,
+				medium-violet-sphere, 28, -35,
+				short-green-cube, 25, -19,
+				medium-green-dodecahedron, 28, -15,
+				short-yellow-octahedron, 17,  -3,
+				short-indigo-tesseract, 12,  -2,
 		];
 
-		green-cube
+		large-orange-tetrahedron
 		{
 			size = [ .25, .25 ];
-			color = "green";
-			height = "short";
-			shape = "cube";
-			smell = "sulfur";
+			height = "large";
+			color = "orange";
+			shape = "tetrahedron";
 			type = "block";
-			weight = "0.5";
 		}
-	
-		blue-short-burn-sphere
+
+		large-red-sphere
 		{
 			size = [ .25, .25 ];
-			color = "blue";
-			height = "short";
+			height = "large";
+			color = "red";
 			shape = "sphere";
-			smell = "burn";
 			type = "block";
-			weight = "0.5";
+		}
+
+		medium-green-dodecahedron
+		{
+			size = [ .25, .25 ];
+			height = "medium";
+			color = "green";
+			shape = "dodecahedron";
+			type = "block";
+		}
+
+		medium-violet-sphere
+		{
+			size = [ .25, .25 ];
+			height = "medium";
+			color = "magenta";
+			shape = "sphere";
+			type = "block";
+		}
+
+		short-green-cube
+		{
+			size = [ .25, .25 ];
+			height = "short";
+			color = "green";
+			shape = "cube";
+			type = "block";
+		}
+
+		short-indigo-tesseract
+		{
+			size = [ .25, .25 ];
+			height = "short";
+			color = "indigo";
+			shape = "tesseract";
+			type = "block";
+		}
+
+		short-yellow-octahedron
+		{
+			size = [ .25, .25 ];
+			height = "short";
+			color = "yellow";
+			shape = "octahedron";
+			type = "block";
 		}
 	}
 }

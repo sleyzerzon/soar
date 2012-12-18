@@ -1,25 +1,144 @@
-# PARAMETERS
+# OBJECT PROPERTIES
 
-# areas-held-in
-# default-storage-area-id
-# delete-old-areas
-# look-ahead-planning
-# method-ecological-doors
-# method-ecological-entry
-# mission
-# objects-held-in
-# search-control-go-to-gateway
-# tasks-held-in
+# height = {short, medium, tall}
+# color = {red, orange, yellow, green, blue, indigo, violet}
+# shape = {sphere, tetrahedron, cube, octahedron, dodecahedron, icosahedron, tesseract}
+# type = {block}
 
 # TASKS
 
 smem --add {
-   (<task01> ^type task
-             ^object <object01>
-             ^destination <dest01>)
-   (<object01> ^color green
-               ^type block)
-   (<dest01> ^id 35)
+    # block 1
+    # start: room 0
+    # end: room 10
+    # distance: 2 rooms
+    (<task01> ^type task
+              ^object <obj01>
+              ^destination <dest01>)
+    (<obj01> ^height large
+             ^color green
+             ^shape sphere)
+    (<dest01> ^id 50)
+
+    # block 2
+    # start: room 10
+    # end: room 40
+    # distance: 6 rooms
+    (<task02> ^type task
+              ^object <obj02>
+              ^destination <dest02>)
+    (<obj02> ^height short
+             ^color green
+             ^color cube)
+    (<dest02> ^id 40)
+
+    # block 3
+    # start: room 20
+    # end: room 0
+    # distance: 6 rooms
+    (<task03> ^type task
+              ^object <obj03>
+              ^destination <dest03>)
+    (<obj03> ^height large
+             ^color green
+             ^shape tetrahedron)
+    (<dest03> ^id 0)
+
+    # block 4
+    # start: room 20
+    # end: room 35
+    # distance: 3 rooms
+    (<task04> ^type task
+              ^object <obj04>
+              ^destination <dest04>)
+    (<obj04> ^height large
+             ^color green
+             ^shape tetrahedron)
+    (<dest04> ^id 35)
+
+    # block 5
+    # start: room 20
+    # end: room 0
+    # distance: 8 rooms
+    (<task05> ^type task
+              ^object <obj05>
+              ^destination <dest05>)
+    (<obj05> ^height short
+             ^color green
+             ^color cube)
+    (<dest05> ^id 30)
+
+    # block 6
+    # start: room 20
+    # end: room 30
+    # distance: 2 rooms
+    (<task06> ^type task
+              ^object <obj06>
+              ^destination <dest06>)
+    (<obj06> ^height large
+             ^color red
+             ^shape sphere)
+    (<dest06> ^id 30)
+
+    # block 7
+    # start: room 30
+    # end: room 20
+    # distance: 10 rooms
+    (<task07> ^type task
+              ^object <obj07>
+              ^destination <dest07>)
+    (<obj07> ^height medium
+             ^color violet
+             ^shape sphere)
+    (<dest07> ^id 20)
+
+    # block 8
+    # start: room 30
+    # end: room 0
+    # distance: 6 rooms
+    (<task08> ^type task
+              ^object <obj08>
+              ^destination <dest08>)
+    (<obj08> ^height short
+             ^color green
+             ^shape cube)
+    (<dest08> ^id 0)
+
+    # block 9
+    # start: room 30
+    # end: room 20
+    # distance: 10 rooms
+    (<task09> ^type task
+              ^object <obj09>
+              ^destination <dest09>)
+    (<obj09> ^height medium
+             ^color green
+             ^shape dodecahedron)
+    (<dest09> ^id 20)
+
+    # block 10
+    # start: room 40
+    # end: room 10
+    # distance: 6 rooms
+    (<task10> ^type task
+              ^object <obj10>
+              ^destination <dest10>)
+    (<obj10> ^height short
+             ^color yellow
+             ^shape octahedron)
+    (<dest10> ^id 10)
+
+    # block 11
+    # start: room 50
+    # end: room 20
+    # distance: 6 rooms
+    (<task11> ^type task
+              ^object <obj11>
+              ^destination <dest11>)
+    (<obj11> ^height short
+             ^color indigo
+             ^shape tesseract)
+    (<dest11> ^id 20)
 }
 
 sp {interrupt
@@ -44,9 +163,12 @@ sp {apply*init-agent
 -->
    (<s> ^name delivery
         ^areas <areas>
+        ^flags <flags>
         ^ltis <ltis>
+        ^metrics <metrics>
         ^objects <objects>
         ^tasks <tasks>)
+   (<metrics> ^unnecessary-retrievals 0)
 }
 
 sp {delivery*elaborate*parameters
@@ -117,7 +239,7 @@ sp {elaborate*state*state-name
 # domain-specific inherited attributes
 
 sp {elaborate*state*inherited*roomsworld
-   (state <s> ^superstate.{<attr> << parameters constants areas objects tasks >>} <val>)
+   (state <s> ^superstate.{<attr> << parameters constants areas flags metrics objects tasks >>} <val>)
 
 -->
    (<s> ^<attr> <val>)
@@ -210,21 +332,21 @@ sp {elaborate*operator*initialization
 
 sp {elaborate*operator*record
    (state <s> ^operator <o> +)
-   (<o> ^name << record-area-wm mark-object-picked-up mark-task-completed >>)
+   (<o> ^name << record-area-wm mark-object-picked-up mark-task-completed remove-flags >>)
 -->
    (<o> ^type record)
 }
 
 sp {elaborate*operator*retrieve
    (state <s> ^operator <o> +)
-   (<o> ^name << recursive-retrieve >>)
+   (<o> ^name << retrieve-all-tasks-area recursive-retrieve >>)
 -->
    (<o> ^type retrieve)
 }
 
 sp {elaborate*operator*task
    (state <s> ^operator <o> +)
-   (<o> ^name << perform-pick-up-task pick-up-object put-down-object >>)
+   (<o> ^name << perform-pick-up-task perform-put-down-task pick-up-object put-down-object >>)
 -->
    (<o> ^type task)
 }
@@ -248,6 +370,8 @@ sp {delivery*compare*operator-types
    (<s> ^operator <o1> > <o2>)
 }
 
+# TODO pick up closer objects first
+
 # OPERATORS
 
 # initialize-tasks
@@ -257,8 +381,8 @@ sp {delivery*propose*initialize-tasks
              -^tasks-initialized
               ^tasks)
 -->
-   (<s> ^operator <op> +)
-   (<op> ^name initialize-tasks)
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-tasks)
 }
 
 sp {delivery*apply*initialize-tasks*first-query
@@ -294,37 +418,87 @@ sp {delivery*apply*initialize-tasks*done
 
 # store-task TODO
 
-# recursive-retrieve
+# retrieve-all-tasks-area
 
-sp {delivery*propose*recursive-retrieve*ecological-doors
+sp {delivery*propose*retrieve-all-tasks-area*doors
    (state <s> ^name delivery
               ^parameters <params>
-              ^current-area.type door
-              ^tasks.task <task>)
+              ^current-area <area>
+             -^flags.tasks-retrieved-in-area <area-id>)
+   (<area> ^id <area-id>
+           ^type door)
    (<params> ^tasks-held-in smem
-             ^method-ecological-doors yes)
-   (<task> -^forgotten no)
+             ^method-ecological-entry yes)
+-->
+   (<s> ^operator <o>)
+   (<o> ^name retrieve-all-tasks-area)
+}
+
+sp {delivery*propose*retrieve-all-tasks-area*entry
+   (state <s> ^name delivery
+              ^parameters <params>
+              ^current-area <area>
+             -^flags.tasks-retrieved-in-area <area-id>)
+   (<area> ^id <area-id>
+           ^type room)
+   (<params> ^tasks-held-in smem
+             ^method-ecological-entry yes)
+-->
+   (<s> ^operator <o>)
+   (<o> ^name retrieve-all-tasks-area)
+}
+
+sp {retrieve-all-tasks-area*propose*remove-flags
+   (state <s> ^name retrieve-all-tasks-area
+              ^flags.tasks-retrieved-in-area)
 -->
    (<s> ^operator <o> +)
+   (<o> ^name remove-flags
+        ^flags <flags>)
+}
+
+sp {retrieve-all-tasks-area*elaborate*remove-flag-operator
+   (state <s> ^name retrieve-all-tasks-area
+              ^operator <o> +
+              ^flags.tasks-retrieved-in-area <val>)
+   (<o> ^name remove-flags
+        ^flags <flags>)
+-->
+   (<flags> ^tasks-retrieved-in-area <val>)
+}
+
+sp {retrieve-all-tasks-area*propose*recursive-retrieve
+   (state <s> ^name retrieve-all-tasks-area
+             -^flags.tasks-retrieved-in-area
+              ^tasks.task <task>)
+  -(<task> ^forgotten no)
+-->
+   (<s> ^operator <o> + =)
    (<o> ^name recursive-retrieve
         ^lti <task>)
 }
 
-sp {delivery*propose*recursive-retrieve*ecological-entry
-   # TODO this rule will fire anytime the agent is in a room
-   # need to be more discriminatory than this
-   (state <s> ^name delivery
-              ^parameters <params>
-              ^current-area.type room
-              ^tasks.task <task>)
-   (<params> ^tasks-held-in smem
-             ^method-ecological-entry yes)
-   (<task> -^forgotten no)
+sp {retrieve-all-tasks-area*propose*done
+   (state <s> ^name retrieve-all-tasks-area
+             -^flags.tasks-retrieved-in-area
+              ^tasks <tasks>)
+  -{ (<tasks> ^task <task>)
+    -(<task> ^forgotten no) }
 -->
-   (<s> ^operator <op>)
-   (<op> ^name recursive-retrieve
-         ^task <task>)
+   (<s> ^operator <o> +)
+   (<o> ^name done)
 }
+
+sp {retrieve-all-tasks-area*apply*done
+   (state <s> ^name retrieve-all-tasks-area
+              ^operator.name done
+              ^current-area.id <area-id>
+              ^flags <flags>)
+-->
+   (<flags> ^tasks-retrieved-in-area <area-id>)
+}
+
+# recursive-retrieve
 
 sp {recursive-retrieve*elaborate*deeper
    (state <s> ^name recursive-retrieve
@@ -389,32 +563,32 @@ sp {recursive-retrieve*propose*retrieve
               ^depth {<depth> > 0}
               ^to-be-retrieved.<depth> <lti>)
 -->
-   (<s> ^operator <op> + =)
-   (<op> ^name retrieve
-         ^lti <lti>)
+   (<s> ^operator <o> + =)
+   (<o> ^name retrieve
+        ^lti <lti>)
 }
 
 sp {recursive-retrieve*apply*retrieve*retrieve
    (state <s> ^name recursive-retrieve
-              ^operator <op>
+              ^operator <o>
               ^smem.command <scmd>
              -^retrieved.lti <lti>)
-   (<op> ^name retrieve
-         ^lti <lti>)
+   (<o> ^name retrieve
+        ^lti <lti>)
 -->
    (<scmd> ^retrieve <lti>)
 }
 
 sp {recursive-retrieve*apply*retrieve*copy-children*no-path
    (state <s> ^name recursive-retrieve
-              ^operator <op>
+              ^operator <o>
               ^smem.result.retrieved <lti>
               ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>
              -^mapping)
-   (<op> ^name retrieve
-         ^lti <lti>)
+   (<o> ^name retrieve
+        ^lti <lti>)
    (<lti> ^<attr> {<val> <=> <s>})
    (<retrieved> -^lti <val>)
 -->
@@ -423,14 +597,14 @@ sp {recursive-retrieve*apply*retrieve*copy-children*no-path
 
 sp {recursive-retrieve*apply*retrieve*copy-children*path
    (state <s> ^name recursive-retrieve
-              ^operator <op>
+              ^operator <o>
               ^smem.result.retrieved <lti>
               ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>
               ^mapping <mapping>)
-   (<op> ^name retrieve
-         ^lti <lti>)
+   (<o> ^name retrieve
+        ^lti <lti>)
    (<lti> ^<attr> {<val> <=> <s>})
    (<retrieved> -^lti <val>)
    (<mapping> ^node <node>)
@@ -445,13 +619,13 @@ sp {recursive-retrieve*apply*retrieve*copy-children*path
 
 sp {recursive-retrieve*apply*retrieve*remove-command
    (state <s> ^name recursive-retrieve
-              ^operator <op>
+              ^operator <o>
               ^smem <smem>
               ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
               ^retrieved <retrieved>)
-   (<op> ^name retrieve
-         ^lti <lti>)
+   (<o> ^name retrieve
+        ^lti <lti>)
    (<smem> ^command <scmd>
            ^result.<< success failure bad-cmd >>)
    (<scmd> ^retrieve <lti>)
@@ -495,7 +669,7 @@ sp {delivery*propose*perform-pick-up-task
   -{ (<desc> ^{<attr> <> forgotten} <val>)
     -(<obj> ^<attr> <val>) }
 -->
-   (<s> ^operator <o> +)
+   (<s> ^operator <o> + =)
    (<o> ^name perform-pick-up-task
         ^task <task>
         ^object <obj>)
@@ -563,19 +737,19 @@ sp {delivery*propose*perform-put-down-task
   -{ (<dest> ^{<attr> <> forgotten} <val>)
     -(<area> ^<attr> <val>) }
 -->
-   (<s> ^operator <op> +)
-   (<op> ^name perform-put-down-task
-         ^task <task>
-         ^object <obj>)
+   (<s> ^operator <o> + =)
+   (<o> ^name perform-put-down-task
+        ^task <task>
+        ^object <obj>)
 }
 
 sp {perform-put-down-task*propose*put-down-object
    (state <s> ^name perform-put-down-task
               ^superstate.operator.object <obj>)
 -->
-   (<s> ^operator <op> +)
-   (<op> ^name put-down-object
-         ^object <obj>)
+   (<s> ^operator <o> +)
+   (<o> ^name put-down-object
+        ^object <obj>)
 }
 
 # mark-task-completed
@@ -955,6 +1129,19 @@ sp {go-to-coord*propose*drive-to-waypoint
         ^actions.set-linear-velocity.linear-velocity <velocity>)
 }
 
+# remove-flags
+
+sp {delivery*apply*remove-flags
+   (state <s> ^operator <o>
+              ^flags <flags>)
+   (<o> ^name remove-flags
+        ^flags <oflags>)
+   (<flags> ^<flag> <val>)
+   (<oflags> ^<flag> <val>)
+-->
+   (<flags> ^<flag> <val> -)
+}
+
 # waypoints
 
 sp {propose*add-waypoint
@@ -1016,4 +1203,21 @@ sp {propose*wait
 -->
    (<s> ^operator <o> +)
    (<o> ^name wait)
+}
+
+# metrics
+
+sp {apply*recursive-retrieve*update-unnecessary-retrievals
+   (state <s> ^name delivery-false
+              ^operator <o>
+              ^tasks.task <task>
+              ^metrics <metrics>
+             -^metrics-updated)
+   (<o> ^name recursive-retrieve
+        ^lti <task>)
+   (<metrics> ^unnecessary-retrievals <n>)
+-->
+   (<metrics> ^unnecessary-retrievals <n> -
+              ^unnecessary-retrievals (+ <n> 1))
+   (<s> ^metrics-updated yes) 
 }
