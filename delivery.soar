@@ -88,7 +88,7 @@ smem --add {
               ^object <obj07>
               ^destination <dest07>)
     (<obj07> ^height medium
-             ^color violet
+             ^color magenta
              ^shape sphere)
     (<dest07> ^id 20)
 
@@ -268,7 +268,8 @@ sp {elaborate*state*forgettables-recurse
 
 sp {elaborate*state*forgettables-status-base
    (state <s> ^superstate nil
-              ^ltis.lti <lti>)
+              ^ltis.lti <lti>
+             -^smem.command.store <lti>)
    # there is at least one non-identifier child
    # and no identifier children
    (<lti> ^{<attr> <> forgotten}
@@ -279,7 +280,8 @@ sp {elaborate*state*forgettables-status-base
 
 sp {elaborate*state*forgettables-status-recurse
    (state <s> ^superstate nil
-              ^ltis.lti <lti>)
+              ^ltis.lti <lti>
+             -^smem.command.store <lti>)
    # there is an identifier child
    # and all identifier children have ^forgotten no
    (<lti> ^<attr> {<=> <s>})
@@ -370,7 +372,16 @@ sp {delivery*compare*operator-types
    (<s> ^operator <o1> > <o2>)
 }
 
-# TODO pick up closer objects first
+sp {delivery*compare*perform-pick-up-task
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name perform-pick-up-task
+         ^object.distance <d1>)
+   (<o2> ^name perform-pick-up-task
+         ^object.distance {> <d1>})
+-->
+   (<s> ^operator <o1> > <o2>)
+}
 
 # OPERATORS
 
@@ -669,7 +680,7 @@ sp {delivery*propose*perform-pick-up-task
   -{ (<desc> ^{<attr> <> forgotten} <val>)
     -(<obj> ^<attr> <val>) }
 -->
-   (<s> ^operator <o> + =)
+   (<s> ^operator <o> +)
    (<o> ^name perform-pick-up-task
         ^task <task>
         ^object <obj>)
@@ -719,7 +730,16 @@ sp {delivery*apply*mark-object-picked-up
    (<desc> ^id <id>)
 }
 
-# FIXME need to store this back to smem too
+sp {delivery*apply*mark-object-picked-up*store-smem
+   (state <s> ^name delivery
+              ^operator <o>
+              ^parameters.tasks-held-in smem
+              ^smem.command <scmd>)
+   (<o> ^name mark-object-picked-up
+        ^task.object <desc>)
+-->
+   (<scmd> ^store <desc>)
+}
 
 # perform-put-down-task
 
@@ -1192,6 +1212,18 @@ sp {apply*operator*remove-output
    (<val> ^status << interrupted complete error >>)
 -->
    (<ol> ^<attr> <val> -)
+}
+
+# smem stores
+
+sp {apply*operator*remove-store-command
+   :o-support
+   (state <s> ^smem <smem>)
+   (<smem> ^command <scmd>
+           ^result.success <store>)
+   (<scmd> ^store <store>)
+-->
+   (<scmd> ^store <store> -)
 }
 
 # wait
