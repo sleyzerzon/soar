@@ -142,8 +142,7 @@ smem --add {
 }
 
 sp {interrupt
-   (state <s> ^operator.name record-area-wm
-              ^io.input-link.area-description.id 15)
+   (state <s> ^operator.name recursive-retrieve)
 -->
    #(interrupt)
 }
@@ -168,7 +167,7 @@ sp {apply*init-agent
         ^metrics <metrics>
         ^objects <objects>
         ^tasks <tasks>)
-   (<metrics> ^unnecessary-retrievals 0)
+   (<metrics> ^num-retrievals 0)
 }
 
 sp {delivery*elaborate*parameters
@@ -1239,17 +1238,27 @@ sp {propose*wait
 
 # metrics
 
-sp {apply*recursive-retrieve*update-unnecessary-retrievals
-   (state <s> ^name delivery-false
-              ^operator <o>
+sp {recursive-retrieve*apply*initialize*increment-num-retrievals
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator.lti <task>
               ^tasks.task <task>
               ^metrics <metrics>
-             -^metrics-updated)
-   (<o> ^name recursive-retrieve
-        ^lti <task>)
-   (<metrics> ^unnecessary-retrievals <n>)
+              ^flags <flags>)
+   (<metrics> ^num-retrievals <n>)
+  -(<flags> ^num-retrievals-updated)
 -->
-   (<metrics> ^unnecessary-retrievals <n> -
-              ^unnecessary-retrievals (+ <n> 1))
-   (<s> ^metrics-updated yes) 
+   (<metrics> ^num-retrievals <n> -
+              ^num-retrievals (+ <n> 1))
+   (<flags> ^num-retrievals-updated <task>)
+}
+
+sp {recursive-retrieve*apply*initialize*remove-num-retrievals-flag
+   (state <s> ^name recursive-retrieve
+              ^operator.name initialize
+              ^superstate.operator.lti <task>
+              ^flags <flags>)
+   (<flags> ^num-retrievals-updated {<flag> <> <task>})
+-->
+   (<flags> ^num-retrievals-updated <flag> -)
 }
