@@ -1,3 +1,12 @@
+# SOAR COMMANDS
+
+multi-attributes area
+multi-attributes child
+multi-attributes lti
+multi-attributes object
+multi-attributes task
+multi-attributes waypoint
+
 # OBJECT PROPERTIES
 
 # height = {short, medium, tall}
@@ -14,11 +23,12 @@ smem --add {
     # distance: 2 rooms
     (<task01> ^type task
               ^object <obj01>
-              ^destination <dest01>)
+              ^destination <dest01>
+              ^priority 1)
     (<obj01> ^height large
-             ^color green
+             ^color red
              ^shape sphere)
-    (<dest01> ^id 50)
+    (<dest01> ^id 10)
 
     # block 2
     # start: room 10
@@ -26,10 +36,11 @@ smem --add {
     # distance: 6 rooms
     (<task02> ^type task
               ^object <obj02>
-              ^destination <dest02>)
+              ^destination <dest02>
+              ^priority 2)
     (<obj02> ^height short
              ^color green
-             ^color cube)
+             ^shape cube)
     (<dest02> ^id 40)
 
     # block 3
@@ -62,11 +73,12 @@ smem --add {
     # distance: 8 rooms
     (<task05> ^type task
               ^object <obj05>
-              ^destination <dest05>)
+              ^destination <dest05>
+              ^priority 3)
     (<obj05> ^height short
              ^color green
-             ^color cube)
-    (<dest05> ^id 30)
+             ^shape cube)
+    (<dest05> ^id 0)
 
     # block 6
     # start: room 20
@@ -74,7 +86,8 @@ smem --add {
     # distance: 2 rooms
     (<task06> ^type task
               ^object <obj06>
-              ^destination <dest06>)
+              ^destination <dest06>
+              ^priority 2)
     (<obj06> ^height large
              ^color red
              ^shape sphere)
@@ -98,7 +111,8 @@ smem --add {
     # distance: 6 rooms
     (<task08> ^type task
               ^object <obj08>
-              ^destination <dest08>)
+              ^destination <dest08>
+              ^priority 1)
     (<obj08> ^height short
              ^color green
              ^shape cube)
@@ -177,6 +191,7 @@ sp {delivery*elaborate*parameters
    (<params> ^distance-tolerance 1.0
              ^heading-tolerance 1.5
              ^linear-velocity 0.7
+             ^max-patrol-circuits 10
              ^storage-delta-x 1
              ^storage-delta-y 1)
 }
@@ -238,7 +253,7 @@ sp {elaborate*state*state-name
 # domain-specific inherited attributes
 
 sp {elaborate*state*inherited*roomsworld
-   (state <s> ^superstate.{<attr> << parameters constants areas flags metrics objects tasks >>} <val>)
+   (state <s> ^superstate.{<attr> << parameters constants areas flags ltis metrics objects tasks >>} <val>)
 
 -->
    (<s> ^<attr> <val>)
@@ -247,47 +262,65 @@ sp {elaborate*state*inherited*roomsworld
 # memory
 
 # TODO these rules will not work on LTIs with cyclic references
-# or, for that matter, when we don't need the entire LTI tree
 
-sp {elaborate*state*forgettables-base
+sp {elaborate*state*ltis-base
    (state <s> ^superstate nil
               ^ltis <ltis>
               ^tasks.task <task>)
 -->
-   (<ltis> ^lti <task>)
+   (<ltis> ^lti <lti>)
+   (<lti> ^identifier <task>
+          ^depth 9999)
 }
 
-sp {elaborate*state*forgettables-recurse
+sp {elaborate*state*ltis-recurse
    (state <s> ^superstate nil
               ^ltis <ltis>)
-   (<ltis> ^lti.<attr> {<ident> <=> <s>})
+   (<ltis> ^lti <parent-lti>)
+   (<parent-lti> ^identifier <parent-ident>
+                 ^depth {<depth> > 0})
+   (<parent-ident> ^<attr> {<child> <=> <s>})
 -->
-   (<ltis> ^lti <ident>)
+   (<parent-lti> ^child <child-lti>)
+   (<ltis> ^lti <child-lti>)
+   (<child-lti> ^identifier <child>
+                ^depth (- <depth> 1))
 }
 
-sp {elaborate*state*forgettables-status-base
+sp {elaborate*state*ltis-status-base*no-identifier-children
    (state <s> ^superstate nil
-              ^ltis.lti <lti>
-             -^smem.command.store <lti>)
-   # there is at least one non-identifier child
+              ^ltis.lti <lti>)
+   (<lti> ^identifier <ident>)
+   # there is at least one child
    # and no identifier children
-   (<lti> ^{<attr> <> forgotten}
-         -^<ident-attr> {<ident> <=> <s>})
+   (<ident> ^<attr>
+           -^<ident-attr> {<=> <s>})
 -->
    (<lti> ^forgotten no)
 }
 
-sp {elaborate*state*forgettables-status-recurse
+sp {elaborate*state*ltis-status-base*depth-limit
    (state <s> ^superstate nil
-              ^ltis.lti <lti>
-             -^smem.command.store <lti>)
-   # there is an identifier child
-   # and all identifier children have ^forgotten no
-   (<lti> ^<attr> {<=> <s>})
-  -{ (<lti> ^<ident-attr> {<ident> <=> <s>})
-    -(<ident> ^forgotten no) }
+              ^ltis.lti <lti>)
+   (<lti> ^identifier <ident>
+          ^depth 0)
+   # there is at least one child 
+   (<ident> ^<attr>)
 -->
    (<lti> ^forgotten no)
+}
+
+sp {elaborate*state*ltis-status-recurse
+   (state <s> ^superstate nil
+              ^ltis <ltis>)
+   (<ltis> ^lti <parent-lti>)
+   # there are identifier children
+   (<parent-lti> ^child)
+   # and none of them have been forgotten
+  -{ (<parent-lti> ^child <child-lti>)
+    -(<child-lti> ^forgotten no) }
+-->
+   (<parent-lti> ^forgotten no)
 }
 
 # navigation
@@ -371,13 +404,46 @@ sp {delivery*compare*operator-types
    (<s> ^operator <o1> > <o2>)
 }
 
-sp {delivery*compare*perform-pick-up-task
+sp {delivery*compare*pick-up*put-down
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name perform-put-down-task)
+   (<o2> ^name perform-pick-up-task)
+-->
+   (<s> ^operator <o1> > <o2>)
+}
+
+sp {delivery*compare*perform-pick-up-task*distance
    (state <s> ^operator <o1> +
               ^operator <o2> +)
    (<o1> ^name perform-pick-up-task
          ^object.distance <d1>)
    (<o2> ^name perform-pick-up-task
          ^object.distance {> <d1>})
+-->
+   (<s> ^operator <o1> > <o2>)
+}
+
+sp {delivery*compare*perform-pick-up-task*priority
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name perform-pick-up-task
+         ^object.distance <dist>
+         ^task.priority <priority>)
+   (<o2> ^name perform-pick-up-task
+         ^object.distance <dist>
+         ^task.priority {> <priority>})
+-->
+   (<s> ^operator <o1> > <o2>)
+}
+
+sp {delivery*compare*record-task-operators*priority
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name {<name> << mark-object-picked-up mark-task-completed >>}
+         ^task.priority <priority>)
+   (<o2> ^name <name>
+         ^task.priority {> <priority>})
 -->
    (<s> ^operator <o1> > <o2>)
 }
@@ -400,6 +466,14 @@ sp {delivery*apply*initialize-tasks*first-query
               ^smem.command <scmd>)
 -->
    (<scmd> ^query.type task)
+}
+
+sp {delivery*apply*initialize-tasks*default-priority
+   (state <s> ^operator.name initialize-tasks
+              ^tasks.task <task>)
+  -(<task> ^priority)
+-->
+   (<task> ^priority 9999)
 }
 
 sp {delivery*apply*initialize-tasks*next-query
@@ -480,8 +554,10 @@ sp {retrieve-all-tasks-area*elaborate*remove-flag-operator
 sp {retrieve-all-tasks-area*propose*recursive-retrieve
    (state <s> ^name retrieve-all-tasks-area
              -^flags.tasks-retrieved-in-area
+              ^ltis.lti <task-lti>
               ^tasks.task <task>)
-  -(<task> ^forgotten no)
+   (<task-lti> ^identifier <task>
+              -^forgotten no)
 -->
    (<s> ^operator <o> + =)
    (<o> ^name recursive-retrieve
@@ -491,9 +567,12 @@ sp {retrieve-all-tasks-area*propose*recursive-retrieve
 sp {retrieve-all-tasks-area*propose*done
    (state <s> ^name retrieve-all-tasks-area
              -^flags.tasks-retrieved-in-area
+              ^ltis <ltis>
               ^tasks <tasks>)
   -{ (<tasks> ^task <task>)
-    -(<task> ^forgotten no) }
+     (<ltis> ^lti <task-lti>)
+     (<task-lti> ^identifier <task>
+                -^forgotten no) }
 -->
    (<s> ^operator <o> +)
    (<o> ^name done)
@@ -670,13 +749,16 @@ sp {recursive-retrieve*apply*go-deeper
 sp {delivery*propose*perform-pick-up-task
    (state <s> ^name delivery
               ^io.input-link.objects.object <obj>
+              ^ltis.lti <obj-lti>
               ^tasks.task <task>)
    (<task> ^object <desc>)
+   # check that the task does not already have an object
+  -(<desc> ^id)
    # check that the object has not been forgotten
-   (<desc> ^forgotten no
-          -^id)
+   (<obj-lti> ^identifier <desc>
+              ^forgotten no)
    # check that the object is right for the task
-  -{ (<desc> ^{<attr> <> forgotten} <val>)
+  -{ (<desc> ^<attr> <val>)
     -(<obj> ^<attr> <val>) }
 -->
    (<s> ^operator <o> +)
@@ -700,15 +782,19 @@ sp {perform-pick-up-task*propose*pick-up-object
 
 sp {delivery*propose*mark-object-picked-up
    (state <s> ^name delivery
+              ^ltis.lti <obj-lti>
               ^tasks <tasks>
               ^io.input-link.self.carry.object <obj>)
    (<obj> ^id <id>)
-  -(<tasks> ^task.object.id <id>)
    (<tasks> ^task <task>)
    (<task> ^object <desc>)
+   # check that the task does not already have an object
+  -(<desc> ^id)
+   # check that the object does not already have a task
+  -(<tasks> ^task.object.id <id>)
    # check that the object has not been forgotten
-   (<desc> ^forgotten no
-          -^id)
+   (<obj-lti> ^identifier <desc>
+              ^forgotten no)
    # check that the object is right for the task
   -{ (<desc> ^{<attr> <> forgotten} <val>)
     -(<obj> ^<attr> <val>) }
@@ -746,12 +832,14 @@ sp {delivery*propose*perform-put-down-task
    (state <s> ^name delivery
               ^io.input-link.self.carry.object <obj>
               ^current-area <area>
+              ^ltis.lti <dest-lti>
               ^tasks.task <task>)
    (<task> ^object.id <id>
            ^destination <dest>)
    (<obj> ^id <id>)
    # check that the destination has not been forgotten
-   (<dest> ^forgotten no)
+   (<dest-lti> ^identifier <dest>
+              ^forgotten no)
    # check that we are in the right location
   -{ (<dest> ^{<attr> <> forgotten} <val>)
     -(<area> ^<attr> <val>) }
@@ -777,16 +865,18 @@ sp {delivery*propose*mark-task-completed
    (state <s> ^name delivery
               ^tasks.task <task>
               ^io.input-link.objects.object <obj>
-              ^current-area <area>)
-   # check that the task has not been forgotten
+              ^current-area <area>
+              ^ltis.lti <task-lti>)
    (<task> ^object <desc>
-           ^destination <dest>
-           ^forgotten no)
+           ^destination <dest>)
+   # check that the task has not been forgotten
+   (<task-lti> ^identifier <task>
+               ^forgotten no)
    # check that the object is right for the task
-  -{ (<desc> ^{<attr> <> forgotten} <val>)
+  -{ (<desc> ^<attr> <val>)
     -(<obj> ^<attr> <val>) }
    # check that we are in the right location
-  -{ (<dest> ^{<attr> <> forgotten} <val>)
+  -{ (<dest> ^<attr> <val>)
     -(<area> ^<attr> <val>) }
 -->
    (<s> ^operator <o> +)
