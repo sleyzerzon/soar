@@ -50,17 +50,17 @@ metadata
 	{
 		# clockwise from top left
 		placed = [
-				large-red-sphere,  3,  -3,
-				short-green-cube, 10, -15,
-				large-orange-tetrahedron, 10, -25,
-				large-orange-tetrahedron, 16, -23,
-				short-green-cube,  2, -30,
-				large-red-sphere,  3, -38,
-				medium-violet-sphere, 28, -35,
-				short-green-cube, 25, -19,
-				medium-green-dodecahedron, 28, -15,
-				short-yellow-octahedron, 17,  -3,
-				short-indigo-tesseract, 12,  -2,
+				large-red-sphere,           8,    -8,
+				short-green-cube,           10,  -15,
+				large-orange-tetrahedron,   10,  -25,
+				large-orange-tetrahedron,   16,  -23,
+				short-green-cube,           2,   -30,
+				large-red-sphere,           3,   -38,
+				medium-violet-sphere,       28,  -35,
+				short-green-cube,           25,  -19,
+				medium-green-dodecahedron,  28,  -15,
+				short-yellow-octahedron,    17,  -3,
+				short-indigo-tesseract,     12,  -2,
 		];
 
 		large-orange-tetrahedron
