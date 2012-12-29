@@ -97,6 +97,8 @@ public class SoarAgent implements RobotController, RadioHandler
     private final EnumPropertyProvider<AngleUnit> angleUnit = new EnumPropertyProvider<AngleUnit>(AgentProperties.ANGLE_UNIT);
     
     private final EnumPropertyProvider<AngleResolution> angleResolution = new EnumPropertyProvider<AngleResolution>(AgentProperties.ANGLE_RESOLUTION);
+
+    private final DefaultPropertyProvider<Double> linearVelocity = new DefaultPropertyProvider<Double>(AgentProperties.LINEAR_VELOCITY);
     
     private final DefaultPropertyProvider<Pose> translation = new DefaultPropertyProvider<Pose>(AgentProperties.TRANSLATION);
 
@@ -125,6 +127,12 @@ public class SoarAgent implements RobotController, RadioHandler
     private final DefaultPropertyProvider<Mission> mission = new DefaultPropertyProvider<Mission>(AgentProperties.MISSION);
 
     private final DefaultPropertyProvider<String[]> miscCommands = new DefaultPropertyProvider<String[]>(AgentProperties.MISC_COMMANDS);
+
+    private final DefaultPropertyProvider<String> methodEcologicalObjects = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
+
+    private final DefaultPropertyProvider<String> methodEcologicalTiming = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
+
+    private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
 
     private final DefaultPropertyProvider<String> methodEcologicalDoors = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
 
@@ -165,22 +173,6 @@ public class SoarAgent implements RobotController, RadioHandler
         properties.setProvider(AgentProperties.ANGLE_RESOLUTION, angleResolution);
         properties.setProvider(AgentProperties.TRANSLATION, translation);
         properties.setProvider(AgentProperties.OBJECT_LINGER_SECONDS, lingerSeconds);
-
-        properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
-        properties.setProvider(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
-        properties.setProvider(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
-        properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
-            public void propertyChanged(PropertyChangeEvent<Double> event)
-            {
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting off");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s decay-rate " + event.getNewValue());
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting on");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forget-wme lti");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation on");
-            }
-        });
-        properties.setProvider(DeliveryProperties.DECAY_RATE, decayRate);
 
         properties.addListener(AgentProperties.LEARN, new PropertyListener<LearnSetting>() {
             public void propertyChanged(PropertyChangeEvent<LearnSetting> event)
@@ -260,6 +252,8 @@ public class SoarAgent implements RobotController, RadioHandler
             }
         });
 
+        addSpProperty(AgentProperties.LINEAR_VELOCITY, linearVelocity);
+
         addSpProperty(AgentProperties.DEFAULT_STORAGE_AREA_ID, defaultStorageAreaId);
         addSpProperty(AgentProperties.AREAS_HELD_IN, areasHeldIn);
         addSpProperty(AgentProperties.OBJECTS_HELD_IN, objectsHeldIn);
@@ -267,19 +261,26 @@ public class SoarAgent implements RobotController, RadioHandler
         addSpProperty(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY, searchControlGoToGateway);
         addSpProperty(AgentProperties.DELETE_OLD_AREAS, deleteOldAreas);
 
+        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS, methodEcologicalObjects);
+        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING, methodEcologicalTiming);
+        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL, methodEcologicalTimingInterval);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
         addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
-        
-        properties.addListener(AgentProperties.MISSION, new PropertyListener<Mission>()
-                {
-            public void propertyChanged(PropertyChangeEvent<Mission> event)
+        addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
+        properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
+            public void propertyChanged(PropertyChangeEvent<Double> event)
             {
-                SoarAgent.this.agent.ExecuteCommandLine(makeSpParam(event.getKey().toString(), event.getNewValue()));
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting off");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s decay-rate " + event.getNewValue());
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting on");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s forget-wme lti");
+                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation on");
             }
         });
-        properties.setProvider(AgentProperties.MISSION, mission);
-
+        
+        addSpProperty(AgentProperties.MISSION, mission);
         properties.addListener(AgentProperties.MISC_COMMANDS, new PropertyListener<String[]>()
         {
             public void propertyChanged(PropertyChangeEvent<String[]> event)
@@ -296,6 +297,9 @@ public class SoarAgent implements RobotController, RadioHandler
     
     private void setDefaults(Config propc)
     {
+        if (propc.hasKey(AgentProperties.LINEAR_VELOCITY.getName()))
+            linearVelocity.set(Double.valueOf(propc.requireString(AgentProperties.LINEAR_VELOCITY.getName())));
+
         if (propc.hasKey(AgentProperties.LEARN.getName()))
             learn.set(LearnSetting.valueOf(propc.requireString(AgentProperties.LEARN.getName())));
         if (propc.hasKey(AgentProperties.EPMEM_LEARNING.getName()))
@@ -321,6 +325,12 @@ public class SoarAgent implements RobotController, RadioHandler
         if (propc.hasKey(AgentProperties.MISC_COMMANDS.getName()))
             miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
 
+        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()))
+            methodEcologicalObjects.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()));
+        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()))
+            methodEcologicalTiming.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()));
+        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName()))
+            methodEcologicalTimingInterval.set(Integer.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
             methodEcologicalDoors.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
@@ -331,19 +341,18 @@ public class SoarAgent implements RobotController, RadioHandler
             decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
     }
     
-    private void addSpProperty(PropertyKey<String> key, DefaultPropertyProvider<String> prov)
+    private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)
     {
-        properties.addListener(key, spParamListener);
+        properties.addListener(key, new PropertyListener<T>()
+		{
+			public void propertyChanged(PropertyChangeEvent<T> event)
+			{
+				SoarAgent.this.agent.ExecuteCommandLine(makeSpParam(event.getKey().toString(), event.getNewValue()));
+			}
+		});
         properties.setProvider(key, prov);
     }
     
-    private final PropertyListener<String> spParamListener = new PropertyListener<String>()
-    {
-        public void propertyChanged(PropertyChangeEvent<String> event)
-        {
-            SoarAgent.this.agent.ExecuteCommandLine(makeSpParam(event.getKey().toString(), event.getNewValue()));
-        }
-    };
     
     private <T> String makeSpParam(String key, T value)
     {
