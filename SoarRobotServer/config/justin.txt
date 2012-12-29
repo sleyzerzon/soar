@@ -7,7 +7,7 @@ seek
 	simulated = true;
 	properties
 	{
-		spawn-debuggers = "false";
+		spawn-debuggers = false;
 
 		linear-velocity = 0.7;
 
@@ -23,8 +23,14 @@ seek
 		tasks-held-in = "smem";
 
 		learn = "ON"; # OFF ON ONLY
-		epmem-learning = "true";
-		smem-learning = "true";
+		epmem-learning = true;
+		smem-learning = true;
+
+		misc-commands = [
+				"smem --set timers two",
+				"epmem --set timers two",
+				"waitsnc --disable"
+		];
 	}
 }
 
