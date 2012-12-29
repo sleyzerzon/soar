@@ -190,7 +190,8 @@ sp {apply*init-agent
         ^objects <objects>
         ^tasks <tasks>)
    (<flags> ^next-task-retrieval-after-episode 0)
-   (<metrics> ^num-retrievals 0)
+   (<metrics> ^num-retrievals 0
+              ^num-circuits -1)
 }
 
 sp {delivery*elaborate*parameters
@@ -199,7 +200,7 @@ sp {delivery*elaborate*parameters
    (<s> ^parameters <params>)
    (<params> ^distance-tolerance 1.0
              ^heading-tolerance 1.5
-             ^max-patrol-circuits 10
+             ^max-patrol-circuits 1
              ^storage-delta-x 1
              ^storage-delta-y 1)
 }
@@ -230,6 +231,8 @@ sp {delivery*elaborate*constants
                 ^east west
                 ^west east)
    (<preferences> ^initialization 10
+                  ^metrics 15
+                  ^flags 17
                   ^record 20
                   ^retrieve 25
                   ^task 30
@@ -372,9 +375,23 @@ sp {elaborate*operator*initialization
    (<o> ^type initialization)
 }
 
+sp {elaborate*operator*metrics
+   (state <s> ^operator <o> +)
+   (<o> ^name << count-circuit >>)
+-->
+   (<o> ^type metrics)
+}
+
+sp {elaborate*operator*flags
+   (state <s> ^operator <o> +)
+   (<o> ^name << remove-flags >>)
+-->
+   (<o> ^type flags)
+}
+
 sp {elaborate*operator*record
    (state <s> ^operator <o> +)
-   (<o> ^name << record-area-wm mark-object-picked-up mark-task-completed remove-flags count-circuit >>)
+   (<o> ^name << record-area-wm mark-object-picked-up mark-task-completed >>)
 -->
    (<o> ^type record)
 }
@@ -985,7 +1002,8 @@ sp {delivery*propose*record-area-wm
 sp {record-area-wm*propose*create-neighbor-area
    (state <s> ^name record-area-wm
               ^io.input-link.area-description <description>
-             -^areas.area.id <to>)
+             -^areas.area.id <to>
+              ^quiescence t)
    (<description> ^id <id>
                   ^gateway.to {<to> <> <id>})
 -->
@@ -1007,7 +1025,8 @@ sp {record-area-wm*apply*create-neighbor-area
 sp {record-area-wm*propose*copy-curent-area
    (state <s> ^name record-area-wm
               ^io.input-link.area-description <description>
-              ^areas <areas>)
+              ^areas <areas>
+              ^quiescence t)
    (<description> ^id <id>)
   -{ (<description> ^gateway.to {<to> <> <id>})
     -(<areas> ^area.id <to>) }
@@ -1345,7 +1364,7 @@ sp {recursive-retrieve*apply*initialize*remove-num-retrievals-flag
 
 sp {delivery*propose*count-circuit
    (state <s> ^name delivery
-              ^io.input-link.area-description.id 35
+              ^io.input-link.area-description.id 25
              -^flags.circuit-counted)
 -->
    (<s> ^operator <o> +)
@@ -1354,6 +1373,7 @@ sp {delivery*propose*count-circuit
 
 sp {delivery*apply*count-circuit
    (state <s> ^name delivery
+              ^operator.name count-circuit
               ^io.input-link.area-description.id <area-id>
               ^flags <flags>
               ^metrics <metrics>)
@@ -1402,11 +1422,15 @@ sp {delivery*apply*report-metrics
    (<parameters> ^decay-rate <decay>
                  ^linear-velocity <velo>)
 -->
-   (write |decay rate: | <decay>)
-   (write |linear velocity: | <velo>)
-   (write (cmd smem -S))
-   (write (cmd smem -S))
-   (write (cmd stats))
+   (write (crlf) |----------| (crlf))
+   (write |decay rate: | <decay> (crlf))
+   (write |linear velocity: | <velo> (crlf))
+   (write |----------| (crlf))
+   (write (cmd smem -S) (crlf))
+   (write (cmd smem --timer) (crlf))
+   (write (cmd epmem --timer) (crlf))
+   (write (cmd epmem --timer) (crlf))
+   (write (cmd stats) (crlf))
    (halt)
 }
 
