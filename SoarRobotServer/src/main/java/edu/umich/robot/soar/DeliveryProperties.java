@@ -28,6 +28,21 @@ import edu.umich.robot.util.properties.PropertyKey;
  */
 public class DeliveryProperties
 {
+    public static final PropertyKey<String> METHOD_ECOLOGICAL_OBJECTS = 
+        PropertyKey.builder("method-ecological-objects", String.class)
+        .defaultValue("no")
+        .build();
+
+    public static final PropertyKey<String> METHOD_ECOLOGICAL_TIMING = 
+        PropertyKey.builder("method-ecological-timing", String.class)
+        .defaultValue("no")
+        .build();
+
+    public static final PropertyKey<Integer> METHOD_ECOLOGICAL_TIMING_INTERVAL = 
+        PropertyKey.builder("method-ecological-timing-interval", Integer.class)
+        .defaultValue(1000)
+        .build();
+
     public static final PropertyKey<String> METHOD_ECOLOGICAL_DOORS = 
         PropertyKey.builder("method-ecological-doors", String.class)
         .defaultValue("no")

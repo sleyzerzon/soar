@@ -66,6 +66,11 @@ public class AgentProperties
         .defaultValue(AngleResolution.INT) 
         .build();
 
+    public static final PropertyKey<Double> LINEAR_VELOCITY = 
+        PropertyKey.builder("linear-velocity", Double.class)
+        .defaultValue(0.7)
+        .build();
+
     public static final PropertyKey<Pose> TRANSLATION = 
         PropertyKey.builder("translation", Pose.class) 
         .defaultValue(ImmutablePose.new2DInstance(0, 0)) 
