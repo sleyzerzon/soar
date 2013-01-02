@@ -34,7 +34,7 @@ seek
 	}
 }
 
-image_path = "common/justin.png";
+image_path = "../../common/justin.png";
 image_origin = [ 0, 0 ];
 meters_per_pixel = 1.0;
 

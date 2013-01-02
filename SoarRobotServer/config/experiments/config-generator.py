@@ -42,7 +42,7 @@ def main(experiment):
 		with open("{}/multiple.runs".format(experiment), "w") as fd:
 			fd.write("multiple-runs {\n")
 			fd.write("\tconfigs = [\n")
-			fd.write("\n".join('\t\t"{}",'.format(run_file) for run_file in run_files) + "\n")
+			fd.write("\n".join('\t\t"config/experiments/{}",'.format(run_file) for run_file in sorted(run_files)) + "\n")
 			fd.write("\t];\n")
 			fd.write("\tcycles = -1;\n")
 			fd.write("\tseconds = -1;\n")
