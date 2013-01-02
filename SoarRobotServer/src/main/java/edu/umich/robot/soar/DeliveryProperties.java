@@ -63,9 +63,8 @@ public class DeliveryProperties
         .defaultValue(0.0)
         .build();
 
-    public static final PropertyKey<Boolean> F = 
-        PropertyKey.builder("epmem-learning", Boolean.class) 
-        .defaultValue(Boolean.FALSE) 
+    public static final PropertyKey<String> LOG_FILE = 
+        PropertyKey.builder("log-file", String.class)
+        .defaultValue("logfile.txt")
         .build();
-
 }
