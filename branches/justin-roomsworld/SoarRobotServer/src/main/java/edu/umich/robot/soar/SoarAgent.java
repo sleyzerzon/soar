@@ -142,16 +142,18 @@ public class SoarAgent implements RobotController, RadioHandler
 
     private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
 
+    private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
+
     private String productions;
     
     private final WallClock clock;
     
     private static final String SP_PARAM = 
         "sp {robot*elaborate*state*%s\n"
-      + "    (state <s> ^superstate nil\n" 
+      + "    (state <s> ^superstate nil\n"
       + "               ^parameters <p>)\n"
       + "-->\n"
-      + "    (<p> ^%s %s)\n" 
+      + "    (<p> ^%s |%s|)\n"
       + "}\n";
 
     public SoarAgent(Agent agent, RobotOutput output, WallClock clock, Config propc)
@@ -268,6 +270,7 @@ public class SoarAgent implements RobotController, RadioHandler
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
         addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
         addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
+        addSpProperty(DeliveryProperties.LOG_FILE, logFile);
         properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
             public void propertyChanged(PropertyChangeEvent<Double> event)
             {
@@ -339,6 +342,8 @@ public class SoarAgent implements RobotController, RadioHandler
             tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
         if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
             decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
+        if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
+            logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
     }
     
     private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)

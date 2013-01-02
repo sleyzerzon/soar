@@ -1,5 +1,7 @@
 # SOAR COMMANDS
 
+w 0
+
 multi-attributes area
 multi-attributes child
 multi-attributes lti
@@ -200,7 +202,7 @@ sp {delivery*elaborate*parameters
    (<s> ^parameters <params>)
    (<params> ^distance-tolerance 1.0
              ^heading-tolerance 1.5
-             ^max-patrol-circuits 1
+             ^max-patrol-circuits 0
              ^storage-delta-x 1
              ^storage-delta-y 1)
 }
@@ -1407,7 +1409,7 @@ sp {delivery*propose*report-metrics*all-tasks-completed
 
 sp {delivery*propose*report-metrics*patrol-limit
    (state <s> ^name delivery
-              ^parameter.max-patrol-circuits <max>
+              ^parameters.max-patrol-circuits <max>
               ^metrics.num-circuits <max>)
 -->
    (<s> ^operator <o> +)
@@ -1420,17 +1422,28 @@ sp {delivery*apply*report-metrics
               ^metrics <metrics>
               ^parameters <parameters>)
    (<parameters> ^decay-rate <decay>
-                 ^linear-velocity <velo>)
+                 ^linear-velocity <velo>
+                 ^log-file <file>
+                 ^method-ecological-doors <doors> 
+                 ^method-ecological-entry <entry>
+                 ^method-ecological-objects <objects>
+                 ^method-ecological-timing <timing>
+                 ^method-ecological-timing-interval <interval>)
+
 -->
-   (write (crlf) |----------| (crlf))
-   (write |decay rate: | <decay> (crlf))
-   (write |linear velocity: | <velo> (crlf))
-   (write |----------| (crlf))
-   (write (cmd smem -S) (crlf))
-   (write (cmd smem --timer) (crlf))
-   (write (cmd epmem --timer) (crlf))
-   (write (cmd epmem --timer) (crlf))
-   (write (cmd stats) (crlf))
+   (cmd |clog | <file>)
+   (cmd echo |decay rate: | <decay>)
+   (cmd echo |linear velocity: | <velo>)
+   (cmd echo |doors ecological method: | <doors>)
+   (cmd echo |entry ecological method: | <entry>)
+   (cmd echo |objects ecological method: | <objects>)
+   (cmd echo |timing ecological method: | <timing>)
+   (cmd echo |timing ecological method interval: | <interval>)
+   (cmd smem --stats)
+   (cmd smem --timer)
+   (cmd epmem --stats)
+   (cmd epmem --timer)
+   (cmd stats)
    (halt)
 }
 
