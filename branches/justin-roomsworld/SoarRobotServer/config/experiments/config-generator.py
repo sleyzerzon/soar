@@ -11,36 +11,37 @@ import sys
 import soar_exp
 
 def main(experiment):
-	global_params = {}
+	params = {}
+	params["seek.properties.trial-num"] = range(0, 2)
+
+	if exists(experiment):
+		rmtree(experiment)
+	mkdir(experiment)
 
 	if experiment == "doors-method-only":
-		if exists(experiment):
-			rmtree(experiment)
-		mkdir(experiment)
-		experiment_params = {}
-		experiment_params["seek.properties.experiment-name"] = experiment
-		experiment_params["seek.properties.method-ecological-doors"] = "true"
-		sweep_params = {}
-		sweep_params["seek.properties.trial-num"] = range(0, 2)
-		sweep_params["seek.properties.decay-rate"] = map((lambda n: float(n) / 10), range(8, 9))
-	create_config_files(global_params, experiment_params, sweep_params)
+		params["seek.properties.experiment-name"] = [experiment,]
+		params["seek.properties.method-ecological-doors"] = ["true",]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
+	elif experiment == "entry-method-only":
+		params["seek.properties.experiment-name"] = [experiment,]
+		params["seek.properties.method-ecological-entry"] = ["true",]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
+	elif experiment == "timing-method-only":
+		params["seek.properties.experiment-name"] = [experiment,]
+		params["seek.properties.method-ecological-timing"] = ["true",]
+		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(0, 10)]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
 
-def create_config_files(global_params, experiment_params, sweep_params):
 	template = open("template.txt", "r").read()
-	experiment = experiment_params["seek.properties.experiment-name"]
 	run_files = []
-	for params in soar_exp.param_permutations(sweep_params):
-		all_params = {}
-		all_params.update(global_params)
-		all_params.update(experiment_params)
-		all_params.update(params)
-		decay_rate = all_params["seek.properties.decay-rate"]
-		trial = all_params["seek.properties.trial-num"]
-		all_params["seek.properties.experiment-name"] = '"{}"'.format(experiment)
-		all_params["seek.properties.log-file"] = '"../../exp_results/{}_{}_{}.txt"'.format(experiment, decay_rate, trial)
+	for param_map in soar_exp.param_permutations(params):
+		decay_rate = param_map["seek.properties.decay-rate"]
+		trial = param_map["seek.properties.trial-num"]
+		param_map["seek.properties.experiment-name"] = '"{}"'.format(experiment)
+		param_map["seek.properties.log-file"] = '"../../exp_results/{}_{}_{}.txt"'.format(experiment, decay_rate, trial)
 		run_file = "{}/{}_{}_{}.run".format(experiment, experiment, decay_rate, trial)
 		with open(run_file, "w") as fd:
-			for k, v in sorted(all_params.items()):
+			for k, v in sorted(param_map.items()):
 				fd.write("{} = {};\n".format(k, v))
 			fd.write("\n")
 			fd.write(template)

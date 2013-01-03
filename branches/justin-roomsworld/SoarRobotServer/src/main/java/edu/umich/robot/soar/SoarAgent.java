@@ -70,502 +70,484 @@ import edu.umich.robot.util.properties.PropertyManager;
  */
 public class SoarAgent implements RobotController, RadioHandler
 {
-    private static final Log logger = LogFactory.getLog(SoarAgent.class);
+	private static final Log logger = LogFactory.getLog(SoarAgent.class);
 
-    private final PropertyManager properties = new PropertyManager();
+	private final PropertyManager properties = new PropertyManager();
 
-    private final Agent agent;
+	private final Agent agent;
 
-    private final RobotOutput output;
+	private final RobotOutput output;
 
-    private final RobotEventManager events = new RobotEventManager();
+	private final RobotEventManager events = new RobotEventManager();
 
-    private InputLink il;
+	private InputLink il;
 
-    private OutputLink ol;
+	private OutputLink ol;
 
-    private final WaypointManager waypoints;
+	private final WaypointManager waypoints;
 
-    private final ConcurrentMap<Long, RadioMessage> radioMessages = new ConcurrentHashMap<Long, RadioMessage>();
-    
-    private final EnumPropertyProvider<LengthUnit> lengthUnit = new EnumPropertyProvider<LengthUnit>(AgentProperties.LENGTH_UNIT);
+	private final ConcurrentMap<Long, RadioMessage> radioMessages = new ConcurrentHashMap<Long, RadioMessage>();
 
-    private final EnumPropertyProvider<LinSpeedUnit> linSpeedUnit = new EnumPropertyProvider<LinSpeedUnit>(AgentProperties.LINEAR_SPEED_UNIT);
-    
-    private final EnumPropertyProvider<AngSpeedUnit> angSpeedUnit = new EnumPropertyProvider<AngSpeedUnit>(AgentProperties.ANGULAR_SPEED_UNIT);
-    
-    private final EnumPropertyProvider<AngleUnit> angleUnit = new EnumPropertyProvider<AngleUnit>(AgentProperties.ANGLE_UNIT);
-    
-    private final EnumPropertyProvider<AngleResolution> angleResolution = new EnumPropertyProvider<AngleResolution>(AgentProperties.ANGLE_RESOLUTION);
+	private final EnumPropertyProvider<LengthUnit> lengthUnit = new EnumPropertyProvider<LengthUnit>(AgentProperties.LENGTH_UNIT);
 
-    private final DefaultPropertyProvider<Double> linearVelocity = new DefaultPropertyProvider<Double>(AgentProperties.LINEAR_VELOCITY);
-    
-    private final DefaultPropertyProvider<Pose> translation = new DefaultPropertyProvider<Pose>(AgentProperties.TRANSLATION);
+	private final EnumPropertyProvider<LinSpeedUnit> linSpeedUnit = new EnumPropertyProvider<LinSpeedUnit>(AgentProperties.LINEAR_SPEED_UNIT);
 
-    private final IntegerPropertyProvider lingerSeconds = new IntegerPropertyProvider(AgentProperties.OBJECT_LINGER_SECONDS);
-    
-    private final EnumPropertyProvider<LearnSetting> learn = new EnumPropertyProvider<LearnSetting>(AgentProperties.LEARN);
+	private final EnumPropertyProvider<AngSpeedUnit> angSpeedUnit = new EnumPropertyProvider<AngSpeedUnit>(AgentProperties.ANGULAR_SPEED_UNIT);
 
-    private final BooleanPropertyProvider epmemLearn = new BooleanPropertyProvider(AgentProperties.EPMEM_LEARNING);
+	private final EnumPropertyProvider<AngleUnit> angleUnit = new EnumPropertyProvider<AngleUnit>(AgentProperties.ANGLE_UNIT);
 
-    private final BooleanPropertyProvider smemLearn = new BooleanPropertyProvider(AgentProperties.SMEM_LEARNING);
-    
-    private final DefaultPropertyProvider<String[]> epmemExclusions = new DefaultPropertyProvider<String[]>(AgentProperties.EPMEM_EXCLUSIONS);
-    
-    private final DefaultPropertyProvider<String> defaultStorageAreaId = new DefaultPropertyProvider<String>(AgentProperties.DEFAULT_STORAGE_AREA_ID);
+	private final EnumPropertyProvider<AngleResolution> angleResolution = new EnumPropertyProvider<AngleResolution>(AgentProperties.ANGLE_RESOLUTION);
 
-    private final DefaultPropertyProvider<String> areasHeldIn = new DefaultPropertyProvider<String>(AgentProperties.AREAS_HELD_IN);
+	private final DefaultPropertyProvider<Double> linearVelocity = new DefaultPropertyProvider<Double>(AgentProperties.LINEAR_VELOCITY);
 
-    private final DefaultPropertyProvider<String> objectsHeldIn = new DefaultPropertyProvider<String>(AgentProperties.OBJECTS_HELD_IN);
+	private final DefaultPropertyProvider<Pose> translation = new DefaultPropertyProvider<Pose>(AgentProperties.TRANSLATION);
 
-    private final DefaultPropertyProvider<String> lookAheadPlanning = new DefaultPropertyProvider<String>(AgentProperties.LOOK_AHEAD_PLANNING);
+	private final IntegerPropertyProvider lingerSeconds = new IntegerPropertyProvider(AgentProperties.OBJECT_LINGER_SECONDS);
 
-    private final DefaultPropertyProvider<String> searchControlGoToGateway = new DefaultPropertyProvider<String>(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY);
+	private final EnumPropertyProvider<LearnSetting> learn = new EnumPropertyProvider<LearnSetting>(AgentProperties.LEARN);
 
-    private final DefaultPropertyProvider<String> deleteOldAreas = new DefaultPropertyProvider<String>(AgentProperties.DELETE_OLD_AREAS);
+	private final BooleanPropertyProvider epmemLearn = new BooleanPropertyProvider(AgentProperties.EPMEM_LEARNING);
 
-    private final DefaultPropertyProvider<Mission> mission = new DefaultPropertyProvider<Mission>(AgentProperties.MISSION);
+	private final BooleanPropertyProvider smemLearn = new BooleanPropertyProvider(AgentProperties.SMEM_LEARNING);
 
-    private final DefaultPropertyProvider<String[]> miscCommands = new DefaultPropertyProvider<String[]>(AgentProperties.MISC_COMMANDS);
+	private final DefaultPropertyProvider<String[]> epmemExclusions = new DefaultPropertyProvider<String[]>(AgentProperties.EPMEM_EXCLUSIONS);
+
+	private final DefaultPropertyProvider<String> defaultStorageAreaId = new DefaultPropertyProvider<String>(AgentProperties.DEFAULT_STORAGE_AREA_ID);
+
+	private final DefaultPropertyProvider<String> areasHeldIn = new DefaultPropertyProvider<String>(AgentProperties.AREAS_HELD_IN);
+
+	private final DefaultPropertyProvider<String> objectsHeldIn = new DefaultPropertyProvider<String>(AgentProperties.OBJECTS_HELD_IN);
+
+	private final DefaultPropertyProvider<String> lookAheadPlanning = new DefaultPropertyProvider<String>(AgentProperties.LOOK_AHEAD_PLANNING);
+
+	private final DefaultPropertyProvider<String> searchControlGoToGateway = new DefaultPropertyProvider<String>(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY);
+
+	private final DefaultPropertyProvider<String> deleteOldAreas = new DefaultPropertyProvider<String>(AgentProperties.DELETE_OLD_AREAS);
+
+	private final DefaultPropertyProvider<Mission> mission = new DefaultPropertyProvider<Mission>(AgentProperties.MISSION);
+
+	private final DefaultPropertyProvider<String[]> miscCommands = new DefaultPropertyProvider<String[]>(AgentProperties.MISC_COMMANDS);
 
 
-    private final DefaultPropertyProvider<String> experimentName = new DefaultPropertyProvider<String>(DeliveryProperties.EXPERIMENT_NAME);
+	private final DefaultPropertyProvider<String> experimentName = new DefaultPropertyProvider<String>(DeliveryProperties.EXPERIMENT_NAME);
 
-    private final DefaultPropertyProvider<Integer> trialNum = new DefaultPropertyProvider<Integer>(DeliveryProperties.TRIAL_NUM);
+	private final DefaultPropertyProvider<Integer> trialNum = new DefaultPropertyProvider<Integer>(DeliveryProperties.TRIAL_NUM);
 
-    private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
+	private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
 
-    private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
+	private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
 
-    private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
+	private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
 
-    private final DefaultPropertyProvider<Integer> maxPatrolCircuits = new DefaultPropertyProvider<Integer>(DeliveryProperties.MAX_PATROL_CIRCUITS);
+	private final DefaultPropertyProvider<Integer> maxPatrolCircuits = new DefaultPropertyProvider<Integer>(DeliveryProperties.MAX_PATROL_CIRCUITS);
 
-    private final DefaultPropertyProvider<Boolean> methodEcologicalObjects = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalObjects = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
 
-    private final DefaultPropertyProvider<Boolean> methodEcologicalTiming = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalTiming = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
 
-    private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
+	private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
 
-    private final DefaultPropertyProvider<Boolean> methodEcologicalDoors = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalDoors = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
 
-    private final DefaultPropertyProvider<Boolean> methodEcologicalEntry = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalEntry = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
 
-    private String productions;
-    
-    private final WallClock clock;
-    
-    private static final String SP_PARAM = 
-        "sp {robot*elaborate*state*%s\n"
-      + "    (state <s> ^superstate nil\n"
-      + "               ^parameters <p>)\n"
-      + "-->\n"
-      + "    (<p> ^%s |%s|)\n"
-      + "}\n";
+	private String productions;
 
-    public SoarAgent(Agent agent, RobotOutput output, WallClock clock, Config propc)
-    {
-        this.agent = agent;
-        this.output = output;
-        this.clock = clock;
-        this.waypoints = new WaypointManager(getName());
-        
-        if (propc != null)
-        {
-            setDefaults(propc);
-        }
-        
-        properties.setProvider(AgentProperties.LENGTH_UNIT, lengthUnit);
-        properties.setProvider(AgentProperties.LINEAR_SPEED_UNIT, linSpeedUnit);
-        properties.setProvider(AgentProperties.ANGULAR_SPEED_UNIT, angSpeedUnit);
-        properties.setProvider(AgentProperties.ANGLE_UNIT, angleUnit);
-        properties.setProvider(AgentProperties.ANGLE_RESOLUTION, angleResolution);
-        properties.setProvider(AgentProperties.TRANSLATION, translation);
-        properties.setProvider(AgentProperties.OBJECT_LINGER_SECONDS, lingerSeconds);
+	private final WallClock clock;
 
-        properties.addListener(AgentProperties.LEARN, new PropertyListener<LearnSetting>() {
-            public void propertyChanged(PropertyChangeEvent<LearnSetting> event)
-            {
-                SoarAgent.this.agent.ExecuteCommandLine(event.getNewValue().toCommandLine());
-            }
-        });
-        properties.setProvider(AgentProperties.LEARN, learn);
+	private static final String SP_PARAM = 
+		"sp {robot*elaborate*state*%s\n"
+		+ "    (state <s> ^superstate nil\n"
+		+ "               ^parameters <p>)\n"
+		+ "-->\n"
+		+ "    (<p> ^%s |%s|)\n"
+		+ "}\n";
 
-        properties.addListener(AgentProperties.EPMEM_LEARNING, new PropertyListener<Boolean>() {
-            public void propertyChanged(PropertyChangeEvent<Boolean> event)
-            {
-                if (event.getNewValue())
-                {
-                    SoarAgent.this.agent.ExecuteCommandLine("epmem -s learning on");
-                    SoarAgent.this.agent.ExecuteCommandLine("epmem -s timers three");
-                }
-                else
-                {
-                    SoarAgent.this.agent.ExecuteCommandLine("epmem -s learning off");
-                }
-            }
-        });
-        properties.setProvider(AgentProperties.EPMEM_LEARNING, epmemLearn);
+	public SoarAgent(Agent agent, RobotOutput output, WallClock clock, Config propc)
+	{
+		this.agent = agent;
+		this.output = output;
+		this.clock = clock;
+		this.waypoints = new WaypointManager(getName());
 
-        properties.addListener(AgentProperties.SMEM_LEARNING, new PropertyListener<Boolean>() {
-            public void propertyChanged(PropertyChangeEvent<Boolean> event)
-            {
-                if (event.getNewValue())
-                {
-                    SoarAgent.this.agent.ExecuteCommandLine("smem -s learning on");
-                    SoarAgent.this.agent.ExecuteCommandLine("smem -s timers three");
-                }
-                else
-                {
-                    SoarAgent.this.agent.ExecuteCommandLine("smem -s learning off");
-                }
-            }
-        });
-        properties.setProvider(AgentProperties.SMEM_LEARNING, smemLearn);
-
-        // because epmem exclusions are toggled, we need to turn on all the defaults 
-        // except the two that are on by default (epmem, smem)
-        for (String s : epmemExclusions.get())
-        {
-            if (s.equals("epmem") || s.equals("smem"))
-                continue;
-            agent.ExecuteCommandLine("epmem -s exclusions " + s);
-        }
-        
-        // This whole step verifies the setting by asking the agent. It isn't necessary but is here for a sanity check.
-        // BUGBUG: agents can change this behind our back (in firstload). It needs to be updated before use.
-        Splitter splitter = Splitter.on(", ").trimResults();
-        List<String> exclList = Lists.newArrayList(splitter.split(agent.ExecuteCommandLine("epmem -g exclusions")));
-        epmemExclusions.set(exclList.toArray(new String[exclList.size()]));
-        logger.debug("Initial epmem exclusions: " + Arrays.toString(epmemExclusions.get()));
-
-        // Setting provider before adding listener so that event doesn't fire.
-        properties.setProvider(AgentProperties.EPMEM_EXCLUSIONS, epmemExclusions);
-        properties.addListener(AgentProperties.EPMEM_EXCLUSIONS, new PropertyListener<String[]>() {
-            public void propertyChanged(PropertyChangeEvent<String[]> event)
-            {
-                // removes old values
-                for (String s : event.getOldValue())
-                {
-                    logger.debug("epmem -s exclusions " + s);
-                    SoarAgent.this.agent.ExecuteCommandLine("epmem -s exclusions " + s);
-                }
-                
-                for (String s : event.getNewValue())
-                {
-                    logger.debug("epmem -s exclusions " + s);
-                    SoarAgent.this.agent.ExecuteCommandLine("epmem -s exclusions " + s);
-                }
-                
-                logger.debug("exclusions after update: " + SoarAgent.this.agent.ExecuteCommandLine("epmem -g exclusions").trim());
-            }
-        });
-
-        addSpProperty(AgentProperties.LINEAR_VELOCITY, linearVelocity);
-
-        addSpProperty(AgentProperties.DEFAULT_STORAGE_AREA_ID, defaultStorageAreaId);
-        addSpProperty(AgentProperties.AREAS_HELD_IN, areasHeldIn);
-        addSpProperty(AgentProperties.OBJECTS_HELD_IN, objectsHeldIn);
-        addSpProperty(AgentProperties.LOOK_AHEAD_PLANNING, lookAheadPlanning);
-        addSpProperty(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY, searchControlGoToGateway);
-        addSpProperty(AgentProperties.DELETE_OLD_AREAS, deleteOldAreas);
-
-        addSpProperty(DeliveryProperties.EXPERIMENT_NAME, experimentName);
-        addSpProperty(DeliveryProperties.TRIAL_NUM, trialNum);
-        addSpProperty(DeliveryProperties.LOG_FILE, logFile);
-        addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
-        addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
-        addSpProperty(DeliveryProperties.MAX_PATROL_CIRCUITS, maxPatrolCircuits);
-        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS, methodEcologicalObjects);
-        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING, methodEcologicalTiming);
-        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL, methodEcologicalTimingInterval);
-        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
-        addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
-        properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
-            public void propertyChanged(PropertyChangeEvent<Double> event)
-            {
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting off");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s decay-rate " + event.getNewValue());
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting on");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s forget-wme lti");
-                SoarAgent.this.agent.ExecuteCommandLine("wma -s activation on");
-            }
-        });
-        
-        addSpProperty(AgentProperties.MISSION, mission);
-        properties.addListener(AgentProperties.MISC_COMMANDS, new PropertyListener<String[]>()
-        {
-            public void propertyChanged(PropertyChangeEvent<String[]> event)
-            {
-                for (String s : event.getNewValue())
-                {
-                    logger.debug(s);
-                    SoarAgent.this.agent.ExecuteCommandLine(s);
-                }
-            }
-        });
-        properties.setProvider(AgentProperties.MISC_COMMANDS, miscCommands);
-    }
-    
-    private void setDefaults(Config propc)
-    {
-        if (propc.hasKey(AgentProperties.LINEAR_VELOCITY.getName()))
-            linearVelocity.set(Double.valueOf(propc.requireString(AgentProperties.LINEAR_VELOCITY.getName())));
-
-        if (propc.hasKey(AgentProperties.LEARN.getName()))
-            learn.set(LearnSetting.valueOf(propc.requireString(AgentProperties.LEARN.getName())));
-        if (propc.hasKey(AgentProperties.EPMEM_LEARNING.getName()))
-            epmemLearn.set(Boolean.valueOf(propc.requireString(AgentProperties.EPMEM_LEARNING.getName())));
-        if (propc.hasKey(AgentProperties.SMEM_LEARNING.getName()))
-            smemLearn.set(Boolean.valueOf(propc.requireString(AgentProperties.SMEM_LEARNING.getName())));
-        if (propc.hasKey(AgentProperties.EPMEM_EXCLUSIONS.getName()))
-            epmemExclusions.set(propc.requireStrings(AgentProperties.EPMEM_EXCLUSIONS.getName()));
-        if (propc.hasKey(AgentProperties.DEFAULT_STORAGE_AREA_ID.getName()))
-            defaultStorageAreaId.set(propc.requireString(AgentProperties.DEFAULT_STORAGE_AREA_ID.getName()));
-        if (propc.hasKey(AgentProperties.AREAS_HELD_IN.getName()))
-            areasHeldIn.set(propc.requireString(AgentProperties.AREAS_HELD_IN.getName()));
-        if (propc.hasKey(AgentProperties.OBJECTS_HELD_IN.getName()))
-            objectsHeldIn.set(propc.requireString(AgentProperties.OBJECTS_HELD_IN.getName()));
-        if (propc.hasKey(AgentProperties.LOOK_AHEAD_PLANNING.getName()))
-            lookAheadPlanning.set(propc.requireString(AgentProperties.LOOK_AHEAD_PLANNING.getName()));
-        if (propc.hasKey(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY.getName()))
-            searchControlGoToGateway.set(propc.requireString(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY.getName()));
-        if (propc.hasKey(AgentProperties.DELETE_OLD_AREAS.getName()))
-            deleteOldAreas.set(propc.requireString(AgentProperties.DELETE_OLD_AREAS.getName()));
-        if (propc.hasKey(AgentProperties.MISSION.getName()))
-            mission.set(Mission.valueOf(propc.requireString(AgentProperties.MISSION.getName())));
-        if (propc.hasKey(AgentProperties.MISC_COMMANDS.getName()))
-            miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
-
-        if (propc.hasKey(DeliveryProperties.EXPERIMENT_NAME.getName()))
-            experimentName.set(propc.requireString(DeliveryProperties.EXPERIMENT_NAME.getName()));
-        if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
-            trialNum.set(Integer.valueOf(propc.requireString(DeliveryProperties.TRIAL_NUM.getName())));
-        if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
-            logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
-        if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
-            decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
-        if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
-            tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
-        if (propc.hasKey(DeliveryProperties.MAX_PATROL_CIRCUITS.getName()))
-            maxPatrolCircuits.set(Integer.valueOf(propc.requireString(DeliveryProperties.MAX_PATROL_CIRCUITS.getName())));
-        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()))
-            methodEcologicalObjects.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName())));
-        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()))
-            methodEcologicalTiming.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName())));
-        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName()))
-            methodEcologicalTimingInterval.set(Integer.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName())));
-        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
-            methodEcologicalDoors.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
-        if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
-            methodEcologicalEntry.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
-    }
-    
-    private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)
-    {
-        properties.addListener(key, new PropertyListener<T>()
+		if (propc != null)
 		{
-			public void propertyChanged(PropertyChangeEvent<T> event)
-			{
+			setDefaults(propc);
+		}
+
+		properties.setProvider(AgentProperties.LENGTH_UNIT, lengthUnit);
+		properties.setProvider(AgentProperties.LINEAR_SPEED_UNIT, linSpeedUnit);
+		properties.setProvider(AgentProperties.ANGULAR_SPEED_UNIT, angSpeedUnit);
+		properties.setProvider(AgentProperties.ANGLE_UNIT, angleUnit);
+		properties.setProvider(AgentProperties.ANGLE_RESOLUTION, angleResolution);
+		properties.setProvider(AgentProperties.TRANSLATION, translation);
+		properties.setProvider(AgentProperties.OBJECT_LINGER_SECONDS, lingerSeconds);
+
+		properties.addListener(AgentProperties.LEARN, new PropertyListener<LearnSetting>() {
+			public void propertyChanged(PropertyChangeEvent<LearnSetting> event) {
+				SoarAgent.this.agent.ExecuteCommandLine(event.getNewValue().toCommandLine());
+			}
+		});
+		properties.setProvider(AgentProperties.LEARN, learn);
+
+		properties.addListener(AgentProperties.EPMEM_LEARNING, new PropertyListener<Boolean>() {
+			public void propertyChanged(PropertyChangeEvent<Boolean> event) {
+				if (event.getNewValue()) {
+					SoarAgent.this.agent.ExecuteCommandLine("epmem -s learning on");
+					SoarAgent.this.agent.ExecuteCommandLine("epmem -s timers three");
+				} else {
+					SoarAgent.this.agent.ExecuteCommandLine("epmem -s learning off");
+				}
+			}
+		});
+		properties.setProvider(AgentProperties.EPMEM_LEARNING, epmemLearn);
+
+		properties.addListener(AgentProperties.SMEM_LEARNING, new PropertyListener<Boolean>() {
+			public void propertyChanged(PropertyChangeEvent<Boolean> event) {
+				if (event.getNewValue()) {
+					SoarAgent.this.agent.ExecuteCommandLine("smem -s learning on");
+					SoarAgent.this.agent.ExecuteCommandLine("smem -s timers three");
+				} else {
+					SoarAgent.this.agent.ExecuteCommandLine("smem -s learning off");
+				}
+			}
+		});
+		properties.setProvider(AgentProperties.SMEM_LEARNING, smemLearn);
+
+		// because epmem exclusions are toggled, we need to turn on all the defaults 
+		// except the two that are on by default (epmem, smem)
+		for (String s : epmemExclusions.get()) {
+			if (s.equals("epmem") || s.equals("smem"))
+				continue;
+			agent.ExecuteCommandLine("epmem -s exclusions " + s);
+		}
+
+		// This whole step verifies the setting by asking the agent. It isn't necessary but is here for a sanity check.
+		// BUGBUG: agents can change this behind our back (in firstload). It needs to be updated before use.
+		Splitter splitter = Splitter.on(", ").trimResults();
+		List<String> exclList = Lists.newArrayList(splitter.split(agent.ExecuteCommandLine("epmem -g exclusions")));
+		epmemExclusions.set(exclList.toArray(new String[exclList.size()]));
+		logger.debug("Initial epmem exclusions: " + Arrays.toString(epmemExclusions.get()));
+
+		// Setting provider before adding listener so that event doesn't fire.
+		properties.setProvider(AgentProperties.EPMEM_EXCLUSIONS, epmemExclusions);
+		properties.addListener(AgentProperties.EPMEM_EXCLUSIONS, new PropertyListener<String[]>() {
+			public void propertyChanged(PropertyChangeEvent<String[]> event) {
+				// removes old values
+				for (String s : event.getOldValue()) {
+					logger.debug("epmem -s exclusions " + s);
+					SoarAgent.this.agent.ExecuteCommandLine("epmem -s exclusions " + s);
+				}
+
+				for (String s : event.getNewValue()) {
+					logger.debug("epmem -s exclusions " + s);
+					SoarAgent.this.agent.ExecuteCommandLine("epmem -s exclusions " + s);
+				}
+
+				logger.debug("exclusions after update: " + SoarAgent.this.agent.ExecuteCommandLine("epmem -g exclusions").trim());
+			}
+		});
+
+		addSpProperty(AgentProperties.LINEAR_VELOCITY, linearVelocity);
+
+		addSpProperty(AgentProperties.DEFAULT_STORAGE_AREA_ID, defaultStorageAreaId);
+		addSpProperty(AgentProperties.AREAS_HELD_IN, areasHeldIn);
+		addSpProperty(AgentProperties.OBJECTS_HELD_IN, objectsHeldIn);
+		addSpProperty(AgentProperties.LOOK_AHEAD_PLANNING, lookAheadPlanning);
+		addSpProperty(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY, searchControlGoToGateway);
+		addSpProperty(AgentProperties.DELETE_OLD_AREAS, deleteOldAreas);
+
+		addSpProperty(DeliveryProperties.EXPERIMENT_NAME, experimentName);
+		addSpProperty(DeliveryProperties.TRIAL_NUM, trialNum);
+		addSpProperty(DeliveryProperties.LOG_FILE, logFile);
+		addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
+		addSpProperty(DeliveryProperties.MAX_PATROL_CIRCUITS, maxPatrolCircuits);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS, methodEcologicalObjects);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING, methodEcologicalTiming);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL, methodEcologicalTimingInterval);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
+		properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
+			public void propertyChanged(PropertyChangeEvent<Double> event) {
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting off");
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s decay-rate " + event.getNewValue());
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s forgetting on");
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s forget-wme lti");
+				SoarAgent.this.agent.ExecuteCommandLine("wma -s activation on");
+			}
+		});
+		// this must be after the additional listener above
+		addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
+
+		addSpProperty(AgentProperties.MISSION, mission);
+		properties.addListener(AgentProperties.MISC_COMMANDS, new PropertyListener<String[]>() {
+			public void propertyChanged(PropertyChangeEvent<String[]> event) {
+				for (String s : event.getNewValue()) {
+					logger.debug(s);
+					SoarAgent.this.agent.ExecuteCommandLine(s);
+				}
+			}
+		});
+		properties.setProvider(AgentProperties.MISC_COMMANDS, miscCommands);
+	}
+
+	private void setDefaults(Config propc)
+	{
+		if (propc.hasKey(AgentProperties.LINEAR_VELOCITY.getName()))
+			linearVelocity.set(Double.valueOf(propc.requireString(AgentProperties.LINEAR_VELOCITY.getName())));
+
+		if (propc.hasKey(AgentProperties.LEARN.getName()))
+			learn.set(LearnSetting.valueOf(propc.requireString(AgentProperties.LEARN.getName())));
+		if (propc.hasKey(AgentProperties.EPMEM_LEARNING.getName()))
+			epmemLearn.set(Boolean.valueOf(propc.requireString(AgentProperties.EPMEM_LEARNING.getName())));
+		if (propc.hasKey(AgentProperties.SMEM_LEARNING.getName()))
+			smemLearn.set(Boolean.valueOf(propc.requireString(AgentProperties.SMEM_LEARNING.getName())));
+		if (propc.hasKey(AgentProperties.EPMEM_EXCLUSIONS.getName()))
+			epmemExclusions.set(propc.requireStrings(AgentProperties.EPMEM_EXCLUSIONS.getName()));
+		if (propc.hasKey(AgentProperties.DEFAULT_STORAGE_AREA_ID.getName()))
+			defaultStorageAreaId.set(propc.requireString(AgentProperties.DEFAULT_STORAGE_AREA_ID.getName()));
+		if (propc.hasKey(AgentProperties.AREAS_HELD_IN.getName()))
+			areasHeldIn.set(propc.requireString(AgentProperties.AREAS_HELD_IN.getName()));
+		if (propc.hasKey(AgentProperties.OBJECTS_HELD_IN.getName()))
+			objectsHeldIn.set(propc.requireString(AgentProperties.OBJECTS_HELD_IN.getName()));
+		if (propc.hasKey(AgentProperties.LOOK_AHEAD_PLANNING.getName()))
+			lookAheadPlanning.set(propc.requireString(AgentProperties.LOOK_AHEAD_PLANNING.getName()));
+		if (propc.hasKey(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY.getName()))
+			searchControlGoToGateway.set(propc.requireString(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY.getName()));
+		if (propc.hasKey(AgentProperties.DELETE_OLD_AREAS.getName()))
+			deleteOldAreas.set(propc.requireString(AgentProperties.DELETE_OLD_AREAS.getName()));
+		if (propc.hasKey(AgentProperties.MISSION.getName()))
+			mission.set(Mission.valueOf(propc.requireString(AgentProperties.MISSION.getName())));
+		if (propc.hasKey(AgentProperties.MISC_COMMANDS.getName()))
+			miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
+
+		if (propc.hasKey(DeliveryProperties.EXPERIMENT_NAME.getName()))
+			experimentName.set(propc.requireString(DeliveryProperties.EXPERIMENT_NAME.getName()));
+		if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
+			trialNum.set(Integer.valueOf(propc.requireString(DeliveryProperties.TRIAL_NUM.getName())));
+		if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
+			logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
+		if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
+			decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
+		if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
+			tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
+		if (propc.hasKey(DeliveryProperties.MAX_PATROL_CIRCUITS.getName()))
+			maxPatrolCircuits.set(Integer.valueOf(propc.requireString(DeliveryProperties.MAX_PATROL_CIRCUITS.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()))
+			methodEcologicalObjects.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()))
+			methodEcologicalTiming.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName()))
+			methodEcologicalTimingInterval.set(Integer.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
+			methodEcologicalDoors.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
+			methodEcologicalEntry.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
+	}
+
+	private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)
+	{
+		properties.addListener(key, new PropertyListener<T>() {
+			public void propertyChanged(PropertyChangeEvent<T> event) {
 				SoarAgent.this.agent.ExecuteCommandLine(makeSpParam(event.getKey().toString(), event.getNewValue()));
 			}
 		});
-        properties.setProvider(key, prov);
-    }
-    
-    
-    private <T> String makeSpParam(String key, T value)
-    {
-        return String.format(SP_PARAM, key, key, value.toString());
-    }
-    
-    public void initialize() 
-    {
-        agent.SetBlinkIfNoChange(false);
+		properties.setProvider(key, prov);
+	}
 
-        il = InputLink.newInstance(this);
 
-        agent.Commit();
-    }
-    
-    public PropertyManager getProperties()
-    {
-        return properties;
-    }
+	private <T> String makeSpParam(String key, T value)
+	{
+		return String.format(SP_PARAM, key, key, value.toString());
+	}
 
-    Agent getSoarAgent()
-    {   
-        return agent;
-    }
+	public void initialize() 
+	{
+		agent.SetBlinkIfNoChange(false);
 
-    RobotEventManager getEvents()
-    {
-        return events;
-    }
+		il = InputLink.newInstance(this);
 
-    WaypointManager getWaypoints()
-    {
-        return waypoints;
-    }
+		agent.Commit();
+	}
 
-    ConcurrentMap<Long, RadioMessage> getRadioMessages()
-    {
-        return radioMessages;
-    }
+	public PropertyManager getProperties()
+	{
+		return properties;
+	}
 
-    private void destroy()
-    {
-        if (il != null)
-            il.destroy();
-        il = null;
+	Agent getSoarAgent()
+	{   
+		return agent;
+	}
 
-        if (ol != null)
-            ol.destroy();
-        ol = null;
-    }
+	RobotEventManager getEvents()
+	{
+		return events;
+	}
 
-    public void loadProductions(String productions) throws SoarException
-    {
-        agent.ExecuteCommandLine("waitsnc -d");
-        if (!agent.LoadProductions(productions))
-        {
-            String message = agent.GetLastErrorDescription();
-            agent.ExecuteCommandLine("waitsnc -e");
-            throw new SoarException(message);
-        }
-        this.productions = productions;
-    }
-    
-    public String getProductionsFile()
-    {
-        return productions;
-    }
+	WaypointManager getWaypoints()
+	{
+		return waypoints;
+	}
 
-    public void seed(int seed)
-    {
-        logger.warn(String.format("Setting random seed: %d", seed));
-        agent.ExecuteCommandLine(String.format("srand %d", seed));
-    }
+	ConcurrentMap<Long, RadioMessage> getRadioMessages()
+	{
+		return radioMessages;
+	}
 
-    public void update()
-    {
-        if (ol == null)
-            if (agent.GetOutputLink() != null)
-                ol = OutputLink.newInstance(this);
+	private void destroy()
+	{
+		if (il != null)
+			il.destroy();
+		il = null;
 
-        if (ol != null)
-            ol.update();
-        il.update();
-        logger.trace("IO Update done");
-        agent.Commit();
-    }
+		if (ol != null)
+			ol.destroy();
+		ol = null;
+	}
 
-    public void debug()
-    {
-        try {
-            SoarProperties sp = new SoarProperties();
-            // sp.spawnDebugger(agent);
-            String jarPath = SoarAgent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            jarPath = URLDecoder.decode(jarPath, "utf-8");
-            jarPath = new File(jarPath).getPath();
-            boolean isOSX = System.getProperty("os.name").equals("Mac OS X");
-            int port = agent.GetKernel().GetListenerPort();
-            String command = "java " + (isOSX ? "-XstartOnFirstThread " : "") + "-jar " + jarPath + " -debugger -remote -port " + port + " -agent " + getName();
-            System.out.println("Spawning debugger with command: \"" + command + "\"");
-            Runtime.getRuntime().exec(command);
-            System.out.println("Done spawning debugger");
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-   }
+	public void loadProductions(String productions) throws SoarException
+	{
+		agent.ExecuteCommandLine("waitsnc -d");
+		if (!agent.LoadProductions(productions))
+		{
+			String message = agent.GetLastErrorDescription();
+			agent.ExecuteCommandLine("waitsnc -e");
+			throw new SoarException(message);
+		}
+		this.productions = productions;
+	}
 
-    public <T extends AbstractControlEvent> void addListener(Class<T> klass,
-            RobotEventListener listener)
-    {
-        events.addListener(klass, listener);
-    }
+	public String getProductionsFile()
+	{
+		return productions;
+	}
 
-    public String getName()
-    {
-        return agent.GetAgentName();
-    }
+	public void seed(int seed)
+	{
+		logger.warn(String.format("Setting random seed: %d", seed));
+		agent.ExecuteCommandLine(String.format("srand %d", seed));
+	}
 
-    public <T extends AbstractControlEvent> void removeListener(Class<T> klass,
-            RobotEventListener listener)
-    {
-        events.removeListener(klass, listener);
-    }
+	public void update()
+	{
+		if (ol == null)
+			if (agent.GetOutputLink() != null)
+				ol = OutputLink.newInstance(this);
 
-    private final AgentEventInterface agentHandler = new AgentEventInterface()
-    {
-        public void agentEventHandler(int eventID, Object data, String agentName)
-        {
-            if (eventID == smlAgentEventId.smlEVENT_BEFORE_AGENT_REINITIALIZED
-                    .swigValue())
-            {
-                logger.trace("smlEVENT_BEFORE_AGENT_REINITIALIZED");
+		if (ol != null)
+			ol.update();
+		il.update();
+		logger.trace("IO Update done");
+		agent.Commit();
+	}
 
-                destroy();
+	public void debug()
+	{
+		try {
+			SoarProperties sp = new SoarProperties();
+			// sp.spawnDebugger(agent);
+			String jarPath = SoarAgent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			jarPath = URLDecoder.decode(jarPath, "utf-8");
+			jarPath = new File(jarPath).getPath();
+			boolean isOSX = System.getProperty("os.name").equals("Mac OS X");
+			int port = agent.GetKernel().GetListenerPort();
+			String command = "java " + (isOSX ? "-XstartOnFirstThread " : "") + "-jar " + jarPath + " -debugger -remote -port " + port + " -agent " + getName();
+			System.out.println("Spawning debugger with command: \"" + command + "\"");
+			Runtime.getRuntime().exec(command);
+			System.out.println("Done spawning debugger");
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-                agent.Commit();
-                logger.trace("smlEVENT_BEFORE_AGENT_REINITIALIZED done");
+	public <T extends AbstractControlEvent> void addListener(Class<T> klass,
+			RobotEventListener listener)
+	{
+		events.addListener(klass, listener);
+	}
 
-            }
-            else if (eventID == smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED
-                    .swigValue())
-            {
-                logger.trace("smlEVENT_AFTER_AGENT_REINITIALIZED");
+	public String getName()
+	{
+		return agent.GetAgentName();
+	}
 
-                il = InputLink.newInstance(SoarAgent.this);
-                
-                agent.Commit();
-                logger.trace("smlEVENT_AFTER_AGENT_REINITIALIZED done");
-            }
-        }
-    };
+	public <T extends AbstractControlEvent> void removeListener(Class<T> klass,
+			RobotEventListener listener)
+	{
+		events.removeListener(klass, listener);
+	}
 
-    public AgentEventInterface getAgentHandler()
-    {
-        return agentHandler;
-    }
+	private final AgentEventInterface agentHandler = new AgentEventInterface()
+	{
+		public void agentEventHandler(int eventID, Object data, String agentName)
+		{
+			if (eventID == smlAgentEventId.smlEVENT_BEFORE_AGENT_REINITIALIZED
+					.swigValue())
+			{
+				logger.trace("smlEVENT_BEFORE_AGENT_REINITIALIZED");
 
-    @Override
-    public String toString()
-    {
-        return "Soar: " + getName();
-    }
+				destroy();
 
-    public RobotOutput getRobotOutput()
-    {
-        return output;
-    }
+				agent.Commit();
+				logger.trace("smlEVENT_BEFORE_AGENT_REINITIALIZED done");
 
-    void stopEvent()
-    {
-        if (ol != null)
-            ol.stopEvent();
-    }
+			}
+			else if (eventID == smlAgentEventId.smlEVENT_AFTER_AGENT_REINITIALIZED
+					.swigValue())
+			{
+				logger.trace("smlEVENT_AFTER_AGENT_REINITIALIZED");
 
-    void startEvent()
-    {
-        if (ol != null)
-            ol.startEvent();
-    }
+				il = InputLink.newInstance(SoarAgent.this);
 
-    public WallClock getWallClock()
-    {
-        return clock;
-    }
-    
-    public void shutdown()
-    {
-        waypoints.shutdown();
-    }
+				agent.Commit();
+				logger.trace("smlEVENT_AFTER_AGENT_REINITIALIZED done");
+			}
+		}
+	};
+
+	public AgentEventInterface getAgentHandler()
+	{
+		return agentHandler;
+	}
 
 	@Override
-	public void radioMessageReceived(RadioMessage comm) {
-		radioMessages.put((long) comm.getId(), comm);
+		public String toString()
+		{
+			return "Soar: " + getName();
+		}
+
+	public RobotOutput getRobotOutput()
+	{
+		return output;
 	}
+
+	void stopEvent()
+	{
+		if (ol != null)
+			ol.stopEvent();
+	}
+
+	void startEvent()
+	{
+		if (ol != null)
+			ol.startEvent();
+	}
+
+	public WallClock getWallClock()
+	{
+		return clock;
+	}
+
+	public void shutdown()
+	{
+		waypoints.shutdown();
+	}
+
+	@Override
+		public void radioMessageReceived(RadioMessage comm) {
+			radioMessages.put((long) comm.getId(), comm);
+		}
 
 }
