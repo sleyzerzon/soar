@@ -158,14 +158,7 @@ smem --add {
 }
 
 sp {interrupt*monitor
-   (state <s> ^name recursive-retrieve
-              ^operator.name initialize
-              ^superstate.operator.lti <task>
-              ^tasks.task <task>
-              ^metrics <metrics>
-              ^flags <flags>)
-   (<metrics> ^num-retrievals <n>)
-  -(<flags> ^num-retrievals-updated)
+   (state <s> ^name recursive-retrieve)
 -->
    #(write |retrieving task | <task>)
    #(interrupt)
@@ -202,7 +195,6 @@ sp {delivery*elaborate*parameters
    (<s> ^parameters <params>)
    (<params> ^distance-tolerance 1.0
              ^heading-tolerance 1.5
-             ^max-patrol-circuits 0
              ^storage-delta-x 1
              ^storage-delta-y 1)
 }
@@ -245,22 +237,22 @@ sp {delivery*elaborate*constants
 
 # default
 
-sp {elaborate*topstate*topstate
+sp {elaborate*state*topstate
    (state <s> ^superstate nil)
 -->
    (<s> ^topstate <s>)
-}
-
-sp {elaborate*state*inherited*defaults
-   (state <s> ^superstate.{<attr> << io topstate >>} <val>)
--->
-   (<s> ^<attr> <val>)
 }
 
 sp {elaborate*state*state-name
    (state <s> ^superstate.operator.name <name>)
 -->
    (<s> ^name <name>)
+}
+
+sp {elaborate*state*inherited*defaults
+   (state <s> ^superstate.{<attr> << io topstate >>} <val>)
+-->
+   (<s> ^<attr> <val>)
 }
 
 # domain-specific inherited attributes
@@ -270,6 +262,24 @@ sp {elaborate*state*inherited*roomsworld
 
 -->
    (<s> ^<attr> <val>)
+}
+
+# parameters
+
+sp {elaborate*state*integer-parameters
+   (state <s> ^superstate nil
+              ^parameters <params>)
+   (<params> ^{<attr> << trial-num max-patrol-circuits method-ecological-timing-interval >>} <val>)
+-->
+   (<params> ^(concat <attr> |-cvrt|) (int <val>))
+}
+
+sp {elaborate*state*float-parameters
+   (state <s> ^superstate nil
+              ^parameters <params>)
+   (<params> ^{<attr> << decay-rate >>} <val>)
+-->
+   (<params> ^(concat <attr> |-cvrt|) (float <val>))
 }
 
 # memory
@@ -537,7 +547,7 @@ sp {delivery*propose*retrieve-all-tasks-area*object
               ^parameters <params>
              -^flags.retrieved-tasks-for-object <id>)
    (<params> ^tasks-held-in smem
-             ^method-ecological-objects yes)
+             ^method-ecological-objects true)
 -->
    (<s> ^operator <o>)
    (<o> ^name retrieve-object-tasks)
@@ -555,7 +565,7 @@ sp {delivery*propose*retrieve-all-tasks-area*doors
    (<area> ^id <area-id>
            ^type door)
    (<params> ^tasks-held-in smem
-             ^method-ecological-entry yes)
+             ^method-ecological-doors true)
 -->
    (<s> ^operator <o>)
    (<o> ^name retrieve-all-tasks-area)
@@ -569,7 +579,7 @@ sp {delivery*propose*retrieve-all-tasks-area*entry
    (<area> ^id <area-id>
            ^type room)
    (<params> ^tasks-held-in smem
-             ^method-ecological-entry yes)
+             ^method-ecological-entry true)
 -->
    (<s> ^operator <o>)
    (<o> ^name retrieve-all-tasks-area)
@@ -639,7 +649,7 @@ sp {delivery*propose*retrieve-all-tasks-area*timing
               ^epmem.present-id {> <epmem-id>}
               ^flags.next-task-retrieval-after-episode <epmem-id>)
    (<params> ^tasks-held-in smem
-             ^method-ecological-timing yes)
+             ^method-ecological-timing true)
 -->
    (<s> ^operator <o>)
    (<o> ^name retrieve-all-tasks-timing)
@@ -673,7 +683,7 @@ sp {retrieve-all-tasks-timing*propose*done
 sp {retrieve-all-tasks-timing*apply*done
    (state <s> ^name retrieve-all-tasks-timing
               ^operator.name done
-              ^parameters.method-ecological-timing-interval <interval>
+              ^parameters.method-ecological-timing-interval-cvrt <interval>
               ^epmem.present-id <present-id>
               ^flags <flags>)
    (<flags> ^next-task-retrieval-after-episode <epmem-id>)
@@ -1409,7 +1419,7 @@ sp {delivery*propose*report-metrics*all-tasks-completed
 
 sp {delivery*propose*report-metrics*patrol-limit
    (state <s> ^name delivery
-              ^parameters.max-patrol-circuits <max>
+              ^parameters.max-patrol-circuits-cvrt <max>
               ^metrics.num-circuits <max>)
 -->
    (<s> ^operator <o> +)
@@ -1421,17 +1431,25 @@ sp {delivery*apply*report-metrics
               ^operator.name report-metrics
               ^metrics <metrics>
               ^parameters <parameters>)
-   (<parameters> ^decay-rate <decay>
-                 ^linear-velocity <velo>
+   (<parameters> ^experiment-name <experiment>
+                 ^trial-num-cvrt <trial>
                  ^log-file <file>
+                 ^decay-rate-cvrt <decay>
+                 ^linear-velocity <velo>
+                 ^max-patrol-circuits-cvrt <max-circuits>
                  ^method-ecological-doors <doors> 
                  ^method-ecological-entry <entry>
                  ^method-ecological-objects <objects>
                  ^method-ecological-timing <timing>
-                 ^method-ecological-timing-interval <interval>)
-
+                 ^method-ecological-timing-interval-cvrt <interval>)
+   (<metrics> ^num-retrievals <num-retrievals>
+              ^num-circuits <num-circuits>)
 -->
    (cmd |clog | <file>)
+   (cmd echo |BEGIN EXPERIMENTAL OUTPUT|)
+   (cmd echo |experiment: | <experiment>)
+   (cmd echo |trial: | <trial>)
+   (cmd echo |max-circuits: | <max-circuits>)
    (cmd echo |decay rate: | <decay>)
    (cmd echo |linear velocity: | <velo>)
    (cmd echo |doors ecological method: | <doors>)
@@ -1439,11 +1457,14 @@ sp {delivery*apply*report-metrics
    (cmd echo |objects ecological method: | <objects>)
    (cmd echo |timing ecological method: | <timing>)
    (cmd echo |timing ecological method interval: | <interval>)
+   (cmd echo |num circuits: | <num-circuits>)
+   (cmd echo |num retrievals: | <num-retrievals>)
    (cmd smem --stats)
    (cmd smem --timer)
    (cmd epmem --stats)
    (cmd epmem --timer)
    (cmd stats)
+   (cmd echo |END EXPERIMENTAL OUTPUT|)
    (halt)
 }
 
