@@ -26,7 +26,8 @@ smem --add {
     (<task01> ^type task
               ^object <obj01>
               ^destination <dest01>
-              ^priority 1)
+              ^priority 1
+              ^id 1)
     (<obj01> ^height large
              ^color red
              ^shape sphere)
@@ -39,7 +40,8 @@ smem --add {
     (<task02> ^type task
               ^object <obj02>
               ^destination <dest02>
-              ^priority 2)
+              ^priority 2
+              ^id 2)
     (<obj02> ^height short
              ^color green
              ^shape cube)
@@ -51,9 +53,11 @@ smem --add {
     # distance: 6 rooms
     (<task03> ^type task
               ^object <obj03>
-              ^destination <dest03>)
+              ^destination <dest03>
+              ^priority 1
+              ^id 3)
     (<obj03> ^height large
-             ^color green
+             ^color orange
              ^shape tetrahedron)
     (<dest03> ^id 0)
 
@@ -63,9 +67,11 @@ smem --add {
     # distance: 3 rooms
     (<task04> ^type task
               ^object <obj04>
-              ^destination <dest04>)
+              ^destination <dest04>
+              ^priority 2
+              ^id 4)
     (<obj04> ^height large
-             ^color green
+             ^color orange
              ^shape tetrahedron)
     (<dest04> ^id 35)
 
@@ -76,7 +82,8 @@ smem --add {
     (<task05> ^type task
               ^object <obj05>
               ^destination <dest05>
-              ^priority 3)
+              ^priority 3
+              ^id 5)
     (<obj05> ^height short
              ^color green
              ^shape cube)
@@ -89,7 +96,8 @@ smem --add {
     (<task06> ^type task
               ^object <obj06>
               ^destination <dest06>
-              ^priority 2)
+              ^priority 2
+              ^id 6)
     (<obj06> ^height large
              ^color red
              ^shape sphere)
@@ -101,7 +109,8 @@ smem --add {
     # distance: 10 rooms
     (<task07> ^type task
               ^object <obj07>
-              ^destination <dest07>)
+              ^destination <dest07>
+              ^id 7)
     (<obj07> ^height medium
              ^color magenta
              ^shape sphere)
@@ -114,7 +123,8 @@ smem --add {
     (<task08> ^type task
               ^object <obj08>
               ^destination <dest08>
-              ^priority 1)
+              ^priority 1
+              ^id 8)
     (<obj08> ^height short
              ^color green
              ^shape cube)
@@ -126,7 +136,8 @@ smem --add {
     # distance: 10 rooms
     (<task09> ^type task
               ^object <obj09>
-              ^destination <dest09>)
+              ^destination <dest09>
+              ^id 9)
     (<obj09> ^height medium
              ^color green
              ^shape dodecahedron)
@@ -138,7 +149,8 @@ smem --add {
     # distance: 6 rooms
     (<task10> ^type task
               ^object <obj10>
-              ^destination <dest10>)
+              ^destination <dest10>
+              ^id 10)
     (<obj10> ^height short
              ^color yellow
              ^shape octahedron)
@@ -150,7 +162,8 @@ smem --add {
     # distance: 6 rooms
     (<task11> ^type task
               ^object <obj11>
-              ^destination <dest11>)
+              ^destination <dest11>
+              ^id 11)
     (<obj11> ^height short
              ^color indigo
              ^shape tesseract)
@@ -158,9 +171,12 @@ smem --add {
 }
 
 sp {interrupt*monitor
-   (state <s> ^name recursive-retrieve)
+   (state <s> ^operator <o>
+              ^io.input-link.area-description.id <area-id>)
+   (<o> ^name mark-task-completed
+        ^task.id <task-id>)
 -->
-   #(write |retrieving task | <task>)
+   (write |completed task | <task-id> | in area | <area-id> (crlf))
    #(interrupt)
 }
 
@@ -277,7 +293,7 @@ sp {elaborate*state*integer-parameters
 sp {elaborate*state*float-parameters
    (state <s> ^superstate nil
               ^parameters <params>)
-   (<params> ^{<attr> << decay-rate >>} <val>)
+   (<params> ^{<attr> << decay-rate linear-velocity >>} <val>)
 -->
    (<params> ^(concat <attr> |-cvrt|) (float <val>))
 }
@@ -597,7 +613,8 @@ sp {retrieve-all-tasks-area*propose*remove-flags
 sp {retrieve-all-tasks-area*elaborate*remove-flag-operator
    (state <s> ^name retrieve-all-tasks-area
               ^operator <o> +
-              ^flags.tasks-retrieved-in-area <val>)
+              ^flags.tasks-retrieved-in-area <val>
+              ^quiescence t)
    (<o> ^name remove-flags
         ^flags <flags>)
 -->
@@ -635,7 +652,8 @@ sp {retrieve-all-tasks-area*apply*done
    (state <s> ^name retrieve-all-tasks-area
               ^operator.name done
               ^current-area.id <area-id>
-              ^flags <flags>)
+              ^flags <flags>
+              ^quiescence t)
 -->
    (<flags> ^tasks-retrieved-in-area <area-id>)
 }
@@ -974,6 +992,8 @@ sp {delivery*propose*mark-task-completed
               ^ltis.lti <task-lti>)
    (<task> ^object <desc>
            ^destination <dest>)
+   # check that the task was completed
+   (<desc> ^id)
    # check that the task has not been forgotten
    (<task-lti> ^identifier <task>
                ^forgotten no)
@@ -1095,19 +1115,20 @@ sp {record-area-wm*apply*copy-current-area*gateway
               ^areas.area <to-area>
               ^area <area>
               ^constants.direction-opposites.<direction> <opposite>)
-   (<area> ^id <id>
-          -^<direction>.id <gid>)
+   (<area> ^id <id>)
    (<to-area> ^id <to>)
-   (<cgateway> ^id <gid>
-               ^to {<to> <> <id>}
+   (<cgateway> ^to {<to> <> <id>}
                ^direction <direction>
                ^x <x>
                ^y <y>)
+   # there is not already a gateway in that location
+   -{ (<area> ^<direction> <exist>)
+      (<exist> ^x <x>
+               ^y <y>) }
 -->
    (<area> ^<direction> <gateway>)
    (<to-area> ^<opposite> <gateway>)
-   (<gateway> ^id <gid>
-              ^class coord
+   (<gateway> ^class coord
               ^type gateway
               ^to <area>
               ^to <to-area>
@@ -1335,7 +1356,7 @@ sp {go-to-coord*propose*drive-to-waypoint
               ^parameters <params>
               ^destination.waypoint <waypoint>)
    (<params> ^distance-tolerance <distance-tol>
-             ^linear-velocity <velocity>
+             ^linear-velocity-cvrt <velocity>
              ^heading-tolerance <heading-tol>)
    (<waypoint> ^abs-relative-bearing {<= <heading-tol>}
                ^distance {<remaining> > <distance-tol>})
@@ -1435,7 +1456,7 @@ sp {delivery*apply*report-metrics
                  ^trial-num-cvrt <trial>
                  ^log-file <file>
                  ^decay-rate-cvrt <decay>
-                 ^linear-velocity <velo>
+                 ^linear-velocity-cvrt <velo>
                  ^max-patrol-circuits-cvrt <max-circuits>
                  ^method-ecological-doors <doors> 
                  ^method-ecological-entry <entry>
@@ -1446,10 +1467,10 @@ sp {delivery*apply*report-metrics
               ^num-circuits <num-circuits>)
 -->
    (cmd |clog | <file>)
-   (cmd echo |BEGIN EXPERIMENTAL OUTPUT|)
+   (cmd echo |BEGIN OUTPUT|)
    (cmd echo |experiment: | <experiment>)
    (cmd echo |trial: | <trial>)
-   (cmd echo |max-circuits: | <max-circuits>)
+   (cmd echo |max circuits: | <max-circuits>)
    (cmd echo |decay rate: | <decay>)
    (cmd echo |linear velocity: | <velo>)
    (cmd echo |doors ecological method: | <doors>)
@@ -1459,12 +1480,13 @@ sp {delivery*apply*report-metrics
    (cmd echo |timing ecological method interval: | <interval>)
    (cmd echo |num circuits: | <num-circuits>)
    (cmd echo |num retrievals: | <num-retrievals>)
+   (cmd echo |BEGIN COMMANDS|)
    (cmd smem --stats)
    (cmd smem --timer)
    (cmd epmem --stats)
    (cmd epmem --timer)
    (cmd stats)
-   (cmd echo |END EXPERIMENTAL OUTPUT|)
+   (cmd echo |END OUTPUT|)
    (halt)
 }
 

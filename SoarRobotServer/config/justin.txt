@@ -9,18 +9,20 @@ seek
 	{
 		spawn-debuggers = false;
 
+		decay-rate = 0.8;
 		linear-velocity = 0.7;
 
 		areas-held-in = "wm";
 		objects-held-in = "wm";
-		decay-rate = 0.8;
-
-		method-ecological-objects = "no";
-		method-ecological-timing = "no";
-		method-ecological-timing-interval = 500;
-		method-ecological-doors = "no";
-		method-ecological-entry = "no";
 		tasks-held-in = "smem";
+
+		max-patrol-circuits = 10;
+
+		method-ecological-objects = false;
+		method-ecological-timing = false;
+		method-ecological-timing-interval = 500;
+		method-ecological-doors = false;
+		method-ecological-entry = false;
 
 		learn = "ON"; # OFF ON ONLY
 		epmem-learning = true;
@@ -65,7 +67,7 @@ metadata
 				large-orange-tetrahedron,   10,  -25,
 				large-orange-tetrahedron,   16,  -23,
 				short-green-cube,           2,   -30,
-				large-red-sphere,           3,   -38,
+				large-red-sphere,           5,   -38,
 				medium-violet-sphere,       28,  -35,
 				short-green-cube,           25,  -19,
 				medium-green-dodecahedron,  28,  -15,

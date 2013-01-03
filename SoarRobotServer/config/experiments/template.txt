@@ -67,7 +67,7 @@ metadata
 				large-orange-tetrahedron,   10,  -25,
 				large-orange-tetrahedron,   16,  -23,
 				short-green-cube,           2,   -30,
-				large-red-sphere,           3,   -38,
+				large-red-sphere,           5,   -38,
 				medium-violet-sphere,       28,  -35,
 				short-green-cube,           25,  -19,
 				medium-green-dodecahedron,  28,  -15,
