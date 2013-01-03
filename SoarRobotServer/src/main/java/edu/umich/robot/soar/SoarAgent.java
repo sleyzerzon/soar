@@ -128,21 +128,28 @@ public class SoarAgent implements RobotController, RadioHandler
 
     private final DefaultPropertyProvider<String[]> miscCommands = new DefaultPropertyProvider<String[]>(AgentProperties.MISC_COMMANDS);
 
-    private final DefaultPropertyProvider<String> methodEcologicalObjects = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
 
-    private final DefaultPropertyProvider<String> methodEcologicalTiming = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
+    private final DefaultPropertyProvider<String> experimentName = new DefaultPropertyProvider<String>(DeliveryProperties.EXPERIMENT_NAME);
 
-    private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
+    private final DefaultPropertyProvider<Integer> trialNum = new DefaultPropertyProvider<Integer>(DeliveryProperties.TRIAL_NUM);
 
-    private final DefaultPropertyProvider<String> methodEcologicalDoors = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
-
-    private final DefaultPropertyProvider<String> methodEcologicalEntry = new DefaultPropertyProvider<String>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
-
-    private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
+    private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
 
     private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
 
-    private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
+    private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
+
+    private final DefaultPropertyProvider<Integer> maxPatrolCircuits = new DefaultPropertyProvider<Integer>(DeliveryProperties.MAX_PATROL_CIRCUITS);
+
+    private final DefaultPropertyProvider<Boolean> methodEcologicalObjects = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
+
+    private final DefaultPropertyProvider<Boolean> methodEcologicalTiming = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
+
+    private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
+
+    private final DefaultPropertyProvider<Boolean> methodEcologicalDoors = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
+
+    private final DefaultPropertyProvider<Boolean> methodEcologicalEntry = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
 
     private String productions;
     
@@ -263,14 +270,17 @@ public class SoarAgent implements RobotController, RadioHandler
         addSpProperty(AgentProperties.SEARCH_CONTROL_GO_TO_GATEWAY, searchControlGoToGateway);
         addSpProperty(AgentProperties.DELETE_OLD_AREAS, deleteOldAreas);
 
+        addSpProperty(DeliveryProperties.EXPERIMENT_NAME, experimentName);
+        addSpProperty(DeliveryProperties.TRIAL_NUM, trialNum);
+        addSpProperty(DeliveryProperties.LOG_FILE, logFile);
+        addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
+        addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
+        addSpProperty(DeliveryProperties.MAX_PATROL_CIRCUITS, maxPatrolCircuits);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS, methodEcologicalObjects);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING, methodEcologicalTiming);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL, methodEcologicalTimingInterval);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
         addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
-        addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
-        addSpProperty(DeliveryProperties.DECAY_RATE, decayRate);
-        addSpProperty(DeliveryProperties.LOG_FILE, logFile);
         properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
             public void propertyChanged(PropertyChangeEvent<Double> event)
             {
@@ -328,22 +338,28 @@ public class SoarAgent implements RobotController, RadioHandler
         if (propc.hasKey(AgentProperties.MISC_COMMANDS.getName()))
             miscCommands.set(propc.requireStrings(AgentProperties.MISC_COMMANDS.getName()));
 
+        if (propc.hasKey(DeliveryProperties.EXPERIMENT_NAME.getName()))
+            experimentName.set(propc.requireString(DeliveryProperties.EXPERIMENT_NAME.getName()));
+        if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
+            trialNum.set(Integer.valueOf(propc.requireString(DeliveryProperties.TRIAL_NUM.getName())));
+        if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
+            logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
+        if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
+            decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
+        if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
+            tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
+        if (propc.hasKey(DeliveryProperties.MAX_PATROL_CIRCUITS.getName()))
+            maxPatrolCircuits.set(Integer.valueOf(propc.requireString(DeliveryProperties.MAX_PATROL_CIRCUITS.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()))
-            methodEcologicalObjects.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName()));
+            methodEcologicalObjects.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()))
-            methodEcologicalTiming.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName()));
+            methodEcologicalTiming.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName()))
             methodEcologicalTimingInterval.set(Integer.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()))
-            methodEcologicalDoors.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName()));
+            methodEcologicalDoors.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
         if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
-            methodEcologicalEntry.set(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()));
-        if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
-            tasksHeldIn.set(propc.requireString(DeliveryProperties.TASKS_HELD_IN.getName()));
-        if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
-            decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
-        if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
-            logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
+            methodEcologicalEntry.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
     }
     
     private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)
