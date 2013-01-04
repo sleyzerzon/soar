@@ -13,6 +13,7 @@ import soar_exp
 def main(experiment):
 	params = {}
 	params["seek.properties.trial-num"] = range(0, 2)
+	params["seek.properties.max-patrol-circuits"] = (5,)
 
 	if exists(experiment):
 		rmtree(experiment)
