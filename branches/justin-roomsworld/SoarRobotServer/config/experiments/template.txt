@@ -16,7 +16,7 @@ seek
 		objects-held-in = "wm";
 		tasks-held-in = "smem";
 
-		max-patrol-circuits = 10;
+#		max-patrol-circuits = 10;
 
 #		method-ecological-objects = false;
 #		method-ecological-timing = false;

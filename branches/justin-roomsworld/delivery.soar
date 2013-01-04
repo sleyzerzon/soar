@@ -1485,6 +1485,7 @@ sp {delivery*apply*report-metrics
    (cmd smem --timer)
    (cmd epmem --stats)
    (cmd epmem --timer)
+   (cmd wma)
    (cmd stats)
    (cmd echo |END OUTPUT|)
    (halt)
