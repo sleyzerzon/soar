@@ -171,12 +171,9 @@ smem --add {
 }
 
 sp {interrupt*monitor
-   (state <s> ^operator <o>
-              ^io.input-link.area-description.id <area-id>)
-   (<o> ^name mark-task-completed
-        ^task.id <task-id>)
+   (state <s> ^operator.name retrieve-all-tasks-timing)
 -->
-   (write |completed task | <task-id> | in area | <area-id> (crlf))
+   #(write |retrieving all tasks| (crlf))
    #(interrupt)
 }
 

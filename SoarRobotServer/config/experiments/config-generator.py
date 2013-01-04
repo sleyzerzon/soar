@@ -12,7 +12,7 @@ import soar_exp
 
 def main(experiment):
 	params = {}
-	params["seek.properties.trial-num"] = range(0, 2)
+	params["seek.properties.trial-num"] = range(0, 1)
 	params["seek.properties.max-patrol-circuits"] = (5,)
 
 	if exists(experiment):
@@ -38,9 +38,11 @@ def main(experiment):
 	for param_map in soar_exp.param_permutations(params):
 		decay_rate = param_map["seek.properties.decay-rate"]
 		trial = param_map["seek.properties.trial-num"]
+		interval = param_map["seek.properties.method-ecological-timing-interval"]
 		param_map["seek.properties.experiment-name"] = '"{}"'.format(experiment)
-		param_map["seek.properties.log-file"] = '"../../exp_results/{}_{}_{}.txt"'.format(experiment, decay_rate, trial)
-		run_file = "{}/{}_{}_{}.run".format(experiment, experiment, decay_rate, trial)
+		filename = "{}_{}_{}_{}".format(experiment, decay_rate, interval, trial)
+		param_map["seek.properties.log-file"] = '"../../exp_results/{}.txt"'.format(filename)
+		run_file = "{}/{}.run".format(experiment, filename)
 		with open(run_file, "w") as fd:
 			for k, v in sorted(param_map.items()):
 				fd.write("{} = {};\n".format(k, v))
