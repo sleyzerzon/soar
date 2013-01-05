@@ -199,7 +199,8 @@ sp {apply*init-agent
         ^tasks <tasks>)
    (<flags> ^next-task-retrieval-after-episode 0)
    (<metrics> ^num-retrievals 0
-              ^num-circuits -1)
+              ^num-circuits -1
+              ^num-tasks-completed 0)
 }
 
 sp {delivery*elaborate*parameters
@@ -1009,12 +1010,16 @@ sp {delivery*propose*mark-task-completed
 sp {delivery*apply*mark-task-completed
    (state <s> ^name delivery
               ^operator <o>
-              ^tasks <tasks>)
-   (<tasks> ^task <task>)
+              ^tasks <tasks>
+              ^metrics <metrics>)
    (<o> ^name mark-task-completed
         ^task <task>)
+   (<tasks> ^task <task>)
+   (<metrics> ^num-tasks-completed <n>)
 -->
    (<tasks> ^task <task> -)
+   (<metrics> ^num-tasks-completed <n> -
+              ^num-tasks-completed (+ <n> 1))
 }
 
 # record-area-wm
