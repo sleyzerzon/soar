@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from argparse import ArgumentParser
 from itertools import product
@@ -8,51 +8,52 @@ from shutil import rmtree
 import re
 import sys
 
-import soar_exp
-
 def main(experiment):
 	params = {}
 	params["seek.properties.trial-num"] = range(0, 1)
-	params["seek.properties.max-patrol-circuits"] = (5,)
+	params["seek.properties.max-patrol-circuits"] = (3,)
 
-	if exists(experiment):
-		rmtree(experiment)
-	mkdir(experiment)
+	expdir = "experiments/{}".format(experiment)
+	if exists(expdir):
+		rmtree(expdir)
+	mkdir(expdir)
 
 	if experiment == "doors-method-only":
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-doors"] = ["true",]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
 	elif experiment == "entry-method-only":
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-entry"] = ["true",]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
 	elif experiment == "timing-method-only":
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-timing"] = ["true",]
-		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(0, 10)]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(8, 9)]
+		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
+		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
 
 	template = open("template.txt", "r").read()
 	run_files = []
-	for param_map in soar_exp.param_permutations(params):
+	keys = sorted(params.keys())
+	for values in product(*(params[key] for key in keys)):
+		param_map = dict(zip(keys, values))
 		decay_rate = param_map["seek.properties.decay-rate"]
 		trial = param_map["seek.properties.trial-num"]
-		interval = param_map["seek.properties.method-ecological-timing-interval"]
+		interval = param_map.get("seek.properties.method-ecological-timing-interval", -1)
 		param_map["seek.properties.experiment-name"] = '"{}"'.format(experiment)
 		filename = "{}_{}_{}_{}".format(experiment, decay_rate, interval, trial)
 		param_map["seek.properties.log-file"] = '"../../exp_results/{}.txt"'.format(filename)
-		run_file = "{}/{}.run".format(experiment, filename)
+		run_file = "{}/{}.run".format(expdir, filename)
 		with open(run_file, "w") as fd:
 			for k, v in sorted(param_map.items()):
 				fd.write("{} = {};\n".format(k, v))
 			fd.write("\n")
 			fd.write(template)
 		run_files.append(run_file)
-	with open("{}/multiple.runs".format(experiment), "w") as fd:
+	with open("{}/multiple.runs".format(expdir), "w") as fd:
 		fd.write("multiple-runs {\n")
 		fd.write("\tconfigs = [\n")
-		fd.write("\n".join('\t\t"config/experiments/{}",'.format(run_file) for run_file in sorted(run_files)) + "\n")
+		fd.write("\n".join('\t\t"../../configs/{}",'.format(run_file) for run_file in sorted(run_files)) + "\n")
 		fd.write("\t];\n")
 		fd.write("\tcycles = -1;\n")
 		fd.write("\tseconds = -1;\n")
