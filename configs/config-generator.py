@@ -71,7 +71,7 @@ def main(experiment):
 	params = {}
 	params["seek.properties.trial-num"] = range(0, 1)
 	params["seek.properties.max-patrol-circuits"] = (3,)
-	params["seek.properties.rand-seed"] = (8675309,)
+	params["seek.properties.rand-seed"] = (42, 1707, 8675309,)
 	params["seek.properties.num-blocks"] = (11,)
 	params["seek.properties.num-tasks"] = (11,)
 
@@ -116,7 +116,7 @@ def main(experiment):
 		else:
 			objects, smem = cache[key]
 
-		filename = "{}_{}_{}_{}".format(experiment, decay_rate, interval, trial)
+		filename = "{}_{}_{}_{}_{}".format(experiment, rand_seed, decay_rate, interval, trial)
 		param_map["seek.properties.log-file"] = '"../../exp_results/{}.txt"'.format(filename)
 		run_file = "{}/{}.run".format(expdir, filename)
 		with open(run_file, "w") as fd:

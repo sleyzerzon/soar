@@ -14,7 +14,7 @@ if __name__ == "__main__":
 				if re.match("[^>]*:", line):
 					output.update(("echoed {}".format(k), v) for k, v in [line.split(":", 1),])
 
-			sstats, stimer, estats, etimer, wma, stats = commands.split("seek>")[1:-1]
+			sstats, stimer, epmem, estats, etimer, wma, stats = commands.split("seek>")[1:-1]
 
 			# smem stats
 			extract = ("Memory Usage", "Memory Highwater", "Retrieves", "Queries", "Stores", "Activation Updates", "Mirrors",)
@@ -27,6 +27,12 @@ if __name__ == "__main__":
 			for line in stimer.splitlines():
 				if ":" in line:
 					output.update(("stimer {}".format(k), v) for k, v in [line.split(":", 1),] if k in extract)
+
+			# epmem settings
+			extract = ("phase", "trigger", "force", "exclusions", "lazy-commit", "path", "balance", "graph-match", "graph-match-ordering",)
+			for line in estats.splitlines():
+				if ":" in line:
+					output.update(("epmem {}".format(k), v) for k, v in [line.split(":", 1),] if k in extract)
 
 			# epmem stats
 			extract = ("Time", "Memory Usage", "Memory Highwater", "Retrievals", "Queries", "Nexts", "Prevs",)
