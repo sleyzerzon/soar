@@ -44,6 +44,26 @@ public class DeliveryProperties
 		.defaultValue("logfile.txt")
 		.build();
 
+	public static final PropertyKey<Integer> RAND_SEED =
+		PropertyKey.builder("rand-seed", Integer.class)
+		.defaultValue(-1)
+		.build();
+
+	public static final PropertyKey<Integer> NUM_BLOCKS =
+		PropertyKey.builder("num-blocks", Integer.class)
+		.defaultValue(-1)
+		.build();
+
+	public static final PropertyKey<Integer> NUM_TASKS =
+		PropertyKey.builder("num-tasks", Integer.class)
+		.defaultValue(-1)
+		.build();
+
+	public static final PropertyKey<String> TASKS_FILE =
+		PropertyKey.builder("tasks-file", String.class)
+		.defaultValue("tasksfile.txt")
+		.build();
+
 	public static final PropertyKey<Double> DECAY_RATE =
 		PropertyKey.builder("decay-rate", Double.class)
 		.defaultValue(0.0)

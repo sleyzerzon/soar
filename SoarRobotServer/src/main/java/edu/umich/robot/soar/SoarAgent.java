@@ -135,6 +135,14 @@ public class SoarAgent implements RobotController, RadioHandler
 
 	private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
 
+	private final DefaultPropertyProvider<Integer> randSeed = new DefaultPropertyProvider<Integer>(DeliveryProperties.RAND_SEED);
+
+	private final DefaultPropertyProvider<Integer> numBlocks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_BLOCKS);
+
+	private final DefaultPropertyProvider<Integer> numTasks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_TASKS);
+
+	private final DefaultPropertyProvider<String> tasksFile = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_FILE);
+
 	private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
 
 	private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
@@ -260,6 +268,10 @@ public class SoarAgent implements RobotController, RadioHandler
 		addSpProperty(DeliveryProperties.EXPERIMENT_NAME, experimentName);
 		addSpProperty(DeliveryProperties.TRIAL_NUM, trialNum);
 		addSpProperty(DeliveryProperties.LOG_FILE, logFile);
+		addSpProperty(DeliveryProperties.RAND_SEED, randSeed);
+		addSpProperty(DeliveryProperties.NUM_BLOCKS, numBlocks);
+		addSpProperty(DeliveryProperties.NUM_TASKS, numTasks);
+		addSpProperty(DeliveryProperties.TASKS_FILE, tasksFile);
 		addSpProperty(DeliveryProperties.TASKS_HELD_IN, tasksHeldIn);
 		addSpProperty(DeliveryProperties.MAX_PATROL_CIRCUITS, maxPatrolCircuits);
 		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS, methodEcologicalObjects);
@@ -328,6 +340,14 @@ public class SoarAgent implements RobotController, RadioHandler
 			trialNum.set(Integer.valueOf(propc.requireString(DeliveryProperties.TRIAL_NUM.getName())));
 		if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
 			logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
+		if (propc.hasKey(DeliveryProperties.RAND_SEED.getName()))
+			randSeed.set(Integer.valueOf(propc.requireString(DeliveryProperties.RAND_SEED.getName())));
+		if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
+			numBlocks.set(Integer.valueOf(propc.requireString(DeliveryProperties.NUM_BLOCKS.getName())));
+		if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
+			numTasks.set(Integer.valueOf(propc.requireString(DeliveryProperties.NUM_TASKS.getName())));
+		if (propc.hasKey(DeliveryProperties.TASKS_FILE.getName()))
+			tasksFile.set(propc.requireString(DeliveryProperties.TASKS_FILE.getName()));
 		if (propc.hasKey(DeliveryProperties.DECAY_RATE.getName()))
 			decayRate.set(Double.valueOf(propc.requireString(DeliveryProperties.DECAY_RATE.getName())));
 		if (propc.hasKey(DeliveryProperties.TASKS_HELD_IN.getName()))
