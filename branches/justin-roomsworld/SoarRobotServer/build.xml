@@ -151,9 +151,7 @@
             <fileset dir="agents" />
         </copy>
         <chmod perm="755">
-			<!--
 			<fileset dir="${platform_release.dir}" includes="**/*.command" />
-			-->
 			<fileset dir="${platform_release.dir}" includes="**/*.sh" />
 			<fileset dir="${platform_release.dir}" includes="**/*.py" />
         </chmod>

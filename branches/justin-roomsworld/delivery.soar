@@ -9,167 +9,6 @@ multi-attributes object
 multi-attributes task
 multi-attributes waypoint
 
-# OBJECT PROPERTIES
-
-# height = {short, medium, tall}
-# color = {red, orange, yellow, green, blue, indigo, violet}
-# shape = {sphere, tetrahedron, cube, octahedron, dodecahedron, icosahedron, tesseract}
-# type = {block}
-
-# TASKS
-
-smem --add {
-    # block 1
-    # start: room 0
-    # end: room 10
-    # distance: 2 rooms
-    (<task01> ^type task
-              ^object <obj01>
-              ^destination <dest01>
-              ^priority 1
-              ^id 1)
-    (<obj01> ^height large
-             ^color red
-             ^shape sphere)
-    (<dest01> ^id 10)
-
-    # block 2
-    # start: room 10
-    # end: room 40
-    # distance: 6 rooms
-    (<task02> ^type task
-              ^object <obj02>
-              ^destination <dest02>
-              ^priority 2
-              ^id 2)
-    (<obj02> ^height short
-             ^color green
-             ^shape cube)
-    (<dest02> ^id 40)
-
-    # block 3
-    # start: room 20
-    # end: room 0
-    # distance: 6 rooms
-    (<task03> ^type task
-              ^object <obj03>
-              ^destination <dest03>
-              ^priority 1
-              ^id 3)
-    (<obj03> ^height large
-             ^color orange
-             ^shape tetrahedron)
-    (<dest03> ^id 0)
-
-    # block 4
-    # start: room 20
-    # end: room 35
-    # distance: 3 rooms
-    (<task04> ^type task
-              ^object <obj04>
-              ^destination <dest04>
-              ^priority 2
-              ^id 4)
-    (<obj04> ^height large
-             ^color orange
-             ^shape tetrahedron)
-    (<dest04> ^id 35)
-
-    # block 5
-    # start: room 20
-    # end: room 0
-    # distance: 8 rooms
-    (<task05> ^type task
-              ^object <obj05>
-              ^destination <dest05>
-              ^priority 3
-              ^id 5)
-    (<obj05> ^height short
-             ^color green
-             ^shape cube)
-    (<dest05> ^id 0)
-
-    # block 6
-    # start: room 20
-    # end: room 30
-    # distance: 2 rooms
-    (<task06> ^type task
-              ^object <obj06>
-              ^destination <dest06>
-              ^priority 2
-              ^id 6)
-    (<obj06> ^height large
-             ^color red
-             ^shape sphere)
-    (<dest06> ^id 30)
-
-    # block 7
-    # start: room 30
-    # end: room 20
-    # distance: 10 rooms
-    (<task07> ^type task
-              ^object <obj07>
-              ^destination <dest07>
-              ^id 7)
-    (<obj07> ^height medium
-             ^color magenta
-             ^shape sphere)
-    (<dest07> ^id 20)
-
-    # block 8
-    # start: room 30
-    # end: room 0
-    # distance: 6 rooms
-    (<task08> ^type task
-              ^object <obj08>
-              ^destination <dest08>
-              ^priority 1
-              ^id 8)
-    (<obj08> ^height short
-             ^color green
-             ^shape cube)
-    (<dest08> ^id 0)
-
-    # block 9
-    # start: room 30
-    # end: room 20
-    # distance: 10 rooms
-    (<task09> ^type task
-              ^object <obj09>
-              ^destination <dest09>
-              ^id 9)
-    (<obj09> ^height medium
-             ^color green
-             ^shape dodecahedron)
-    (<dest09> ^id 20)
-
-    # block 10
-    # start: room 40
-    # end: room 10
-    # distance: 6 rooms
-    (<task10> ^type task
-              ^object <obj10>
-              ^destination <dest10>
-              ^id 10)
-    (<obj10> ^height short
-             ^color yellow
-             ^shape octahedron)
-    (<dest10> ^id 10)
-
-    # block 11
-    # start: room 50
-    # end: room 20
-    # distance: 6 rooms
-    (<task11> ^type task
-              ^object <obj11>
-              ^destination <dest11>
-              ^id 11)
-    (<obj11> ^height short
-             ^color indigo
-             ^shape tesseract)
-    (<dest11> ^id 20)
-}
-
 sp {interrupt*monitor
    (state <s> ^operator.name retrieve-all-tasks-timing)
 -->
@@ -245,6 +84,13 @@ sp {delivery*elaborate*constants
                   ^retrieve 25
                   ^task 30
                   ^movement 40)
+}
+
+sp {delivery*elaborate*load-smem-tasks
+   (state <s> ^superstate nil
+              ^parameters.tasks-file <file>)
+-->
+   (cmd |source | <file>)
 }
 
 # ELABORATIONS
@@ -1488,6 +1334,7 @@ sp {delivery*apply*report-metrics
    (cmd echo |BEGIN COMMANDS|)
    (cmd smem --stats)
    (cmd smem --timer)
+   (cmd epmem)
    (cmd epmem --stats)
    (cmd epmem --timer)
    (cmd wma)
