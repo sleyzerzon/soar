@@ -321,28 +321,13 @@ sp {delivery*compare*perform-pick-up-task*distance
    (<s> ^operator <o1> > <o2>)
 }
 
-sp {delivery*compare*perform-pick-up-task*priority
+sp {delivery*compare*task-operators
    (state <s> ^operator <o1> +
               ^operator <o2> +)
-   (<o1> ^name perform-pick-up-task
-         ^object.distance <dist>
-         ^task.priority <priority>)
-   (<o2> ^name perform-pick-up-task
-         ^object.distance <dist>
-         ^task.priority {> <priority>})
+   (<o1> ^name {<name> << perform-pick-up-task mark-object-picked-up perform-put-down-task mark-task-completed >>})
+   (<o2> ^name <name>)
 -->
-   (<s> ^operator <o1> > <o2>)
-}
-
-sp {delivery*compare*record-task-operators*priority
-   (state <s> ^operator <o1> +
-              ^operator <o2> +)
-   (<o1> ^name {<name> << mark-object-picked-up mark-task-completed >>}
-         ^task.priority <priority>)
-   (<o2> ^name <name>
-         ^task.priority {> <priority>})
--->
-   (<s> ^operator <o1> > <o2>)
+   (<s> ^operator <o1> = <o2>)
 }
 
 # OPERATORS
@@ -363,14 +348,6 @@ sp {delivery*apply*initialize-tasks*first-query
               ^smem.command <scmd>)
 -->
    (<scmd> ^query.type task)
-}
-
-sp {delivery*apply*initialize-tasks*default-priority
-   (state <s> ^operator.name initialize-tasks
-              ^tasks.task <task>)
-  -(<task> ^priority)
--->
-   (<task> ^priority 9999)
 }
 
 sp {delivery*apply*initialize-tasks*next-query
@@ -811,7 +788,7 @@ sp {delivery*propose*perform-put-down-task
   -{ (<dest> ^{<attr> <> forgotten} <val>)
     -(<area> ^<attr> <val>) }
 -->
-   (<s> ^operator <o> + =)
+   (<s> ^operator <o> +)
    (<o> ^name perform-put-down-task
         ^task <task>
         ^object <obj>)
