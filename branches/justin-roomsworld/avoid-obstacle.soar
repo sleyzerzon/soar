@@ -1,0 +1,60 @@
+# avoid-obstacle
+
+# TODO
+# this needs to be modified to handle multiple obstacles simultaneously
+# this does not work for obstacles of different sizes
+
+sp {go-to-coord*propose*avoid-obstacle
+   (state <s> ^name go-to-coord
+              ^parameters.collision-outer-distance <collision>
+              ^io.input-link.objects.object.distance {< <collision>})
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name avoid-obstacle)
+}
+
+sp {avoid-obstacle*propose*back-up
+   "FIXME using magic number constant linear velocity"
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link.lidar.range <lidar>)
+   (<params> ^collision-inner-distance <collision>
+             ^linear-velocity-cvrt <velocity>)
+   (<lidar> ^id 0
+            ^distance {< <collision>})
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name back-up
+        ^actions.set-velocity.linear-velocity -0.1)
+}
+
+sp {avoid-obstacle*propose*turn-until-clear
+   "FIXME should calculate angle and use set-heading instead"
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link.lidar.range <lidar>)
+   (<params> ^angular-velocity <velocity>
+             ^collision-inner-distance <collision-inner>
+             ^collision-outer-distance <collision-outer>
+             ^distance-tolerance <distance-tol>)
+   (<lidar> ^id 0
+            ^distance {> <collision-inner>})
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name turn-until-clear
+        ^actions.set-velocity.angular-velocity <velocity>)
+}
+
+sp {avoid-obstacle*propose*move-until-clear
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link.lidar.range <lidar>)
+   (<params> ^distance-tolerance <distance-tol>
+             ^linear-velocity-cvrt <velocity>)
+   (<lidar> ^id 0
+            ^distance {> <distance-tol> })
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name drive-until-clear
+        ^actions.set-linear-velocity.linear-velocity <velocity>)
+}

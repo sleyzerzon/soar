@@ -10,7 +10,7 @@ multi-attributes task
 multi-attributes waypoint
 
 sp {interrupt*monitor
-   (state <s> ^operator.name retrieve-all-tasks-timing)
+   (state <s> ^operator.name timing-trigger)
 -->
    #(write |retrieving all tasks| (crlf))
    #(interrupt)
@@ -36,7 +36,10 @@ sp {apply*init-agent
         ^metrics <metrics>
         ^objects <objects>
         ^tasks <tasks>)
-   (<flags> ^next-task-retrieval-after-episode 0)
+   (<flags> ^area <area-flags>
+            ^episode <episode-flags>
+            ^manual <manual-flags>)
+   (<episode-flags> ^tasks-retrieved 0)
    (<metrics> ^num-retrievals 0
               ^num-circuits -1
               ^num-tasks-completed 0)
@@ -88,7 +91,7 @@ sp {delivery*elaborate*constants
 
 sp {delivery*elaborate*load-smem-tasks
    (state <s> ^superstate nil
-              ^parameters.tasks-file <file>)
+              ^parameters.tasks-file {<file> <> dummy})
 -->
    (cmd |source | <file>)
 }
@@ -129,7 +132,7 @@ sp {elaborate*state*inherited*roomsworld
 sp {elaborate*state*integer-parameters
    (state <s> ^superstate nil
               ^parameters <params>)
-   (<params> ^{<attr> << trial-num max-patrol-circuits method-ecological-timing-interval >>} <val>)
+   (<params> ^{<attr> << trial-num max-patrol-circuits method-ecological-timing-interval method-ecological-rehearsal-amount >>} <val>)
 -->
    (<params> ^(concat <attr> |-cvrt|) (int <val>))
 }
@@ -256,7 +259,7 @@ sp {elaborate*operator*metrics
 
 sp {elaborate*operator*flags
    (state <s> ^operator <o> +)
-   (<o> ^name << remove-flags >>)
+   (<o> ^name << remove-area-flags remove-episode-flags >>)
 -->
    (<o> ^type flags)
 }
@@ -270,21 +273,21 @@ sp {elaborate*operator*record
 
 sp {elaborate*operator*retrieve
    (state <s> ^operator <o> +)
-   (<o> ^name << retrieve-all-tasks-area retrieve-all-tasks-timing recursive-retrieve >>)
+   (<o> ^name << area-trigger timing-trigger >>)
 -->
    (<o> ^type retrieve)
 }
 
 sp {elaborate*operator*task
    (state <s> ^operator <o> +)
-   (<o> ^name << perform-pick-up-task perform-put-down-task pick-up-object put-down-object >>)
+   (<o> ^name << perform-pick-up-task perform-put-down-task >>)
 -->
    (<o> ^type task)
 }
 
 sp {elaborate*operator*movement
    (state <s> ^operator <o> +)
-   (<o> ^name << patrol go-to-adjacent-area go-to-coord turn-to-coord drive-to-coord >>)
+   (<o> ^name << patrol go-to-adjacent-area go-to-coord >>)
 -->
    (<o> ^type movement)
 }
@@ -295,8 +298,8 @@ sp {delivery*compare*operator-types
               ^constants.operator-preferences <preferences>)
    (<o1> ^type <o1-type>)
    (<o2> ^type <o2-type>)
-   (<preferences> ^<o1-type> <o1-rank>
-                  ^<o2-type> {<o2-rank> > <o1-rank>})
+   (<preferences> ^<o1-type> <rank>
+                  ^<o2-type> {> <rank>})
 -->
    (<s> ^operator <o1> > <o2>)
 }
@@ -321,6 +324,15 @@ sp {delivery*compare*perform-pick-up-task*distance
    (<s> ^operator <o1> > <o2>)
 }
 
+sp {delivery*compare*flag-operators
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^type flags)
+   (<o2> ^type flags)
+-->
+   (<s> ^operator <o1> = <o2>)
+}
+
 sp {delivery*compare*task-operators
    (state <s> ^operator <o1> +
               ^operator <o2> +)
@@ -336,7 +348,7 @@ sp {delivery*compare*task-operators
 
 sp {delivery*propose*initialize-tasks
    (state <s> ^name delivery
-             -^tasks-initialized
+             -^flags.manual.tasks-initialized
               ^tasks)
 -->
    (<s> ^operator <o> +)
@@ -365,86 +377,64 @@ sp {delivery*apply*initialize-tasks*next-query
 
 sp {delivery*apply*initialize-tasks*done
    (state <s> ^operator.name initialize-tasks
-              ^smem <smem>)
+              ^smem <smem>
+              ^flags.manual <flags>)
    (<smem> ^command <scmd>
            ^result.failure)
    (<scmd> ^{<cmd> << query prohibit >>} <arg>)
 -->
    (<scmd> ^<cmd> <arg> -)
-   (<s> ^tasks-initialized yes)
+   (<flags> ^tasks-initialized yes)
 }
 
 # store-task TODO
 
-# retrieve-object-tasks
+# area-trigger
 
-sp {delivery*propose*retrieve-all-tasks-area*object
-   (state <s> ^name delivery
-              ^io.input-link.objects.object.id <id>
-              ^parameters <params>
-             -^flags.retrieved-tasks-for-object <id>)
-   (<params> ^tasks-held-in smem
-             ^method-ecological-objects true)
--->
-   (<s> ^operator <o>)
-   (<o> ^name retrieve-object-tasks)
-}
-
-# FIXME
-
-# retrieve-all-tasks-area
-
-sp {delivery*propose*retrieve-all-tasks-area*doors
+sp {delivery*propose*area-trigger*doors
    (state <s> ^name delivery
               ^parameters <params>
               ^current-area <area>
-             -^flags.tasks-retrieved-in-area <area-id>)
+             -^flags.area.area-trigger <area-id>)
    (<area> ^id <area-id>
            ^type door)
    (<params> ^tasks-held-in smem
              ^method-ecological-doors true)
 -->
    (<s> ^operator <o>)
-   (<o> ^name retrieve-all-tasks-area)
+   (<o> ^name area-trigger)
 }
 
-sp {delivery*propose*retrieve-all-tasks-area*entry
+sp {delivery*propose*area-trigger*entry
    (state <s> ^name delivery
               ^parameters <params>
               ^current-area <area>
-             -^flags.tasks-retrieved-in-area <area-id>)
+             -^flags.area.area-trigger <area-id>)
    (<area> ^id <area-id>
            ^type room)
    (<params> ^tasks-held-in smem
              ^method-ecological-entry true)
 -->
    (<s> ^operator <o>)
-   (<o> ^name retrieve-all-tasks-area)
+   (<o> ^name area-trigger)
 }
 
-sp {retrieve-all-tasks-area*propose*remove-flags
-   (state <s> ^name retrieve-all-tasks-area
-              ^flags.tasks-retrieved-in-area)
+sp {area-trigger*propose*recursive-rehearse
+   (state <s> ^name area-trigger
+              ^parameters.method-ecological-rehearsal true
+              ^ltis.lti <task-lti>
+              ^tasks.task <task>)
+   (<task-lti> ^identifier <task>
+               ^forgotten no)
 -->
-   (<s> ^operator <o> +)
-   (<o> ^name remove-flags
-        ^flags <flags>)
+   (<s> ^operator <o> + =)
+   (<o> ^name recursive-rehearsal
+        ^lti <task>)
 }
 
-sp {retrieve-all-tasks-area*elaborate*remove-flag-operator
-   (state <s> ^name retrieve-all-tasks-area
-              ^operator <o> +
-              ^flags.tasks-retrieved-in-area <val>
-              ^quiescence t)
-   (<o> ^name remove-flags
-        ^flags <flags>)
--->
-   (<flags> ^tasks-retrieved-in-area <val>)
-}
-
-sp {retrieve-all-tasks-area*propose*recursive-retrieve
-   (state <s> ^name retrieve-all-tasks-area
-             -^flags.tasks-retrieved-in-area
+sp {area-trigger*propose*recursive-retrieve
+   (state <s> ^name area-trigger
+              ^parameters.method-ecological-retrieval true
               ^ltis.lti <task-lti>
               ^tasks.task <task>)
    (<task-lti> ^identifier <task>
@@ -455,47 +445,58 @@ sp {retrieve-all-tasks-area*propose*recursive-retrieve
         ^lti <task>)
 }
 
-sp {retrieve-all-tasks-area*propose*done
-   (state <s> ^name retrieve-all-tasks-area
-             -^flags.tasks-retrieved-in-area
-              ^ltis <ltis>
-              ^tasks <tasks>)
-  -{ (<tasks> ^task <task>)
-     (<ltis> ^lti <task-lti>)
-     (<task-lti> ^identifier <task>
-                -^forgotten no) }
+sp {area-trigger*propose*done
+   (state <s> ^attribute state
+              ^impasse no-change
+              ^quiescence t
+              ^superstate <ss>)
+   (<ss> ^name area-trigger)
 -->
-   (<s> ^operator <o> +)
+   (<ss> ^operator <o> +)
    (<o> ^name done)
 }
 
-sp {retrieve-all-tasks-area*apply*done
-   (state <s> ^name retrieve-all-tasks-area
+sp {area-trigger*apply*done
+   (state <s> ^name area-trigger
               ^operator.name done
-              ^current-area.id <area-id>
-              ^flags <flags>
+              ^io.input-link.area-description.id <area-id>
+              ^flags.area <flags>
               ^quiescence t)
 -->
-   (<flags> ^tasks-retrieved-in-area <area-id>)
+   (<flags> ^area-trigger <area-id>)
 }
 
-# retrieve-all-tasks-timing
+# timing-trigger
 
-sp {delivery*propose*retrieve-all-tasks-area*timing
+sp {delivery*propose*timing-trigger*timing
    # FIXME this might blink if present-id changes
    (state <s> ^name delivery
               ^parameters <params>
               ^epmem.present-id {> <epmem-id>}
-              ^flags.next-task-retrieval-after-episode <epmem-id>)
+              ^flags.episode.timing-trigger <epmem-id>)
    (<params> ^tasks-held-in smem
              ^method-ecological-timing true)
 -->
    (<s> ^operator <o>)
-   (<o> ^name retrieve-all-tasks-timing)
+   (<o> ^name timing-trigger)
 }
 
-sp {retrieve-all-tasks-timing*propose*recursive-retrieve
-   (state <s> ^name retrieve-all-tasks-timing
+sp {timing-trigger*propose*recursive-rehearse
+   (state <s> ^name timing-trigger
+              ^parameters.method-ecological-rehearsal true
+              ^ltis.lti <task-lti>
+              ^tasks.task <task>)
+   (<task-lti> ^identifier <task>
+               ^forgotten no)
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name recursive-rehearse
+        ^lti <task>)
+}
+
+sp {timing-trigger*propose*recursive-retrieve
+   (state <s> ^name timing-trigger
+              ^parameters.method-ecological-retrieval true
               ^ltis.lti <task-lti>
               ^tasks.task <task>)
    (<task-lti> ^identifier <task>
@@ -506,29 +507,26 @@ sp {retrieve-all-tasks-timing*propose*recursive-retrieve
         ^lti <task>)
 }
 
-sp {retrieve-all-tasks-timing*propose*done
-   (state <s> ^name retrieve-all-tasks-timing
-              ^ltis <ltis>
-              ^tasks <tasks>)
-  -{ (<tasks> ^task <task>)
-     (<ltis> ^lti <task-lti>)
-     (<task-lti> ^identifier <task>
-                -^forgotten no) }
+sp {timing-trigger*propose*done
+   (state <s> ^attribute state
+              ^impasse no-change
+              ^quiescence t
+              ^superstate <ss>)
+   (<ss> ^name timing-trigger)
 -->
-   (<s> ^operator <o> +)
+   (<ss> ^operator <o> +)
    (<o> ^name done)
 }
 
-sp {retrieve-all-tasks-timing*apply*done
-   (state <s> ^name retrieve-all-tasks-timing
+sp {timing-trigger*apply*done
+   (state <s> ^name timing-trigger
               ^operator.name done
               ^parameters.method-ecological-timing-interval-cvrt <interval>
               ^epmem.present-id <present-id>
-              ^flags <flags>)
-   (<flags> ^next-task-retrieval-after-episode <epmem-id>)
+              ^flags.episode <flags>
+              ^quiescence t)
 -->
-   (<flags> ^next-task-retrieval-after-episode <epmem-id> -
-            ^next-task-retrieval-after-episode (+ <present-id> <interval>))
+   (<flags> ^timing-trigger (+ <present-id> <interval>))
 }
 
 # recursive-retrieve
@@ -1199,7 +1197,7 @@ sp {recursive-retrieve*apply*initialize*increment-num-retrievals
               ^superstate.operator.lti <task>
               ^tasks.task <task>
               ^metrics <metrics>
-              ^flags <flags>)
+              ^flags.manual <flags>)
    (<metrics> ^num-retrievals <n>)
   -(<flags> ^num-retrievals-updated)
 -->
@@ -1212,7 +1210,7 @@ sp {recursive-retrieve*apply*initialize*remove-num-retrievals-flag
    (state <s> ^name recursive-retrieve
               ^operator.name initialize
               ^superstate.operator.lti <task>
-              ^flags <flags>)
+              ^flags.manual <flags>)
    (<flags> ^num-retrievals-updated {<flag> <> <task>})
 -->
    (<flags> ^num-retrievals-updated <flag> -)
@@ -1223,7 +1221,7 @@ sp {recursive-retrieve*apply*initialize*remove-num-retrievals-flag
 sp {delivery*propose*count-circuit
    (state <s> ^name delivery
               ^io.input-link.area-description.id 25
-             -^flags.circuit-counted)
+             -^flags.area.circuit-counted)
 -->
    (<s> ^operator <o> +)
    (<o> ^name count-circuit)
@@ -1233,7 +1231,7 @@ sp {delivery*apply*count-circuit
    (state <s> ^name delivery
               ^operator.name count-circuit
               ^io.input-link.area-description.id <area-id>
-              ^flags <flags>
+              ^flags.area <flags>
               ^metrics <metrics>)
    (<metrics> ^num-circuits <n>)
 -->
@@ -1242,22 +1240,13 @@ sp {delivery*apply*count-circuit
    (<flags> ^circuit-counted <area-id>)
 }
 
-sp {delivery*propose*remove-flags
-   (state <s> ^name delivery
-              ^io.input-link.area-description.id <area-id>
-              ^flags.circuit-counted {<val> <> <area-id>})
--->
-   (<s> ^operator <o> +)
-   (<o> ^name remove-flags
-        ^flags.circuit-counted <val>)
-}
-
 # report-metrics
 
 sp {delivery*propose*report-metrics*all-tasks-completed
    (state <s> ^name delivery
              -^tasks.task
-              ^metrics.num-retrievals > 0)
+              ^metrics.num-retrievals > 0
+              ^parameters.experiment-name {<> dummy})
 -->
    (<s> ^operator <o> +)
    (<o> ^name report-metrics)
@@ -1265,8 +1254,10 @@ sp {delivery*propose*report-metrics*all-tasks-completed
 
 sp {delivery*propose*report-metrics*patrol-limit
    (state <s> ^name delivery
-              ^parameters.max-patrol-circuits-cvrt <max>
+              ^parameters <params>
               ^metrics.num-circuits <max>)
+   (<params> ^experiment-name {<> dummy}
+             ^max-patrol-circuits-cvrt <max>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name report-metrics)
@@ -1279,7 +1270,7 @@ sp {delivery*apply*report-metrics
               ^parameters <parameters>)
    (<parameters> ^experiment-name <experiment>
                  ^trial-num-cvrt <trial>
-                 ^log-file <file>
+                 ^log-file {<logfile> <> dummy}
                  ^decay-rate-cvrt <decay>
                  ^linear-velocity-cvrt <velo>
                  ^max-patrol-circuits-cvrt <max-circuits>
@@ -1287,12 +1278,15 @@ sp {delivery*apply*report-metrics
                  ^method-ecological-entry <entry>
                  ^method-ecological-objects <objects>
                  ^method-ecological-timing <timing>
-                 ^method-ecological-timing-interval-cvrt <interval>)
+                 ^method-ecological-timing-interval-cvrt <interval>
+                 ^method-ecological-rehearsal <rehearsal>
+                 ^method-ecological-rehearsal-amount-cvrt <amount>
+                 ^method-ecological-retrieval <retrieval>)
    (<metrics> ^num-retrievals <num-retrievals>
               ^num-circuits <num-circuits>
               ^num-tasks-completed <num-tasks>)
 -->
-   (cmd |clog | <file>)
+   (cmd |clog | <logfile>)
    (cmd echo |BEGIN OUTPUT|)
    (cmd echo |timestamp: | (timestamp))
    (cmd echo |experiment: | <experiment>)
@@ -1305,6 +1299,9 @@ sp {delivery*apply*report-metrics
    (cmd echo |objects ecological method: | <objects>)
    (cmd echo |timing ecological method: | <timing>)
    (cmd echo |timing ecological method interval: | <interval>)
+   (cmd echo |rehearsal ecological method: | <rehearsal>)
+   (cmd echo |rehearsal ecological method amount: | <amount>)
+   (cmd echo |retrieval ecological method: | <retrieval>)
    (cmd echo |num circuits: | <num-circuits>)
    (cmd echo |num retrievals: | <num-retrievals>)
    (cmd echo |num completed tasks: | <num-tasks>)
@@ -1322,15 +1319,42 @@ sp {delivery*apply*report-metrics
 
 # remove-flags
 
-sp {delivery*apply*remove-flags
-   (state <s> ^operator <o>
-              ^flags <flags>)
-   (<o> ^name remove-flags
-        ^flags <oflags>)
-   (<flags> ^<flag> <val>)
-   (<oflags> ^<flag> <val>)
+sp {delivery*propose*remove-area-flags
+   (state <s> ^name delivery
+              ^io.input-link.area-description.id <area-id>
+              ^flags.area <flags>)
+   (<flags> ^<flag> {<> <area-id>})
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name remove-area-flags)
+}
+
+sp {delivery*apply*remove-area-flags
+   (state <s> ^operator.name remove-area-flags
+              ^io.input-link.area-description.id <area-id>
+              ^flags.area <flags>)
+   (<flags> ^<flag> {<val> <> <area-id>})
 -->
    (<flags> ^<flag> <val> -)
+}
+
+sp {delivery*propose*remove-episode-flags
+   (state <s> ^name delivery
+              ^flags.episode <flags>)
+   (<flags> ^<flag> <smaller>
+            ^<flag> {> <smaller>})
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name remove-episode-flags)
+}
+
+sp {delivery*apply*remove-episode-flags
+   (state <s> ^operator.name remove-episode-flags
+              ^flags.episode <flags>)
+   (<flags> ^<flag> <smaller>
+            ^<flag> {<larger> > <smaller>})
+-->
+   (<flags> ^<flag> <larger> -)
 }
 
 # waypoints
