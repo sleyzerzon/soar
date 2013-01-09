@@ -1,0 +1,14 @@
+
+# retrieve-object-tasks TODO
+
+sp {delivery*propose*retrieve-object-tasks
+   (state <s> ^name delivery
+              ^io.input-link.objects.object.id <id>
+              ^parameters <params>
+             -^flags.object.retrieved-tasks-for-object <id>)
+   (<params> ^tasks-held-in smem
+             ^method-ecological-objects true)
+-->
+   (<s> ^operator <o>)
+   (<o> ^name retrieve-object-tasks)
+}

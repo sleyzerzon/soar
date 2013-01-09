@@ -130,34 +130,23 @@ public class SoarAgent implements RobotController, RadioHandler
 
 
 	private final DefaultPropertyProvider<String> experimentName = new DefaultPropertyProvider<String>(DeliveryProperties.EXPERIMENT_NAME);
-
 	private final DefaultPropertyProvider<Integer> trialNum = new DefaultPropertyProvider<Integer>(DeliveryProperties.TRIAL_NUM);
-
 	private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
-
 	private final DefaultPropertyProvider<Integer> randSeed = new DefaultPropertyProvider<Integer>(DeliveryProperties.RAND_SEED);
-
 	private final DefaultPropertyProvider<Integer> numBlocks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_BLOCKS);
-
 	private final DefaultPropertyProvider<Integer> numTasks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_TASKS);
-
 	private final DefaultPropertyProvider<String> tasksFile = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_FILE);
-
 	private final DefaultPropertyProvider<Double> decayRate = new DefaultPropertyProvider<Double>(DeliveryProperties.DECAY_RATE);
-
 	private final DefaultPropertyProvider<String> tasksHeldIn = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_HELD_IN);
-
 	private final DefaultPropertyProvider<Integer> maxPatrolCircuits = new DefaultPropertyProvider<Integer>(DeliveryProperties.MAX_PATROL_CIRCUITS);
-
 	private final DefaultPropertyProvider<Boolean> methodEcologicalObjects = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_OBJECTS);
-
 	private final DefaultPropertyProvider<Boolean> methodEcologicalTiming = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING);
-
 	private final DefaultPropertyProvider<Integer> methodEcologicalTimingInterval = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL);
-
 	private final DefaultPropertyProvider<Boolean> methodEcologicalDoors = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_DOORS);
-
 	private final DefaultPropertyProvider<Boolean> methodEcologicalEntry = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalRehearsal = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL);
+	private final DefaultPropertyProvider<Integer> methodEcologicalRehearsalAmount = new DefaultPropertyProvider<Integer>(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL_AMOUNT);
+	private final DefaultPropertyProvider<Boolean> methodEcologicalRetrieval = new DefaultPropertyProvider<Boolean>(DeliveryProperties.METHOD_ECOLOGICAL_RETRIEVAL);
 
 	private String productions;
 
@@ -279,6 +268,9 @@ public class SoarAgent implements RobotController, RadioHandler
 		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_TIMING_INTERVAL, methodEcologicalTimingInterval);
 		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_DOORS, methodEcologicalDoors);
 		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY, methodEcologicalEntry);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL, methodEcologicalRehearsal);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL_AMOUNT, methodEcologicalRehearsalAmount);
+		addSpProperty(DeliveryProperties.METHOD_ECOLOGICAL_RETRIEVAL, methodEcologicalRetrieval);
 		properties.addListener(DeliveryProperties.DECAY_RATE, new PropertyListener<Double>() {
 			public void propertyChanged(PropertyChangeEvent<Double> event) {
 				SoarAgent.this.agent.ExecuteCommandLine("wma -s activation off");
@@ -364,6 +356,12 @@ public class SoarAgent implements RobotController, RadioHandler
 			methodEcologicalDoors.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_DOORS.getName())));
 		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName()))
 			methodEcologicalEntry.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_ENTRY.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL.getName()))
+			methodEcologicalRehearsal.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL_AMOUNT.getName()))
+			methodEcologicalRehearsalAmount.set(Integer.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_REHEARSAL_AMOUNT.getName())));
+		if (propc.hasKey(DeliveryProperties.METHOD_ECOLOGICAL_RETRIEVAL.getName()))
+			methodEcologicalRetrieval.set(Boolean.valueOf(propc.requireString(DeliveryProperties.METHOD_ECOLOGICAL_RETRIEVAL.getName())));
 	}
 
 	private <T> void addSpProperty(PropertyKey<T> key, DefaultPropertyProvider<T> prov)

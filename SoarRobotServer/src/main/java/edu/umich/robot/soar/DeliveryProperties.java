@@ -41,7 +41,7 @@ public class DeliveryProperties
 
 	public static final PropertyKey<String> LOG_FILE =
 		PropertyKey.builder("log-file", String.class)
-		.defaultValue("logfile.txt")
+		.defaultValue("dummy")
 		.build();
 
 	public static final PropertyKey<Integer> RAND_SEED =
@@ -61,7 +61,7 @@ public class DeliveryProperties
 
 	public static final PropertyKey<String> TASKS_FILE =
 		PropertyKey.builder("tasks-file", String.class)
-		.defaultValue("tasksfile.txt")
+		.defaultValue("dummy")
 		.build();
 
 	public static final PropertyKey<Double> DECAY_RATE =
@@ -76,7 +76,7 @@ public class DeliveryProperties
 
 	public static final PropertyKey<Integer> MAX_PATROL_CIRCUITS =
 		PropertyKey.builder("max-patrol-circuits", Integer.class)
-		.defaultValue(10)
+		.defaultValue(-1)
 		.build();
 
 	public static final PropertyKey<Boolean> METHOD_ECOLOGICAL_OBJECTS =
@@ -91,7 +91,7 @@ public class DeliveryProperties
 
 	public static final PropertyKey<Integer> METHOD_ECOLOGICAL_TIMING_INTERVAL =
 		PropertyKey.builder("method-ecological-timing-interval", Integer.class)
-		.defaultValue(1000)
+		.defaultValue(-1)
 		.build();
 
 	public static final PropertyKey<Boolean> METHOD_ECOLOGICAL_DOORS =
@@ -101,6 +101,21 @@ public class DeliveryProperties
 
 	public static final PropertyKey<Boolean> METHOD_ECOLOGICAL_ENTRY =
 		PropertyKey.builder("method-ecological-entry", Boolean.class)
+		.defaultValue(Boolean.FALSE)
+		.build();
+
+	public static final PropertyKey<Boolean> METHOD_ECOLOGICAL_REHEARSAL =
+		PropertyKey.builder("method-ecological-rehearsal", Boolean.class)
+		.defaultValue(Boolean.FALSE)
+		.build();
+
+	public static final PropertyKey<Integer> METHOD_ECOLOGICAL_REHEARSAL_AMOUNT =
+		PropertyKey.builder("method-ecological-rehearsal-amount", Integer.class)
+		.defaultValue(-1)
+		.build();
+
+	public static final PropertyKey<Boolean> METHOD_ECOLOGICAL_RETRIEVAL =
+		PropertyKey.builder("method-ecological-retrieval", Boolean.class)
 		.defaultValue(Boolean.FALSE)
 		.build();
 }
