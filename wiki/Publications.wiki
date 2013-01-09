@@ -3,6 +3,8 @@
 
 = 2012 =
 
+Stensrud, B., Purcel, E., Fragomeni, G., Woods, A., Wintermute, S., and Garrity, P. (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/12045.pdf No More Zombies! High-Fidelity Character Autonomy for Virtual Small-Unit Training], Proceedings of the Interservice/Industry Training, Simulation and Education Conference (I/ITSEC) 2012, Orlando, FL, December 3-6, 2012.
+
 Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
 
 Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
