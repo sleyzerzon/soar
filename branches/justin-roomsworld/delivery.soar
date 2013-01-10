@@ -45,7 +45,8 @@ sp {apply*init-agent
             ^manual <manual-flags>)
    (<episode-flags> ^tasks-retrieved 0)
    (<manual-flags> ^tasks-initialized no)
-   (<metrics> ^num-retrievals 0
+   (<metrics> ^start-time (timestamp)
+              ^num-retrievals 0
               ^num-circuits -1
               ^num-tasks-completed 0)
 }
@@ -1325,7 +1326,7 @@ sp {go-to-coord*propose*avoid-obstacle
    (state <s> ^name go-to-coord
               ^obstacle <object>)
 -->
-   (<s> ^operator <o> +)
+   (<s> ^operator <o> + =)
    (<o> ^name avoid-obstacle
         ^obstacle <object>
         ^actions.estop.estop <estop>)
@@ -1400,6 +1401,15 @@ sp {avoid-obstacle*propose*move-until-clear
    (<s> ^operator <o> +)
    (<o> ^name drive-until-clear
         ^actions.set-linear-velocity.linear-velocity <velocity>)
+}
+
+sp {avoid-obstacle*propose*back-up
+   (state <s> ^name avoid-obstacle
+              ^parameters.linear-velocity-cvrt <velocity>)
+-->
+   (<s> ^operator <o> + <)
+   (<o> ^name back-up
+        ^actions.set-linear-velocity.linear-velocity (- 0 <velocity>))
 }
 
 # metrics/num-retrievals
@@ -1495,13 +1505,15 @@ sp {delivery*apply*report-metrics
                  ^method-ecological-rehearsal <rehearsal>
                  ^method-ecological-rehearsal-amount-cvrt <amount>
                  ^method-ecological-retrieval <retrieval>)
-   (<metrics> ^num-retrievals <num-retrievals>
+   (<metrics> ^start-time <start-time>
+              ^num-retrievals <num-retrievals>
               ^num-circuits <num-circuits>
               ^num-tasks-completed <num-tasks>)
 -->
    (cmd |clog | <logfile>)
    (cmd echo -- |BEGIN OUTPUT|)
-   (cmd echo -- |timestamp: | (timestamp))
+   (cmd echo -- |start time: | <start-time>)
+   (cmd echo -- |end time: | (timestamp))
    (cmd echo -- |experiment: | <experiment>)
    (cmd echo -- |trial: | <trial>)
    (cmd echo -- |max circuits: | <max-circuits>)
