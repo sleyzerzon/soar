@@ -2,7 +2,7 @@ superdroids = [seek];
 
 seek
 {
-	position = [19, -30.5];
+	position = [19.9, -30.5];
 	productions = "../../delivery.soar";
 	simulated = true;
 	properties
@@ -16,7 +16,7 @@ seek
 		objects-held-in = "wm";
 		tasks-held-in = "smem";
 
-#		max-patrol-circuits = 10;
+#		max-patrol-circuits = 0;
 
 #		method-ecological-objects = false;
 #		method-ecological-timing = false;

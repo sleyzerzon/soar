@@ -1,16 +1,20 @@
 # SOAR COMMANDS
 
 w 0
+smem --set mirroring on
 
 multi-attributes area
 multi-attributes child
 multi-attributes lti
 multi-attributes object
+multi-attributes retrieved
+multi-attributes rehearsed
+multi-attributes to-be-retrieved
 multi-attributes task
 multi-attributes waypoint
 
 sp {interrupt*monitor
-   (state <s> ^operator.name timing-trigger)
+   (state <s> ^operator.name area-trigger)
 -->
    #(write |retrieving all tasks| (crlf))
    #(interrupt)
@@ -40,6 +44,7 @@ sp {apply*init-agent
             ^episode <episode-flags>
             ^manual <manual-flags>)
    (<episode-flags> ^tasks-retrieved 0)
+   (<manual-flags> ^tasks-initialized no)
    (<metrics> ^num-retrievals 0
               ^num-circuits -1
               ^num-tasks-completed 0)
@@ -49,7 +54,10 @@ sp {delivery*elaborate*parameters
    (state <s> ^name delivery)
 -->
    (<s> ^parameters <params>)
-   (<params> ^distance-tolerance 1.0
+   (<params> ^angular-velocity 10
+             ^collision-distance 1.0
+             ^collision-bearing 45
+             ^distance-tolerance 1.0
              ^heading-tolerance 1.5
              ^storage-delta-x 1
              ^storage-delta-y 1)
@@ -333,6 +341,15 @@ sp {delivery*compare*flag-operators
    (<s> ^operator <o1> = <o2>)
 }
 
+sp {delivery*compare*retrieve*rehearse
+   (state <s> ^operator <o1> +
+              ^operator <o2> +)
+   (<o1> ^name recursive-retrieve)
+   (<o2> ^name recursive-rehearse)
+-->
+   (<s> ^operator <o1> = <o2>)
+}
+
 sp {delivery*compare*task-operators
    (state <s> ^operator <o1> +
               ^operator <o2> +)
@@ -348,24 +365,36 @@ sp {delivery*compare*task-operators
 
 sp {delivery*propose*initialize-tasks
    (state <s> ^name delivery
-             -^flags.manual.tasks-initialized
-              ^tasks)
+              ^flags.manual.tasks-initialized no)
 -->
    (<s> ^operator <o> +)
    (<o> ^name initialize-tasks)
 }
 
-sp {delivery*apply*initialize-tasks*first-query
-   (state <s> ^operator.name initialize-tasks
+sp {initialize-tasks*propose*retrieve-tasks
+   (state <s> ^name initialize-tasks
+              ^smem <smem>)
+   (<smem> ^command <scmd>
+          -^result.failure)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name retrieve-tasks)
+}
+
+sp {initialize-tasks*apply*retrieve-tasks*first-query
+   (state <s> ^name initialize-tasks
+              ^operator.name retrieve-tasks
               ^smem.command <scmd>)
 -->
    (<scmd> ^query.type task)
 }
 
-sp {delivery*apply*initialize-tasks*next-query
-   (state <s> ^operator.name initialize-tasks
+sp {initialize-tasks*apply*retrieve-tasks*next-query
+   (state <s> ^name initialize-tasks
+              ^operator.name retrieve-tasks
               ^smem <smem>
-              ^tasks <tasks>)
+              ^tasks <tasks>
+              ^quiescence t)
    (<smem> ^command <scmd>
            ^result <sres>)
    (<sres> ^success
@@ -375,19 +404,42 @@ sp {delivery*apply*initialize-tasks*next-query
    (<scmd> ^prohibit <task>)
 }
 
-sp {delivery*apply*initialize-tasks*done
-   (state <s> ^operator.name initialize-tasks
-              ^smem <smem>
-              ^flags.manual <flags>)
-   (<smem> ^command <scmd>
-           ^result.failure)
-   (<scmd> ^{<cmd> << query prohibit >>} <arg>)
+sp {initialize-tasks*propose*recursive-retrieve
+   (state <s> ^name initialize-tasks
+              ^ltis.lti <task-lti>
+              ^tasks <tasks>
+              ^smem.result.failure)
+   (<task-lti> ^identifier <task>
+              -^forgotten no)
 -->
-   (<scmd> ^<cmd> <arg> -)
-   (<flags> ^tasks-initialized yes)
+   (<s> ^operator <o> + =)
+   (<o> ^name recursive-retrieve
+        ^lti <task>)
 }
 
-# store-task TODO
+sp {initialize-tasks*propose*done
+   (state <s> ^name initialize-tasks
+              ^ltis <ltis>
+              ^tasks <tasks>
+              ^smem.result.failure)
+   -{ (<tasks> ^task <task>)
+      (<ltis> ^lti <task-lti>)
+      (<task-lti> ^identifier <task>
+                 -^forgotten no) }
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name done)
+}
+
+sp {initialize-tasks*apply*done
+   (state <s> ^name initialize-tasks
+              ^operator.name done
+              ^flags.manual <flags>
+              ^quiescence t)
+   (<flags> ^tasks-initialized no)
+-->
+   (<flags> ^tasks-initialized no -)
+}
 
 # area-trigger
 
@@ -401,7 +453,7 @@ sp {delivery*propose*area-trigger*doors
    (<params> ^tasks-held-in smem
              ^method-ecological-doors true)
 -->
-   (<s> ^operator <o>)
+   (<s> ^operator <o> +)
    (<o> ^name area-trigger)
 }
 
@@ -415,20 +467,21 @@ sp {delivery*propose*area-trigger*entry
    (<params> ^tasks-held-in smem
              ^method-ecological-entry true)
 -->
-   (<s> ^operator <o>)
+   (<s> ^operator <o> +)
    (<o> ^name area-trigger)
 }
 
 sp {area-trigger*propose*recursive-rehearse
    (state <s> ^name area-trigger
               ^parameters.method-ecological-rehearsal true
+             -^flags.manual.lti-rehearsed <task>
               ^ltis.lti <task-lti>
               ^tasks.task <task>)
    (<task-lti> ^identifier <task>
                ^forgotten no)
 -->
    (<s> ^operator <o> + =)
-   (<o> ^name recursive-rehearsal
+   (<o> ^name recursive-rehearse
         ^lti <task>)
 }
 
@@ -446,13 +499,9 @@ sp {area-trigger*propose*recursive-retrieve
 }
 
 sp {area-trigger*propose*done
-   (state <s> ^attribute state
-              ^impasse no-change
-              ^quiescence t
-              ^superstate <ss>)
-   (<ss> ^name area-trigger)
+   (state <s> ^name area-trigger)
 -->
-   (<ss> ^operator <o> +)
+   (<s> ^operator <o> + <)
    (<o> ^name done)
 }
 
@@ -484,6 +533,7 @@ sp {delivery*propose*timing-trigger*timing
 sp {timing-trigger*propose*recursive-rehearse
    (state <s> ^name timing-trigger
               ^parameters.method-ecological-rehearsal true
+             -^flags.manual.lti-rehearsed <task>
               ^ltis.lti <task-lti>
               ^tasks.task <task>)
    (<task-lti> ^identifier <task>
@@ -508,13 +558,9 @@ sp {timing-trigger*propose*recursive-retrieve
 }
 
 sp {timing-trigger*propose*done
-   (state <s> ^attribute state
-              ^impasse no-change
-              ^quiescence t
-              ^superstate <ss>)
-   (<ss> ^name timing-trigger)
+   (state <s> ^name timing-trigger)
 -->
-   (<ss> ^operator <o> +)
+   (<s> ^operator <o> + <)
    (<o> ^name done)
 }
 
@@ -548,7 +594,8 @@ sp {recursive-retrieve*propose*initialize
               ^quiescence t)
 -->
    (<s> ^operator <o> +)
-   (<o> ^name initialize)
+   (<o> ^name initialize
+        ^actions.estop.estop <stop>)
 }
 
 sp {recursive-retrieve*apply*initialize*default-depth
@@ -616,12 +663,11 @@ sp {recursive-retrieve*apply*retrieve*copy-children*no-path
               ^smem.result.retrieved <lti>
               ^depth <depth>
               ^to-be-retrieved <to-be-retrieved>
-              ^retrieved <retrieved>
+             -^retrieved.lti <val>
              -^mapping)
    (<o> ^name retrieve
         ^lti <lti>)
    (<lti> ^<attr> {<val> <=> <s>})
-   (<retrieved> -^lti <val>)
 -->
    (<to-be-retrieved> ^(- <depth> 1) <val>)
 }
@@ -684,6 +730,81 @@ sp {recursive-retrieve*apply*go-deeper
 -->
    (<s> ^depth <depth> -
         ^depth (- <depth> 1))
+}
+
+# recursive-rehearse
+
+sp {recursive-rehearse*propose*initialize
+   (state <s> ^name recursive-rehearse
+             -^rehearsals-remaining
+             -^rehearsed)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize
+        ^actions.estop.estop <stop>)
+}
+
+sp {recurisve-rehearse*apply*initialize
+   (state <s> ^name recursive-rehearse
+              ^parameters.method-ecological-rehearsal-amount-cvrt <amount>
+              ^operator.name initialize
+              ^superstate.operator.lti <lti>)
+-->
+   (<s> ^rehearsals-remaining <amount>
+        ^rehearsed.lti <lti>)
+}
+
+sp {recurisve-rehearse*propose*recurse
+   (state <s> ^name recursive-rehearse
+              ^rehearsed <rehearsed>)
+   (<rehearsed> ^lti <lti>
+               -^lti <val>)
+   (<lti> ^<attr> {<val> <=> <s>})
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name recurse
+        ^lti <val>)
+}
+
+sp {recursive-rehearse*apply*recurse
+   (state <s> ^name recursive-rehearse
+              ^operator <o>
+              ^rehearsed <rehearsed>)
+   (<o> ^name recurse
+        ^lti <val>)
+-->
+   (<rehearsed> ^lti <val>)
+}
+ 
+sp {recursive-rehearse*propose*complete-rehearsal
+   (state <s> ^name recursive-rehearse)
+-->
+   (<s> ^operator <o> + <)
+   (<o> ^name complete-rehearsal)
+}
+
+sp {recursive-rehearse*apply*complete-rehearsal*again
+   (state <s> ^name recursive-rehearse
+              ^operator.name complete-rehearsal
+              ^superstate.operator.lti <lti>
+              ^rehearsals-remaining {<n> > 0}
+              ^rehearsed <rehearsed>)
+-->
+   (<s> ^rehearsals-remaining <n> -
+        ^rehearsals-remaining (- <n> 1)
+        ^rehearsed <rehearsed> -
+        ^rehearsed.lti <lti>)
+}
+
+sp {recursive-rehearse*apply*complete-rehearsal*done
+   (state <s> ^name recursive-rehearse
+              ^operator.name complete-rehearsal
+              ^superstate.operator.lti <lti>
+              ^rehearsals-remaining 0
+              ^flags.manual <flags>
+              ^quiescence t)
+-->
+   (<flags> ^lti-rehearsed <lti>)
 }
 
 # perform-pick-up-task
@@ -1162,9 +1283,19 @@ sp {go-to-coord*elaborate*destination
                   ^y <y>)
 }
 
+sp {go-to-coord*elaborate*obstacle
+   (state <s> ^name go-to-coord
+              ^parameters.collision-distance <collision>
+              ^io.input-link.objects.object <object>)
+   (<object> ^distance {< <collision>})
+-->
+   (<s> ^obstacle <object>)
+}
+
 sp {go-to-coord*propose*turn-to-waypoint
    (state <s> ^name go-to-coord
               ^parameters.heading-tolerance <heading-tol>
+             -^obstacle
               ^destination.waypoint <waypoint>)
    (<waypoint> ^yaw <yaw>
                ^abs-relative-bearing {> <heading-tol>})
@@ -1177,6 +1308,7 @@ sp {go-to-coord*propose*turn-to-waypoint
 sp {go-to-coord*propose*drive-to-waypoint
    (state <s> ^name go-to-coord
               ^parameters <params>
+             -^obstacle
               ^destination.waypoint <waypoint>)
    (<params> ^distance-tolerance <distance-tol>
              ^linear-velocity-cvrt <velocity>
@@ -1186,6 +1318,87 @@ sp {go-to-coord*propose*drive-to-waypoint
 -->
    (<s> ^operator <o> +)
    (<o> ^name drive-to-waypoint
+        ^actions.set-linear-velocity.linear-velocity <velocity>)
+}
+
+sp {go-to-coord*propose*avoid-obstacle
+   (state <s> ^name go-to-coord
+              ^obstacle <object>)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name avoid-obstacle
+        ^obstacle <object>
+        ^actions.estop.estop <estop>)
+}
+
+# avoid-obstacle
+    
+# TODO
+# this needs to be modified to handle multiple obstacles simultaneously
+# this does not work for obstacles of different sizes
+
+sp {avoid-obstacle*elaborate*destination
+   (state <s> ^name avoid-obstacle
+              ^superstate.operator.obstacle <obj>)
+   (<obj> ^x <x>
+          ^y <y>)
+-->
+   (<s> ^destination <destination>)
+   (<destination> ^x <x>
+                  ^y <y>)
+}
+
+sp {avoid-obstacle*propose*turn-until-clear*turn-left
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link <il>
+              ^destination.waypoint <waypoint>)
+   (<params> ^angular-velocity <velocity>
+             ^collision-bearing <collision-bearing>
+             ^distance-tolerance <distance-tol>)
+   (<il> ^lidar.range <lidar>
+         ^self.pose.yaw <yaw>)
+   (<lidar> ^id 0
+            ^distance {<= <distance-tol> })
+   (<waypoint> ^abs-relative-bearing {< <collision-bearing>}
+               ^relative-bearing {<relative-bearing> <= 0})
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name turn-until-clear
+        ^actions.set-heading.yaw (+ (+ <yaw> <relative-bearing>) <collision-bearing>))
+}
+
+sp {avoid-obstacle*propose*turn-until-clear*turn-right
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link <il>
+              ^destination.waypoint <waypoint>)
+   (<params> ^angular-velocity <velocity>
+             ^collision-bearing <collision-bearing>
+             ^distance-tolerance <distance-tol>)
+   (<il> ^lidar.range <lidar>
+         ^self.pose.yaw <yaw>)
+   (<waypoint> ^abs-relative-bearing {< <collision-bearing>}
+               ^relative-bearing {<relative-bearing> > 0})
+   (<lidar> ^id 0
+            ^distance {<= <distance-tol> })
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name turn-until-clear
+        ^actions.set-heading.yaw (- (+ <yaw> <relative-bearing>) <collision-bearing>))
+}
+
+sp {avoid-obstacle*propose*move-until-clear
+   (state <s> ^name avoid-obstacle
+              ^parameters <params>
+              ^io.input-link.lidar.range <lidar>)
+   (<params> ^distance-tolerance <distance-tol>
+             ^linear-velocity-cvrt <velocity>)
+   (<lidar> ^id 0
+            ^distance {> <distance-tol> })
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name drive-until-clear
         ^actions.set-linear-velocity.linear-velocity <velocity>)
 }
 
@@ -1287,25 +1500,25 @@ sp {delivery*apply*report-metrics
               ^num-tasks-completed <num-tasks>)
 -->
    (cmd |clog | <logfile>)
-   (cmd echo |BEGIN OUTPUT|)
-   (cmd echo |timestamp: | (timestamp))
-   (cmd echo |experiment: | <experiment>)
-   (cmd echo |trial: | <trial>)
-   (cmd echo |max circuits: | <max-circuits>)
-   (cmd echo |decay rate: | <decay>)
-   (cmd echo |linear velocity: | <velo>)
-   (cmd echo |doors ecological method: | <doors>)
-   (cmd echo |entry ecological method: | <entry>)
-   (cmd echo |objects ecological method: | <objects>)
-   (cmd echo |timing ecological method: | <timing>)
-   (cmd echo |timing ecological method interval: | <interval>)
-   (cmd echo |rehearsal ecological method: | <rehearsal>)
-   (cmd echo |rehearsal ecological method amount: | <amount>)
-   (cmd echo |retrieval ecological method: | <retrieval>)
-   (cmd echo |num circuits: | <num-circuits>)
-   (cmd echo |num retrievals: | <num-retrievals>)
-   (cmd echo |num completed tasks: | <num-tasks>)
-   (cmd echo |BEGIN COMMANDS|)
+   (cmd echo -- |BEGIN OUTPUT|)
+   (cmd echo -- |timestamp: | (timestamp))
+   (cmd echo -- |experiment: | <experiment>)
+   (cmd echo -- |trial: | <trial>)
+   (cmd echo -- |max circuits: | <max-circuits>)
+   (cmd echo -- |decay rate: | <decay>)
+   (cmd echo -- |linear velocity: | <velo>)
+   (cmd echo -- |doors ecological method: | <doors>)
+   (cmd echo -- |entry ecological method: | <entry>)
+   (cmd echo -- |objects ecological method: | <objects>)
+   (cmd echo -- |timing ecological method: | <timing>)
+   (cmd echo -- |timing ecological method interval: | <interval>)
+   (cmd echo -- |rehearsal ecological method: | <rehearsal>)
+   (cmd echo -- |rehearsal ecological method amount: | <amount>)
+   (cmd echo -- |retrieval ecological method: | <retrieval>)
+   (cmd echo -- |num circuits: | <num-circuits>)
+   (cmd echo -- |num retrievals: | <num-retrievals>)
+   (cmd echo -- |num completed tasks: | <num-tasks>)
+   (cmd echo -- |BEGIN COMMANDS|)
    (cmd smem --stats)
    (cmd smem --timer)
    (cmd epmem)
@@ -1313,6 +1526,7 @@ sp {delivery*apply*report-metrics
    (cmd epmem --timer)
    (cmd wma)
    (cmd stats)
+   (cmd stats -M)
    (cmd echo |END OUTPUT|)
    (halt)
 }

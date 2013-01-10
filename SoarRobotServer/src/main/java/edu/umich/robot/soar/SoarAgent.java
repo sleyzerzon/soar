@@ -132,7 +132,7 @@ public class SoarAgent implements RobotController, RadioHandler
 	private final DefaultPropertyProvider<String> experimentName = new DefaultPropertyProvider<String>(DeliveryProperties.EXPERIMENT_NAME);
 	private final DefaultPropertyProvider<Integer> trialNum = new DefaultPropertyProvider<Integer>(DeliveryProperties.TRIAL_NUM);
 	private final DefaultPropertyProvider<String> logFile = new DefaultPropertyProvider<String>(DeliveryProperties.LOG_FILE);
-	private final DefaultPropertyProvider<Integer> randSeed = new DefaultPropertyProvider<Integer>(DeliveryProperties.RAND_SEED);
+	private final DefaultPropertyProvider<Double> randSeed = new DefaultPropertyProvider<Double>(DeliveryProperties.RAND_SEED);
 	private final DefaultPropertyProvider<Integer> numBlocks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_BLOCKS);
 	private final DefaultPropertyProvider<Integer> numTasks = new DefaultPropertyProvider<Integer>(DeliveryProperties.NUM_TASKS);
 	private final DefaultPropertyProvider<String> tasksFile = new DefaultPropertyProvider<String>(DeliveryProperties.TASKS_FILE);
@@ -333,7 +333,7 @@ public class SoarAgent implements RobotController, RadioHandler
 		if (propc.hasKey(DeliveryProperties.LOG_FILE.getName()))
 			logFile.set(propc.requireString(DeliveryProperties.LOG_FILE.getName()));
 		if (propc.hasKey(DeliveryProperties.RAND_SEED.getName()))
-			randSeed.set(Integer.valueOf(propc.requireString(DeliveryProperties.RAND_SEED.getName())));
+			randSeed.set(Double.valueOf(propc.requireString(DeliveryProperties.RAND_SEED.getName())));
 		if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))
 			numBlocks.set(Integer.valueOf(propc.requireString(DeliveryProperties.NUM_BLOCKS.getName())));
 		if (propc.hasKey(DeliveryProperties.TRIAL_NUM.getName()))

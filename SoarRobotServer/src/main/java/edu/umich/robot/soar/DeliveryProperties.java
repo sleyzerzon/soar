@@ -44,9 +44,9 @@ public class DeliveryProperties
 		.defaultValue("dummy")
 		.build();
 
-	public static final PropertyKey<Integer> RAND_SEED =
-		PropertyKey.builder("rand-seed", Integer.class)
-		.defaultValue(-1)
+	public static final PropertyKey<Double> RAND_SEED =
+		PropertyKey.builder("rand-seed", Double.class)
+		.defaultValue(0.0)
 		.build();
 
 	public static final PropertyKey<Integer> NUM_BLOCKS =
