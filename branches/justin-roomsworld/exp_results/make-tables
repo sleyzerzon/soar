@@ -1,0 +1,89 @@
+#!/bin/bash
+
+make-single-table() {
+	paste <(
+	./logfile-parser.py *.txt | speedy2csv | csvplot.py \
+		-c 'echoed_experiment!="timing-method-only"' \
+		-g echoed_experiment \
+		-x wma_decay_rate \
+		-y "$1"
+	) <(
+	./logfile-parser.py *.txt | speedy2csv | csvplot.py \
+		-c 'echoed_experiment=="timing-method-only"' \
+		-g echoed_experiment \
+		-g echoed_timing_ecological_method_interval \
+		-x wma_decay_rate \
+		-y "$1" | cut -d ' ' -f 2-5
+	) | sed 's/	/ /g'
+	echo ""
+}
+
+make-single-table echoed_num_completed_tasks
+make-single-table sstats_retrieves
+make-single-table echoed_num_circuits
+make-single-table stats_avg_wm_size
+make-single-table stats_max_wm_size
+make-single-table 'avg_output_msec=(stats_decision_msec*(stats_decision/estats_time))'
+make-single-table 'max_output_sec=(max_decision_sec*(stats_decision/estats_time))'
+
+# FIELDS
+#
+# echoed_decay_rate
+# echoed_doors_ecological_method
+# echoed_entry_ecological_method
+# echoed_experiment
+# echoed_linear_velocity
+# echoed_max_circuits
+# echoed_num_circuits
+# echoed_num_completed_tasks
+# echoed_num_retrievals
+# echoed_objects_ecological_method
+# echoed_rehearsal_ecological_method
+# echoed_rehearsal_ecological_method_amount
+# echoed_retrieval_ecological_method
+# echoed_timestamp
+# echoed_timing_ecological_method
+# echoed_timing_ecological_method_interval
+# echoed_trial
+# estats_memory_highwater
+# estats_memory_usage
+# estats_nexts
+# estats_prevs
+# estats_queries
+# estats_retrievals
+# estats_time
+# etimer_epmem_ncb_retrieval
+# etimer_epmem_next
+# etimer_epmem_prev
+# etimer_epmem_query
+# etimer_epmem_storage
+# etimer_total
+# max_decision_sec
+# max_epmem_sec
+# max_smem_sec
+# max_wm_changes
+# sstats_activation_updates
+# sstats_memory_highwater
+# sstats_memory_usage
+# sstats_mirrors
+# sstats_queries
+# sstats_retrieves
+# sstats_stores
+# stats_avg_wm_size
+# stats_decision
+# stats_decision_msec
+# stats_elab_cycles
+# stats_kernel_cpu_sec
+# stats_max_wm_size
+# stats_total_cpu_sec
+# stimer_smem_api
+# stimer_smem_hash
+# stimer_smem_init
+# stimer_smem_ncb_retrieval
+# stimer_smem_query
+# stimer_smem_storage
+# stimer_total
+# wma_decay_rate
+# wma_decay_thresh
+# wma_forget_wme
+# wma_forgetting

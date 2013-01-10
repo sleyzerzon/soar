@@ -71,14 +71,9 @@ def main(experiment):
 	params = {}
 	params["seek.properties.trial-num"] = range(0, 1)
 	params["seek.properties.max-patrol-circuits"] = (3,)
-	params["seek.properties.rand-seed"] = (42, 1707, 8675309,)
+	params["seek.properties.rand-seed"] = (0.3607740397412259, 0.04379098940730264, 0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266, 0.6871929206606627, 0.78931705115309, 0.7819027528531993)
 	params["seek.properties.num-blocks"] = (11,)
 	params["seek.properties.num-tasks"] = (11,)
-
-	expdir = "experiments/{}".format(experiment)
-	if exists(expdir):
-		rmtree(expdir)
-	mkdir(expdir)
 
 	if experiment == "doors-retrieval":
 		params["seek.properties.experiment-name"] = [experiment,]
@@ -100,21 +95,29 @@ def main(experiment):
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-doors"] = ["true",]
 		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [pow(2, n) for n in range(3, 7)]
+		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
 		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
 	elif experiment == "entry-rehearsal":
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-entry"] = ["true",]
 		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [pow(2, n) for n in range(3, 7)]
+		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
 		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
 	elif experiment == "timing-rehearsal":
 		params["seek.properties.experiment-name"] = [experiment,]
 		params["seek.properties.method-ecological-timing"] = ["true",]
 		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
 		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [pow(2, n) for n in range(3, 7)]
+		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
 		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+	else:
+		print("unknown experiment name: {}".format(experiment))
+		exit(1)
+
+	expdir = "experiments/{}".format(experiment)
+	if exists(expdir):
+		rmtree(expdir)
+	mkdir(expdir)
 
 	template = open("template.txt", "r").read()
 	run_files = []

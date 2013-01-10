@@ -1,4 +1,4 @@
-seek.properties.decay-rate = 0.5;
+seek.properties.decay-rate = 0.3;
 seek.properties.max-patrol-circuits = 0;
 
 superdroids = [seek];
@@ -6,15 +6,11 @@ superdroids = [seek];
 seek
 {
 	position = [5.5, -30.5];
-	#productions = "../../delivery.soar";
-	productions = "../../SoarRobotServer/agents/robot3/clean-house-new.soar";
+	productions = "../../delivery.soar";
 	simulated = true;
 	properties
 	{
 		spawn-debuggers = true;
-
-		decay-rate = 0.8;
-		linear-velocity = 0.7;
 
 		areas-held-in = "wm";
 		objects-held-in = "wm";
@@ -60,14 +56,26 @@ metadata
 		placed = [
 			large-red-sphere,  5.5,  -25,
 			large-red-sphere,   10,  -30.5,
+			#large-red-sphere,   11,  -31.2,
+			#large-red-sphere,   11,  -29.8,
+			small-green-sphere,   25,  -29.8,
 		];
 
 		large-red-sphere
 		{
 			#size = [ 2, 2 ];
+			#size = [ 1, 1 ];
 			size = [ .25, .25 ];
 			height = "large";
 			color = "red";
+			shape = "sphere";
+			type = "block";
+		}
+		small-green-sphere
+		{
+			size = [ .25, .25 ];
+			height = "small";
+			color = "green";
 			shape = "sphere";
 			type = "block";
 		}

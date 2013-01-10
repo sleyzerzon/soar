@@ -14,7 +14,7 @@ if __name__ == "__main__":
 				if re.match("[^>]*:", line):
 					output.update(("echoed {}".format(k), v) for k, v in [line.split(":", 1),])
 
-			sstats, stimer, epmem, estats, etimer, wma, stats = commands.split("seek>")[1:-1]
+			sstats, stimer, epmem, estats, etimer, wma, stats, statsmax = commands.split("seek>")[1:-1]
 
 			# smem stats
 			extract = ("Memory Usage", "Memory Highwater", "Retrieves", "Queries", "Stores", "Activation Updates", "Mirrors",)
@@ -53,27 +53,30 @@ if __name__ == "__main__":
 					output.update(("wma {}".format(k), v) for k, v in [line.split(":", 1),] if k in extract)
 
 			# stats
-
 			# kernel CPU
 			output["stats kernel cpu sec"] = re.sub(".*Kernel CPU Time: *([0-9.]*).*", r"\1", stats, flags=re.DOTALL)
-
 			# total CPU
 			output["stats total cpu sec"] = re.sub(".*Total  CPU Time: *([0-9.]*).*", r"\1", stats, flags=re.DOTALL)
-
 			# decisions
 			output["stats decision"] = re.sub(".*?([0-9]+) decisions.*", r"\1", stats, flags=re.DOTALL)
-
 			# msec/decisions
 			output["stats decision msec"] = re.sub(".*?([0-9.]+) msec/decision.*", r"\1", stats, flags=re.DOTALL)
-
 			# elaboration cycles
 			output["stats elab cycles"] = re.sub(".*?([0-9]+) elaboration cycles.*", r"\1", stats, flags=re.DOTALL)
-
 			# avg wm size 
 			output["stats avg wm size"] = re.sub(".*?([0-9.]+) mean.*", r"\1", stats, flags=re.DOTALL)
-
 			# max wm size 
 			output["stats max wm size"] = re.sub(".*?([0-9.]+) maximum.*", r"\1", stats, flags=re.DOTALL)
+
+			# statsmax
+			# max decision time
+			output["max decision sec"] = re.sub(".*  Time \(sec\) *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
+			# max epmem time
+			output["max epmem sec"] = re.sub(".*EpMem Time \(sec\) *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
+			# max smem time
+			output["max smem sec"] = re.sub(".*SMem Time \(sec\) *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
+			# max wm changes
+			output["max wm changes"] = re.sub(".*WM changes *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
 
 			print(" ".join(sorted("{}={}".format(re.sub("_+", "_", re.sub("[ -]", "_", k.lower())).strip("_"), v.strip()) for k, v in sorted(output.items()))))
 
