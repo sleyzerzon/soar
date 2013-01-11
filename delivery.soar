@@ -14,9 +14,9 @@ multi-attributes task
 multi-attributes waypoint
 
 sp {interrupt*monitor
-   (state <s> ^operator.name area-trigger)
+   (state <s> ^type state)
 -->
-   #(write |retrieving all tasks| (crlf))
+   #(write |timing triggered|)
    #(interrupt)
 }
 
@@ -43,7 +43,7 @@ sp {apply*init-agent
    (<flags> ^area <area-flags>
             ^episode <episode-flags>
             ^manual <manual-flags>)
-   (<episode-flags> ^tasks-retrieved 0)
+   (<episode-flags> ^timing-trigger 0)
    (<manual-flags> ^tasks-initialized no)
    (<metrics> ^start-time (timestamp)
               ^num-retrievals 0
@@ -56,12 +56,10 @@ sp {delivery*elaborate*parameters
 -->
    (<s> ^parameters <params>)
    (<params> ^angular-velocity 10
-             ^collision-distance 1.0
+             ^collision-distance 0.75
              ^collision-bearing 45
              ^distance-tolerance 1.0
-             ^heading-tolerance 1.5
-             ^storage-delta-x 1
-             ^storage-delta-y 1)
+             ^heading-tolerance 1.5)
 }
 
 sp {delivery*elaborate*constants
@@ -218,6 +216,41 @@ sp {elaborate*state*ltis-status-recurse
    (<parent-lti> ^forgotten no)
 }
 
+# flags
+
+# FIXME this is a hack to get around a Soar bug
+
+sp {elaborate*state*create-episode-flag-abstraction
+   (state <s> ^superstate nil
+              ^operator.name <name>
+              ^epmem.present-id {> <epmem-id>}
+              ^flags.episode <flags>)
+   (<flags> ^<flag> {<epmem-id> <=> 0}
+           -^<flag> {<> <epmem-id> <=> 0})
+-->
+   (<flags> ^<flag> yes)
+}
+
+sp {elaborate*state*remove-episode-flag-abstraction
+   (state <s> ^superstate nil
+              ^operator.name <name>
+              ^epmem.present-id {< <epmem-id>}
+              ^flags.episode <flags>)
+   (<flags> ^<flag> {<epmem-id> <=> 0}
+            ^<flag> yes)
+-->
+   (<flags> ^<flag> yes -)
+}
+
+# operators
+
+sp {elaborate*operator*retrieve-operators
+   (state <s> ^operator <o> +)
+   (<o> ^type retrieve)
+-->
+   (<o> ^actions.estop.estop <estop>)
+}
+
 # navigation
 
 sp {elaborate*state*current-area
@@ -229,7 +262,7 @@ sp {elaborate*state*current-area
    (<s> ^current-area <area>)
 }
 
-sp {elaboroate*state*waypoint
+sp {elaborate*state*waypoint
    (state <s> ^name <name>
               ^io.input-link.waypoints.waypoint <waypoint>
               ^destination <destination>)
@@ -518,12 +551,10 @@ sp {area-trigger*apply*done
 
 # timing-trigger
 
-sp {delivery*propose*timing-trigger*timing
-   # FIXME this might blink if present-id changes
+sp {delivery*propose*timing-trigger
    (state <s> ^name delivery
               ^parameters <params>
-              ^epmem.present-id {> <epmem-id>}
-              ^flags.episode.timing-trigger <epmem-id>)
+              ^flags.episode.timing-trigger yes)
    (<params> ^tasks-held-in smem
              ^method-ecological-timing true)
 -->
@@ -595,8 +626,7 @@ sp {recursive-retrieve*propose*initialize
               ^quiescence t)
 -->
    (<s> ^operator <o> +)
-   (<o> ^name initialize
-        ^actions.estop.estop <stop>)
+   (<o> ^name initialize)
 }
 
 sp {recursive-retrieve*apply*initialize*default-depth
@@ -1129,7 +1159,7 @@ sp {pick-up-object*propose*get-object
    (<s> ^operator <o> +)
    (<o> ^name get-object
         ^actions <actions>)
-   (<actions> ^stop <stop>
+   (<actions> ^estop.estop <estop>
               ^get-object.id <id>)
 }
 
@@ -1137,18 +1167,16 @@ sp {pick-up-object*propose*get-object
 
 sp {put-down-object*elaborate*destination
    (state <s> ^name put-down-object
-              ^parameters <params>
+              ^parameters.distance-tolerance <distance-tol>
               ^current-area <area>)
-   (<params> ^storage-delta-x <dx>
-             ^storage-delta-y <dy>)
    (<area> ^center-x <x>
            ^center-y <y>
            ^width <width>
            ^height <height>)
 -->
    (<s> ^destination <destination>)
-   (<destination> ^x (+ (- <x> (/ <width> 2)) <dx>)
-                  ^y (+ (- <y> (/ <height> 2)) <dy>))
+   (<destination> ^x (+ (- <x> (/ <width> 2)) <distance-tol>)
+                  ^y (+ (- <y> (/ <height> 2)) <distance-tol>))
 }
 
 sp {put-down-object*propose*go-to-storage-coord
@@ -1172,7 +1200,7 @@ sp {put-down-object*propose*drop-object
    (<s> ^operator <o> +)
    (<o> ^name drop-object
         ^actions <actions>)
-   (<actions> ^stop <stop>
+   (<actions> ^estop.estop <estop>
               ^drop-object.id <id>)
 }
 
@@ -1493,6 +1521,7 @@ sp {delivery*apply*report-metrics
               ^parameters <parameters>)
    (<parameters> ^experiment-name <experiment>
                  ^trial-num-cvrt <trial>
+                 ^rand-seed <seed>
                  ^log-file {<logfile> <> dummy}
                  ^decay-rate-cvrt <decay>
                  ^linear-velocity-cvrt <velo>
@@ -1516,6 +1545,7 @@ sp {delivery*apply*report-metrics
    (cmd echo -- |end time: | (timestamp))
    (cmd echo -- |experiment: | <experiment>)
    (cmd echo -- |trial: | <trial>)
+   (cmd echo -- |random seed: | <seed>)
    (cmd echo -- |max circuits: | <max-circuits>)
    (cmd echo -- |decay rate: | <decay>)
    (cmd echo -- |linear velocity: | <velo>)
@@ -1540,6 +1570,7 @@ sp {delivery*apply*report-metrics
    (cmd stats)
    (cmd stats -M)
    (cmd echo |END OUTPUT|)
+   (cmd |clog -c|)
    (halt)
 }
 
@@ -1567,8 +1598,8 @@ sp {delivery*apply*remove-area-flags
 sp {delivery*propose*remove-episode-flags
    (state <s> ^name delivery
               ^flags.episode <flags>)
-   (<flags> ^<flag> <smaller>
-            ^<flag> {> <smaller>})
+   (<flags> ^<flag> {<smaller> <=> 0}
+            ^<flag> {> <smaller> <=> 0})
 -->
    (<s> ^operator <o> +)
    (<o> ^name remove-episode-flags)
@@ -1577,10 +1608,10 @@ sp {delivery*propose*remove-episode-flags
 sp {delivery*apply*remove-episode-flags
    (state <s> ^operator.name remove-episode-flags
               ^flags.episode <flags>)
-   (<flags> ^<flag> <smaller>
-            ^<flag> {<larger> > <smaller>})
+   (<flags> ^<flag> {<smaller> <=> 0}
+            ^<flag> {<larger> > <smaller> <=> 0})
 -->
-   (<flags> ^<flag> <larger> -)
+   (<flags> ^<flag> <smaller> -)
 }
 
 # waypoints

@@ -69,49 +69,61 @@ def generate_map(randseed, num_tasks, num_blocks):
 
 def main(experiment):
 	params = {}
-	params["seek.properties.trial-num"] = range(0, 1)
-	params["seek.properties.max-patrol-circuits"] = (3,)
-	params["seek.properties.rand-seed"] = (0.3607740397412259, 0.04379098940730264, 0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266, 0.6871929206606627, 0.78931705115309, 0.7819027528531993)
-	params["seek.properties.num-blocks"] = (11,)
-	params["seek.properties.num-tasks"] = (11,)
+	params["experiment-name"] = [experiment,]
+	params["trial-num"] = range(0, 1)
+	params["max-patrol-circuits"] = (3,)
+	#params["rand-seed"] = (0.3607740397412259, 0.04379098940730264, 0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266, 0.6871929206606627, 0.78931705115309, 0.7819027528531993)
+	params["rand-seed"] = (0.3607740397412259, 0.04379098940730264,)
+	params["num-blocks"] = (11,)
+	params["num-tasks"] = (11,)
 
-	if experiment == "doors-retrieval":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-doors"] = ["true",]
-		params["seek.properties.method-ecological-retrieval"] = ["true",]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+	if experiment == "ecological-task-limits":
+		params["max-patrol-circuits"] = (0,)
+		params["num-blocks"] = (1,)
+		params["num-tasks"] = [pow(2, n) for n in range(0, 3, 2)]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{num-tasks}_{trial-num}",)
+	elif experiment == "doors-retrieval":
+		params["method-ecological-doors"] = ["true",]
+		params["method-ecological-retrieval"] = ["true",]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{trial-num}",)
 	elif experiment == "entry-retrieval":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-entry"] = ["true",]
-		params["seek.properties.method-ecological-retrieval"] = ["true",]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["method-ecological-entry"] = ["true",]
+		params["method-ecological-retrieval"] = ["true",]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{trial-num}",)
 	elif experiment == "timing-retrieval":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-timing"] = ["true",]
-		params["seek.properties.method-ecological-retrieval"] = ["true",]
-		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["method-ecological-timing"] = ["true",]
+		params["method-ecological-retrieval"] = ["true",]
+		params["method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{method-ecological-timing-interval}_{trial-num}",)
 	elif experiment == "doors-rehearsal":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-doors"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["method-ecological-doors"] = ["true",]
+		params["method-ecological-rehearsal"] = ["true",]
+		params["method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{method-ecological-rehearsal-amount}_{trial-num}",)
 	elif experiment == "entry-rehearsal":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-entry"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["method-ecological-entry"] = ["true",]
+		params["method-ecological-rehearsal"] = ["true",]
+		params["method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{method-ecological-rehearsal-amount}_{trial-num}",)
 	elif experiment == "timing-rehearsal":
-		params["seek.properties.experiment-name"] = [experiment,]
-		params["seek.properties.method-ecological-timing"] = ["true",]
-		params["seek.properties.method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
-		params["seek.properties.method-ecological-rehearsal"] = ["true",]
-		params["seek.properties.method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
-		params["seek.properties.decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["method-ecological-timing"] = ["true",]
+		params["method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
+		params["method-ecological-rehearsal"] = ["true",]
+		params["method-ecological-rehearsal-amount"] = [range(0, 10, 2)]
+		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
+		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{method-ecological-timing-interval}_{method-ecological-rehearsal-amount}_{trial-num}",)
 	else:
 		print("unknown experiment name: {}".format(experiment))
+		exit(1)
+
+	if "filename-template" not in params:
+		print("experiment does not have a filename-template")
 		exit(1)
 
 	expdir = "experiments/{}".format(experiment)
@@ -123,27 +135,23 @@ def main(experiment):
 	run_files = []
 	keys = sorted(params.keys())
 	cache = {}
-	for values in product(*(params[key] for key in keys)):
-		param_map = dict(zip(keys, values))
-		decay_rate = param_map["seek.properties.decay-rate"]
-		trial = param_map["seek.properties.trial-num"]
-		interval = param_map.get("seek.properties.method-ecological-timing-interval", -1)
-		amount = param_map.get("seek.properties.method-ecological-rehearsal-amount", -1)
-		param_map["seek.properties.experiment-name"] = '"{}"'.format(experiment)
+	for values in product(*(params[k] for k in keys)):
+		raw_params = dict(zip(keys, values))
+		param_map = dict(zip([(k if "." in k else "seek.properties.{}".format(k)) for k in keys], values))
 
-		rand_seed = param_map["seek.properties.rand-seed"]
-		num_blocks = param_map["seek.properties.num-blocks"]
-		num_tasks = param_map["seek.properties.num-tasks"]
-		key = (rand_seed, num_blocks, num_tasks)
-		param_map["seek.properties.tasks-file"] = '"../../tasks/{}.soar"'.format("_".join(str(k) for k in key))
-		if key not in cache:
-			objects, smem = generate_map(rand_seed, num_tasks, num_blocks)
-			cache[key] = (objects, smem)
-		else:
-			objects, smem = cache[key]
-
-		filename = "_".join(str(x) for x in (experiment, rand_seed, decay_rate, interval, amount))
+		filename = raw_params["filename-template"].format(**raw_params)
+		for attribute in ("experiment-name", "filename-template"):
+			param_map["seek.properties.{}".format(attribute)] = '"{}"'.format(raw_params[attribute])
 		param_map["seek.properties.log-file"] = '"../../exp_results/{}.txt"'.format(filename)
+
+		task_key = (raw_params["rand-seed"], raw_params["num-blocks"], raw_params["num-tasks"])
+		if task_key not in cache:
+			objects, smem = generate_map(task_key[0], task_key[1], task_key[2])
+			cache[task_key] = (objects, smem)
+		else:
+			objects, smem = cache[task_key]
+		param_map["seek.properties.tasks-file"] = '"../../tasks/{}.soar"'.format("_".join(str(k) for k in task_key))
+
 		run_file = "{}/{}.run".format(expdir, filename)
 		with open(run_file, "w") as fd:
 			for k, v in sorted(param_map.items()):
@@ -163,12 +171,13 @@ def main(experiment):
 		fd.write("\n".join('\t\t"../../configs/{}",'.format(run_file) for run_file in sorted(run_files)) + "\n")
 		fd.write("\t];\n")
 		fd.write("\tcycles = -1;\n")
-		fd.write("\tseconds = 1800;\n")
+		fd.write("\tseconds = -1;\n")
 		fd.write("}\n")
 
 if __name__ == "__main__":
 	arg_parser = ArgumentParser(usage="%(prog)s <experiment>", description="experiment configuration generator for RoomsWorld")
-	arg_parser.add_argument("experiment",  metavar="EXPERIMENT", help="the experiment to generate configurations for")
+	arg_parser.add_argument("experiments",  metavar="EXPERIMENTS", nargs="*", help="the experiment to generate configurations for")
 	args = arg_parser.parse_args()
 
-	main(args.experiment)
+	for exp in args.experiments:
+		main(exp)
