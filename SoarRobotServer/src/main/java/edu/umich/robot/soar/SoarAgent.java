@@ -153,12 +153,12 @@ public class SoarAgent implements RobotController, RadioHandler
 	private final WallClock clock;
 
 	private static final String SP_PARAM = 
-		"sp {robot*elaborate*state*%s\n"
-		+ "    (state <s> ^superstate nil\n"
-		+ "               ^parameters <p>)\n"
-		+ "-->\n"
-		+ "    (<p> ^%s |%s|)\n"
-		+ "}\n";
+		"sp {elaborate*state*parameters*%s\n" +
+		"   (state <s> ^superstate nil\n" +
+		"              ^parameters <p>)\n" +
+		"-->\n" +
+		"   (<p> ^%s %s)\n" +
+		"}\n";
 
 	public SoarAgent(Agent agent, RobotOutput output, WallClock clock, Config propc)
 	{
@@ -377,7 +377,11 @@ public class SoarAgent implements RobotController, RadioHandler
 
 	private <T> String makeSpParam(String key, T value)
 	{
-		return String.format(SP_PARAM, key, key, value.toString());
+		if (value.toString().matches("[-0-9.]+")) {
+			return String.format(SP_PARAM, key, key, value.toString());
+		} else {
+			return String.format(SP_PARAM, key, key, "|" + value.toString() + "|");
+		}
 	}
 
 	public void initialize() 
