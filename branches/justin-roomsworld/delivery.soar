@@ -14,9 +14,11 @@ multi-attributes task
 multi-attributes waypoint
 
 sp {interrupt*monitor
-   (state <s> ^type state)
+   (state <s> ^type state
+              ^operator.name {<name> << timing-trigger recurse >>}
+   )
 -->
-   #(write |timing triggered|)
+   #(write |operator | <name>)
    #(interrupt)
 }
 
@@ -48,6 +50,7 @@ sp {apply*init-agent
    (<metrics> ^start-time (timestamp)
               ^num-retrievals 0
               ^num-circuits -1
+              ^num-initial-retrievals 0
               ^num-tasks-completed 0)
 }
 
@@ -56,7 +59,7 @@ sp {delivery*elaborate*parameters
 -->
    (<s> ^parameters <params>)
    (<params> ^angular-velocity 10
-             ^collision-distance 0.75
+             ^collision-distance 0.9
              ^collision-bearing 45
              ^distance-tolerance 1.0
              ^heading-tolerance 1.5)
@@ -132,24 +135,6 @@ sp {elaborate*state*inherited*roomsworld
 
 -->
    (<s> ^<attr> <val>)
-}
-
-# parameters
-
-sp {elaborate*state*integer-parameters
-   (state <s> ^superstate nil
-              ^parameters <params>)
-   (<params> ^{<attr> << trial-num max-patrol-circuits method-ecological-timing-interval method-ecological-rehearsal-amount >>} <val>)
--->
-   (<params> ^(concat <attr> |-cvrt|) (int <val>))
-}
-
-sp {elaborate*state*float-parameters
-   (state <s> ^superstate nil
-              ^parameters <params>)
-   (<params> ^{<attr> << decay-rate linear-velocity >>} <val>)
--->
-   (<params> ^(concat <attr> |-cvrt|) (float <val>))
 }
 
 # memory
@@ -441,7 +426,7 @@ sp {initialize-tasks*apply*retrieve-tasks*next-query
 sp {initialize-tasks*propose*recursive-retrieve
    (state <s> ^name initialize-tasks
               ^ltis.lti <task-lti>
-              ^tasks <tasks>
+              ^tasks.task <task>
               ^smem.result.failure)
    (<task-lti> ^identifier <task>
               -^forgotten no)
@@ -449,6 +434,33 @@ sp {initialize-tasks*propose*recursive-retrieve
    (<s> ^operator <o> + =)
    (<o> ^name recursive-retrieve
         ^lti <task>)
+}
+
+sp {initialize-tasks*apply*recursive-retrieve*remove-count-flag
+   (state <s> ^name initialize-tasks
+              ^operator <o>
+              ^flags.manual <flags>
+              ^metrics <metrics>)
+   (<o> ^name recursive-retrieve
+        ^lti <task>)
+   (<flags> ^num-initial-retrievals-updated {<flag> <> <task>})
+-->
+   (<flags> ^num-initial-retrievals-updated <flag> -)
+}
+
+sp {initialize-tasks*apply*recursive-retrieve*count
+   (state <s> ^name initialize-tasks
+              ^operator <o>
+              ^flags.manual <flags>
+              ^metrics <metrics>)
+   (<o> ^name recursive-retrieve
+        ^lti <task>)
+  -(<flags> ^num-initial-retrievals-updated)
+   (<metrics> ^num-initial-retrievals <n>)
+-->
+   (<metrics> ^num-initial-retrievals <n> -
+              ^num-initial-retrievals (+ <n> 1))
+   (<flags> ^num-initial-retrievals-updated <task>)
 }
 
 sp {initialize-tasks*propose*done
@@ -473,6 +485,18 @@ sp {initialize-tasks*apply*done
    (<flags> ^tasks-initialized no)
 -->
    (<flags> ^tasks-initialized no -)
+}
+
+# triggers
+
+# FIXME this is a hack
+sp {delivery*apply*patrol*remove-rehearsed-flags
+   (state <s> ^name delivery
+              ^operator.name patrol
+              ^flags.manual <flags>)
+   (<flags> ^lti-rehearsed <lti>)
+-->
+   (<flags> ^lti-rehearsed <lti> -)
 }
 
 # area-trigger
@@ -599,7 +623,7 @@ sp {timing-trigger*propose*done
 sp {timing-trigger*apply*done
    (state <s> ^name timing-trigger
               ^operator.name done
-              ^parameters.method-ecological-timing-interval-cvrt <interval>
+              ^parameters.method-ecological-timing-interval <interval>
               ^epmem.present-id <present-id>
               ^flags.episode <flags>
               ^quiescence t)
@@ -777,7 +801,7 @@ sp {recursive-rehearse*propose*initialize
 
 sp {recurisve-rehearse*apply*initialize
    (state <s> ^name recursive-rehearse
-              ^parameters.method-ecological-rehearsal-amount-cvrt <amount>
+              ^parameters.method-ecological-rehearsal-amount <amount>
               ^operator.name initialize
               ^superstate.operator.lti <lti>)
 -->
@@ -1340,7 +1364,7 @@ sp {go-to-coord*propose*drive-to-waypoint
              -^obstacle
               ^destination.waypoint <waypoint>)
    (<params> ^distance-tolerance <distance-tol>
-             ^linear-velocity-cvrt <velocity>
+             ^linear-velocity <velocity>
              ^heading-tolerance <heading-tol>)
    (<waypoint> ^abs-relative-bearing {<= <heading-tol>}
                ^distance {<remaining> > <distance-tol>})
@@ -1422,7 +1446,7 @@ sp {avoid-obstacle*propose*move-until-clear
               ^parameters <params>
               ^io.input-link.lidar.range <lidar>)
    (<params> ^distance-tolerance <distance-tol>
-             ^linear-velocity-cvrt <velocity>)
+             ^linear-velocity <velocity>)
    (<lidar> ^id 0
             ^distance {> <distance-tol> })
 -->
@@ -1433,7 +1457,7 @@ sp {avoid-obstacle*propose*move-until-clear
 
 sp {avoid-obstacle*propose*back-up
    (state <s> ^name avoid-obstacle
-              ^parameters.linear-velocity-cvrt <velocity>)
+              ^parameters.linear-velocity <velocity>)
 -->
    (<s> ^operator <o> + <)
    (<o> ^name back-up
@@ -1508,36 +1532,38 @@ sp {delivery*propose*report-metrics*patrol-limit
               ^parameters <params>
               ^metrics.num-circuits <max>)
    (<params> ^experiment-name {<> dummy}
-             ^max-patrol-circuits-cvrt <max>)
+             ^max-patrol-circuits <max>)
 -->
    (<s> ^operator <o> +)
    (<o> ^name report-metrics)
 }
 
-sp {delivery*apply*report-metrics
-   (state <s> ^name delivery
-              ^operator.name report-metrics
+sp {apply*report-metrics
+   (state <s> ^operator.name report-metrics
               ^metrics <metrics>
               ^parameters <parameters>)
    (<parameters> ^experiment-name <experiment>
-                 ^trial-num-cvrt <trial>
+                 ^trial-num <trial>
                  ^rand-seed <seed>
+                 ^num-blocks <num-blocks>
+                 ^num-tasks <num-tasks>
                  ^log-file {<logfile> <> dummy}
-                 ^decay-rate-cvrt <decay>
-                 ^linear-velocity-cvrt <velo>
-                 ^max-patrol-circuits-cvrt <max-circuits>
+                 ^decay-rate <decay>
+                 ^linear-velocity <velo>
+                 ^max-patrol-circuits <max-circuits>
                  ^method-ecological-doors <doors> 
                  ^method-ecological-entry <entry>
                  ^method-ecological-objects <objects>
                  ^method-ecological-timing <timing>
-                 ^method-ecological-timing-interval-cvrt <interval>
+                 ^method-ecological-timing-interval <interval>
                  ^method-ecological-rehearsal <rehearsal>
-                 ^method-ecological-rehearsal-amount-cvrt <amount>
+                 ^method-ecological-rehearsal-amount <amount>
                  ^method-ecological-retrieval <retrieval>)
    (<metrics> ^start-time <start-time>
+              ^num-initial-retrievals <num-initial-retrievals>
               ^num-retrievals <num-retrievals>
               ^num-circuits <num-circuits>
-              ^num-tasks-completed <num-tasks>)
+              ^num-tasks-completed <num-completed-tasks>)
 -->
    (cmd |clog | <logfile>)
    (cmd echo -- |BEGIN OUTPUT|)
@@ -1546,6 +1572,8 @@ sp {delivery*apply*report-metrics
    (cmd echo -- |experiment: | <experiment>)
    (cmd echo -- |trial: | <trial>)
    (cmd echo -- |random seed: | <seed>)
+   (cmd echo -- |num blocks: | <num-blocks>)
+   (cmd echo -- |num tasks: | <num-tasks>)
    (cmd echo -- |max circuits: | <max-circuits>)
    (cmd echo -- |decay rate: | <decay>)
    (cmd echo -- |linear velocity: | <velo>)
@@ -1558,8 +1586,9 @@ sp {delivery*apply*report-metrics
    (cmd echo -- |rehearsal ecological method amount: | <amount>)
    (cmd echo -- |retrieval ecological method: | <retrieval>)
    (cmd echo -- |num circuits: | <num-circuits>)
+   (cmd echo -- |num initial retrievals: | <num-initial-retrievals>)
    (cmd echo -- |num retrievals: | <num-retrievals>)
-   (cmd echo -- |num completed tasks: | <num-tasks>)
+   (cmd echo -- |num completed tasks: | <num-completed-tasks>)
    (cmd echo -- |BEGIN COMMANDS|)
    (cmd smem --stats)
    (cmd smem --timer)
