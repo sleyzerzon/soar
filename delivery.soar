@@ -13,12 +13,19 @@ multi-attributes to-be-retrieved
 multi-attributes task
 multi-attributes waypoint
 
-sp {interrupt*monitor
+sp {monitor
    (state <s> ^type state
-              ^operator.name {<name> << timing-trigger recurse >>}
+             -^monitoring no
    )
 -->
-   #(write |operator | <name>)
+   #(write |lti | <lti>)
+}
+
+sp {interrupt
+   (state <s> ^type state
+             -^interrupting no
+   )
+-->
    #(interrupt)
 }
 
@@ -62,7 +69,9 @@ sp {delivery*elaborate*parameters
              ^collision-distance 0.9
              ^collision-bearing 45
              ^distance-tolerance 1.0
-             ^heading-tolerance 1.5)
+             ^effector-range 1.0 # TODO unused
+             ^heading-tolerance 1.5
+             ^waypoint-tolerance 0.5)
 }
 
 sp {delivery*elaborate*constants
@@ -230,8 +239,8 @@ sp {elaborate*state*remove-episode-flag-abstraction
 # operators
 
 sp {elaborate*operator*retrieve-operators
-   (state <s> ^operator <o> +)
-   (<o> ^type retrieve)
+   (state <s> ^superstate.operator.type retrieve
+              ^operator <o> +)
 -->
    (<o> ^actions.estop.estop <estop>)
 }
@@ -251,19 +260,26 @@ sp {elaborate*state*waypoint
    (state <s> ^name <name>
               ^io.input-link.waypoints.waypoint <waypoint>
               ^destination <destination>)
-   (<destination> ^x <x>
-                  ^y <y>)
-   (<waypoint> ^id <name>
-               ^x <x>
-               ^y <y>)
+   (<waypoint> ^id <name>)
 -->
    (<destination> ^waypoint <waypoint>)
+}
+
+sp {elaborate*state*destination-waypoint-difference
+   (state <s> ^destination <destination>)
+   (<destination> ^x <dx>
+                  ^y <dy>
+                  ^waypoint <waypoint>)
+   (<waypoint> ^x <wx>
+               ^y <wy>)
+-->
+   (<destination> ^waypoint-difference (sqrt (+ (* (- <dx> <wx>) (- <dx> <wx>)) (* (- <dy> <wy>) (- <dy> <wy>)))))
 }
 
 sp {elaborate*state*arrived
    (state <s> ^name <name>
               ^parameters.distance-tolerance <distance-tol>
-              ^destination.waypoint.distance {<= <distance-tol>})
+              ^destination.waypoint.distance {< <distance-tol>})
 -->
    (<s> ^arrived yes)
 }
@@ -795,8 +811,7 @@ sp {recursive-rehearse*propose*initialize
              -^rehearsed)
 -->
    (<s> ^operator <o> +)
-   (<o> ^name initialize
-        ^actions.estop.estop <stop>)
+   (<o> ^name initialize)
 }
 
 sp {recurisve-rehearse*apply*initialize
@@ -814,7 +829,7 @@ sp {recurisve-rehearse*propose*recurse
               ^rehearsed <rehearsed>)
    (<rehearsed> ^lti <lti>
                -^lti <val>)
-   (<lti> ^<attr> {<val> <=> <s>})
+   (<lti> ^<attr> <val>) # FIXME not sure if this should be {<val> <=> <s>} or simply <val>
 -->
    (<s> ^operator <o> + =)
    (<o> ^name recurse
@@ -1366,7 +1381,7 @@ sp {go-to-coord*propose*drive-to-waypoint
    (<params> ^distance-tolerance <distance-tol>
              ^linear-velocity <velocity>
              ^heading-tolerance <heading-tol>)
-   (<waypoint> ^abs-relative-bearing {<= <heading-tol>}
+   (<waypoint> ^abs-relative-bearing {< <heading-tol>}
                ^distance {<remaining> > <distance-tol>})
 -->
    (<s> ^operator <o> +)
@@ -1412,7 +1427,7 @@ sp {avoid-obstacle*propose*turn-until-clear*turn-left
    (<il> ^lidar.range <lidar>
          ^self.pose.yaw <yaw>)
    (<lidar> ^id 0
-            ^distance {<= <distance-tol> })
+            ^distance {< <distance-tol> })
    (<waypoint> ^abs-relative-bearing {< <collision-bearing>}
                ^relative-bearing {<relative-bearing> <= 0})
 -->
@@ -1434,7 +1449,7 @@ sp {avoid-obstacle*propose*turn-until-clear*turn-right
    (<waypoint> ^abs-relative-bearing {< <collision-bearing>}
                ^relative-bearing {<relative-bearing> > 0})
    (<lidar> ^id 0
-            ^distance {<= <distance-tol> })
+            ^distance {< <distance-tol> })
 -->
    (<s> ^operator <o> + =)
    (<o> ^name turn-until-clear
@@ -1566,7 +1581,6 @@ sp {apply*report-metrics
               ^num-tasks-completed <num-completed-tasks>)
 -->
    (cmd |clog | <logfile>)
-   (cmd echo -- |BEGIN OUTPUT|)
    (cmd echo -- |start time: | <start-time>)
    (cmd echo -- |end time: | (timestamp))
    (cmd echo -- |experiment: | <experiment>)
@@ -1589,7 +1603,7 @@ sp {apply*report-metrics
    (cmd echo -- |num initial retrievals: | <num-initial-retrievals>)
    (cmd echo -- |num retrievals: | <num-retrievals>)
    (cmd echo -- |num completed tasks: | <num-completed-tasks>)
-   (cmd echo -- |BEGIN COMMANDS|)
+   (cmd echo |END ECHOED|)
    (cmd smem --stats)
    (cmd smem --timer)
    (cmd epmem)
@@ -1598,6 +1612,8 @@ sp {apply*report-metrics
    (cmd wma)
    (cmd stats)
    (cmd stats -M)
+   (cmd firing-counts)
+   (cmd print -d 1000 s1)
    (cmd echo |END OUTPUT|)
    (cmd |clog -c|)
    (halt)
@@ -1662,13 +1678,8 @@ sp {propose*add-waypoint
 
 sp {propose*remove-waypoint
    (state <s> ^name <name>
-              ^io.input-link.waypoints.waypoint <waypoint>
-              ^destination <destination>)
-   (<destination> ^x <x>
-                  ^y <y>)
-   (<waypoint> ^id <name>)
-  -(<waypoint> ^x <x>
-               ^y <y>)
+              ^parameters.waypoint-tolerance <distance-tol>
+              ^destination.waypoint-difference {> <distance-tol>})
 -->
    (<s> ^operator <o> + >)
    (<o> ^name remove-waypoint

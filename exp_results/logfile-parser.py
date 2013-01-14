@@ -7,14 +7,15 @@ if __name__ == "__main__":
 	for f in sys.argv[1:]:
 		with open(f, "r") as fd:
 			output = {}
-			echo, commands = fd.read().partition("END OUTPUT")[0].partition("BEGIN COMMANDS")[0:3:2]
+			echo, commands = fd.read().partition("END OUTPUT")[0].partition("END ECHOED")[0:3:2]
 
 			# echo'ed output
 			for line in echo.splitlines():
 				if re.match("[^>]*:", line):
 					output.update(("echoed {}".format(k), v) for k, v in [line.split(":", 1),])
 
-			sstats, stimer, epmem, estats, etimer, wma, stats, statsmax = commands.split("seek>")[1:-1]
+			sstats, stimer, epmem, estats, etimer, wma, stats, statsmax, firing = commands.split("seek>")[1:-2]
+			# FIXME would like to include topstate too
 
 			# smem stats
 			extract = ("Memory Usage", "Memory Highwater", "Retrieves", "Queries", "Stores", "Activation Updates", "Mirrors",)
@@ -77,6 +78,11 @@ if __name__ == "__main__":
 			output["max smem sec"] = re.sub(".*SMem Time \(sec\) *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
 			# max wm changes
 			output["max wm changes"] = re.sub(".*WM changes *([0-9.]*).*", r"\1", statsmax, flags=re.DOTALL)
+
+			# firing counts
+			for line in firing.splitlines()[2:-1]:
+				count, rule = line.strip().split(":")
+				output["firing {}".format(rule.strip().replace("-", "").replace("*", " "))] = count.strip()
 
 			print(" ".join(sorted("{}={}".format(re.sub("_+", "_", re.sub("[ -]", "_", k.lower())).strip("_"), v.strip()) for k, v in sorted(output.items()))))
 

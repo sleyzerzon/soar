@@ -22,6 +22,7 @@
 package edu.umich.robot;
 
 import javax.swing.SwingUtilities;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -113,6 +114,7 @@ public class Application
         
         for (int i = 0; i < configs.length; ++i)
         {
+            logger.info(new Date().toString());
             logger.info("Running " + configs[i] + " for " + cycles + " cycles, timeout " + seconds + " seconds.");
             HeadlessApplication h = new HeadlessApplication(toArgs(configs[i]), cycles, seconds);
             if (h.go())
