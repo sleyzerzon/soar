@@ -1,7 +1,0 @@
-struct velodyne_t
-{
-	int64_t utime;
-
-	int32_t datalen;
-	byte data[datalen];
-}
