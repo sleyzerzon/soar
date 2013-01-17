@@ -75,6 +75,9 @@ enum epmem_variable_key
 // - distinguish between smem versions
 #define EPMEM_SCHEMA_VERSION 2.0
 
+//#define DEBUG_EPMEM_SQL
+//#define DEBUG_EPMEM_WME_ADD
+
 //////////////////////////////////////////////////////////
 // EpMem Typedefs
 //////////////////////////////////////////////////////////
@@ -344,29 +347,29 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
 class epmem_graph_statement_container: public soar_module::sqlite_statement_container
 {
 	public:
-//		soar_module::sqlite_statement *add_node;
+		soar_module::sqlite_statement *add_node;
 		soar_module::sqlite_statement *add_time;
 
 		//
 
-		soar_module::sqlite_statement *add_node_now;
-		soar_module::sqlite_statement *delete_node_now;
-		soar_module::sqlite_statement *add_node_point;
-		soar_module::sqlite_statement *add_node_range;
+		soar_module::sqlite_statement *add_epmem_wmes_constant_now;
+		soar_module::sqlite_statement *delete_epmem_wmes_constant_now;
+		soar_module::sqlite_statement *add_epmem_wmes_constant_point;
+		soar_module::sqlite_statement *add_epmem_wmes_constant_range;
 
-		soar_module::sqlite_statement *add_node_unique;
-		soar_module::sqlite_statement *find_node_unique;
+		soar_module::sqlite_statement *add_epmem_wmes_constant;
+		soar_module::sqlite_statement *find_epmem_wmes_constant;
 
 		//
 
-		soar_module::sqlite_statement *add_edge_now;
-		soar_module::sqlite_statement *delete_edge_now;
-		soar_module::sqlite_statement *add_edge_point;
-		soar_module::sqlite_statement *add_edge_range;
+		soar_module::sqlite_statement *add_epmem_wmes_identifier_now;
+		soar_module::sqlite_statement *delete_epmem_wmes_identifier_now;
+		soar_module::sqlite_statement *add_epmem_wmes_identifier_point;
+		soar_module::sqlite_statement *add_epmem_wmes_identifier_range;
 
-		soar_module::sqlite_statement *add_edge_unique;
-		soar_module::sqlite_statement *find_edge_unique;
-		soar_module::sqlite_statement *find_edge_unique_shared;
+		soar_module::sqlite_statement *add_epmem_wmes_identifier;
+		soar_module::sqlite_statement *find_epmem_wmes_identifier;
+		soar_module::sqlite_statement *find_epmem_wmes_identifier_shared;
 
 		//
 
@@ -385,7 +388,7 @@ class epmem_graph_statement_container: public soar_module::sqlite_statement_cont
 
 		//
 
-		soar_module::sqlite_statement *update_edge_unique_last;
+		soar_module::sqlite_statement *update_epmem_wmes_identifier_last_episode_id;
 
 		//
 
@@ -493,9 +496,9 @@ typedef struct epmem_id_reservation_struct
 typedef struct epmem_edge_struct
 {
 	
-	epmem_node_id q0;							// id
-	Symbol *w;									// attr
-	epmem_node_id q1;							// value
+	epmem_node_id parent_n_id;							// id
+	Symbol *attribute;							// attr
+	epmem_node_id child_n_id;							// value
 
 	bool val_is_short_term;
 	char val_letter;
@@ -573,16 +576,16 @@ typedef std::set<epmem_node_pair> epmem_node_pair_set;
 
 // structs
 struct epmem_triple_struct {
-	epmem_node_id q0;
-	epmem_node_id w;
-	epmem_node_id q1;
+	epmem_node_id parent_n_id;
+	epmem_node_id attribute_s_id;
+	epmem_node_id child_n_id;
 	bool operator<(const epmem_triple& other) const {
-		if (q0 != other.q0) {
-			return (q0 < other.q0);
-		} else if (w != other.w) {
-			return (w < other.w);
+		if (parent_n_id != other.parent_n_id) {
+			return (parent_n_id < other.parent_n_id);
+		} else if (attribute_s_id != other.attribute_s_id) {
+			return (attribute_s_id < other.attribute_s_id);
 		} else {
-			return (q1 < other.q1);
+			return (child_n_id < other.child_n_id);
 		}
 	}
 };
@@ -594,8 +597,8 @@ struct epmem_literal_struct {
 	int value_is_id;
 	bool is_leaf;
 	bool is_current;
-	epmem_node_id w;
-	epmem_node_id q1;
+	epmem_node_id attribute_s_id;
+	epmem_node_id child_n_id;
 	double weight;
 	epmem_literal_set parents;
 	epmem_literal_set children;
