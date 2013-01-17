@@ -336,6 +336,7 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
         soar_module::sqlite_statement *hash_get_int;
         soar_module::sqlite_statement *hash_get_float;
         soar_module::sqlite_statement *hash_get_str;
+        soar_module::sqlite_statement *hash_get_type;
         soar_module::sqlite_statement *hash_add_type;
         soar_module::sqlite_statement *hash_add_int;
         soar_module::sqlite_statement *hash_add_float;

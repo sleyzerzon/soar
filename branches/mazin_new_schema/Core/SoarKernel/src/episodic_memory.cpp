@@ -353,11 +353,11 @@ inline epmem_hash_id epmem_temporal_hash_str( agent *my_agent, char* val, bool a
 }
 
 
-inline int64_t epmem_reverse_hash_int( agent* my_agent, epmem_hash_id hash_value )
+inline int64_t epmem_reverse_hash_int( agent* my_agent, epmem_hash_id s_id_lookup )
 {
 	int64_t return_val = NIL;
 
-	my_agent->epmem_stmts_common->hash_rev_int->bind_int( 1, hash_value );
+	my_agent->epmem_stmts_common->hash_rev_int->bind_int( 1, s_id_lookup );
 	soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_int->execute();
 	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
@@ -367,11 +367,11 @@ inline int64_t epmem_reverse_hash_int( agent* my_agent, epmem_hash_id hash_value
 	return return_val;
 }
 
-inline double epmem_reverse_hash_float( agent* my_agent, epmem_hash_id hash_value )
+inline double epmem_reverse_hash_float( agent* my_agent, epmem_hash_id s_id_lookup )
 {
 	double return_val = NIL;
 
-	my_agent->epmem_stmts_common->hash_rev_float->bind_int( 1, hash_value );
+	my_agent->epmem_stmts_common->hash_rev_float->bind_int( 1, s_id_lookup );
 	soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_float->execute();
 	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
@@ -381,9 +381,9 @@ inline double epmem_reverse_hash_float( agent* my_agent, epmem_hash_id hash_valu
 	return return_val;
 }
 
-inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id hash_value, std::string& dest )
+inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id s_id_lookup, std::string& dest )
 {
-	my_agent->epmem_stmts_common->hash_rev_str->bind_int( 1, hash_value );
+	my_agent->epmem_stmts_common->hash_rev_str->bind_int( 1, s_id_lookup );
 	soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_str->execute();
 	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
@@ -391,24 +391,54 @@ inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id hash_value, s
 	my_agent->epmem_stmts_common->hash_rev_str->reinitialize();
 }
 
-inline Symbol* epmem_reverse_hash( agent* my_agent, byte sym_type, epmem_hash_id hash_value )
+/* **************************************************************************
+
+                         epmem_reverse_hash
+
+  This function will take an s_id and return a symbol whose contents match those
+  stored in the epmem database.  If no sym_type is passed in, this function will
+  look up the type in the symbol type database.
+
+  How type id is handled is changed somewhat  from how smem does it and epmem
+  previously did it;  that code retrieves the symbol types within the original
+  large query. The reasoning behind this change is that it we'll gain more from
+  removing a join from the big, more computationally intensive query than we
+  lose from the overhead of a second query.  This leverages the fact that id's
+  and attributes are always a known type, so we don't even need to join with
+  the type table for those.
+
+  Will want to verify later.  If confirmed, could we do it for smem too?
+
+************************************************************************** */
+
+inline Symbol* epmem_reverse_hash( agent* my_agent, epmem_hash_id s_id_lookup, byte sym_type = 255 )
 {
 	Symbol *return_val = NULL;
 	std::string dest;
 
+	if (sym_type == 255) {
+		my_agent->epmem_stmts_common->hash_get_type->bind_int( 1, s_id_lookup );
+		soar_module::exec_result res = my_agent->epmem_stmts_common->hash_get_type->execute();
+		(void)res; // quells compiler warning
+		assert( res == soar_module::row );
+		// check if should be column_int
+		sym_type = my_agent->epmem_stmts_common->hash_get_type->column_int(0);
+		my_agent->epmem_stmts_common->hash_get_type->reinitialize();
+	}
+
 	switch ( sym_type )
 	{
 		case SYM_CONSTANT_SYMBOL_TYPE:
-			epmem_reverse_hash_str( my_agent, hash_value, dest );
+			epmem_reverse_hash_str( my_agent, s_id_lookup, dest );
 			return_val = make_sym_constant( my_agent, const_cast<char *>( dest.c_str() ) );
 			break;
 
 		case INT_CONSTANT_SYMBOL_TYPE:
-			return_val = make_int_constant( my_agent, epmem_reverse_hash_int( my_agent, hash_value ) );
+			return_val = make_int_constant( my_agent, epmem_reverse_hash_int( my_agent, s_id_lookup ) );
 			break;
 
 		case FLOAT_CONSTANT_SYMBOL_TYPE:
-			return_val = make_float_constant( my_agent, epmem_reverse_hash_float( my_agent, hash_value ) );
+			return_val = make_float_constant( my_agent, epmem_reverse_hash_float( my_agent, s_id_lookup ) );
 			break;
 
 		default:
@@ -417,6 +447,42 @@ inline Symbol* epmem_reverse_hash( agent* my_agent, byte sym_type, epmem_hash_id
 	}
 
 	return return_val;
+}
+
+inline void epmem_reverse_hash_print( agent* my_agent, epmem_hash_id s_id_lookup, std::string& dest, byte sym_type = 255)
+{
+	Symbol *return_val = NULL;
+
+	// This may be faster than including type lookup in edges?  Might want to check later.
+
+	if (sym_type == 255) {
+		my_agent->epmem_stmts_common->hash_get_type->bind_int( 1, s_id_lookup );
+		soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_str->execute();
+		(void)res; // quells compiler warning
+		assert( res == soar_module::row );
+		// check if should be column_int
+		sym_type = my_agent->epmem_stmts_common->hash_rev_int->column_int(0);
+		my_agent->epmem_stmts_common->hash_get_type->reinitialize();
+	}
+
+	switch ( sym_type )
+	{
+		case SYM_CONSTANT_SYMBOL_TYPE:
+			epmem_reverse_hash_str( my_agent, s_id_lookup, dest );
+			break;
+
+		case INT_CONSTANT_SYMBOL_TYPE:
+			to_string( epmem_reverse_hash_int( my_agent, s_id_lookup), dest );
+			break;
+
+		case FLOAT_CONSTANT_SYMBOL_TYPE:
+			to_string( epmem_reverse_hash_float( my_agent, s_id_lookup), dest );
+			break;
+
+		default:
+			return_val = NULL;
+			break;
+	}
 }
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -433,7 +499,7 @@ inline Symbol* epmem_reverse_hash( agent* my_agent, byte sym_type, epmem_hash_id
 
 
 // returns a temporally unique integer representing a symbol constant
-epmem_hash_id epmem_temporal_hash2( agent *my_agent, Symbol *sym, bool add_on_fail = true )
+epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail = true )
 {
 	epmem_hash_id return_val = NIL;
 
@@ -469,97 +535,6 @@ epmem_hash_id epmem_temporal_hash2( agent *my_agent, Symbol *sym, bool add_on_fa
 		}
 
 		return_val = sym->common.epmem_hash;
-	}
-
-	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->hash->stop();
-	////////////////////////////////////////////////////////////////////////////
-
-	return return_val;
-}
-/***************************************************************************
- * Function     : epmem_temporal_hash
- * Author		: Nate Derbinsky
- * Notes		: Returns a temporally unique integer representing
- *                a symbol constant.
- **************************************************************************/
-epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail = true )
-{
-	epmem_hash_id return_val = NIL;
-	////////////////////////////////////////////////////////////////////////////
-	my_agent->epmem_timers->hash->start();
-	////////////////////////////////////////////////////////////////////////////
-
-	if ( ( sym->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) ||
-			( sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) ||
-			( sym->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE ) )
-	{
-		if ( ( !sym->common.epmem_hash ) || ( sym->common.epmem_valid != my_agent->epmem_validation ) )
-		{
-			sym->common.epmem_hash = NIL;
-			sym->common.epmem_valid = my_agent->epmem_validation;
-
-			// basic process:
-			// - search
-			// - if found, return
-			// - else, add
-
-			my_agent->epmem_stmts_common->hash_get->bind_int( 1, sym->common.symbol_type );
-			switch ( sym->common.symbol_type )
-			{
-				case SYM_CONSTANT_SYMBOL_TYPE:
-					my_agent->epmem_stmts_common->hash_get->bind_text( 2, static_cast<const char *>( sym->sc.name ) );
-					break;
-
-				case INT_CONSTANT_SYMBOL_TYPE:
-					my_agent->epmem_stmts_common->hash_get->bind_int( 2, sym->ic.value );
-					break;
-
-				case FLOAT_CONSTANT_SYMBOL_TYPE:
-					my_agent->epmem_stmts_common->hash_get->bind_double( 2, sym->fc.value );
-					break;
-			}
-
-			if ( my_agent->epmem_stmts_common->hash_get->execute() == soar_module::row )
-			{
-				return_val = static_cast<epmem_hash_id>( my_agent->epmem_stmts_common->hash_get->column_int( 0 ) );
-			}
-
-			my_agent->epmem_stmts_common->hash_get->reinitialize();
-
-			//
-
-			if ( !return_val && add_on_fail )
-			{
-				my_agent->epmem_stmts_common->hash_add->bind_int( 1, sym->common.symbol_type );
-				switch ( sym->common.symbol_type )
-				{
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						my_agent->epmem_stmts_common->hash_add->bind_text( 2, static_cast<const char *>( sym->sc.name ) );
-						break;
-
-					case INT_CONSTANT_SYMBOL_TYPE:
-						my_agent->epmem_stmts_common->hash_add->bind_int( 2, sym->ic.value );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						my_agent->epmem_stmts_common->hash_add->bind_double( 2, sym->fc.value );
-						break;
-				}
-
-				my_agent->epmem_stmts_common->hash_add->execute( soar_module::op_reinit );
-				return_val = static_cast<epmem_hash_id>( my_agent->epmem_db->last_insert_rowid() );
-			}
-
-			// cache results for later re-use
-//			sym->common.epmem_hash = return_val;
-//			sym->common.epmem_valid = my_agent->epmem_validation;
-		}
-		epmem_hash_id return_val2 = NIL;
-		return_val2 = epmem_temporal_hash2(my_agent, sym, add_on_fail);
-
-		return_val = sym->common.epmem_hash;
-		assert(return_val == return_val2);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -859,9 +834,6 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_left_nodes (rit_min INTEGER, rit_max INTEGER)" );
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_right_nodes (rit_id INTEGER)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS temporal_symbol_hash (id INTEGER PRIMARY KEY, sym_const NONE, sym_type INTEGER)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS temporal_symbol_hash_const_type ON temporal_symbol_hash (sym_type,sym_const)" );
-
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_type (s_id INTEGER PRIMARY KEY, symbol_type INTEGER)" );
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_integer (s_id INTEGER PRIMARY KEY, symbol_value INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_int_const ON epmem_symbols_integer (symbol_value)" );
@@ -871,12 +843,10 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_str_const ON epmem_symbols_string (symbol_value)" );
 
 	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
-	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (0,NULL,1)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_type (s_id,symbol_type) VALUES (0,2)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_string (s_id,symbol_value) VALUES (0,'root')" );
 
 	// workaround for acceptable preference wmes: id 1 = "operator+"
-	add_structure( "INSERT OR IGNORE INTO temporal_symbol_hash (id,sym_const,sym_type) VALUES (1,'operator*',2)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_type (s_id,symbol_type) VALUES (1,2)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_string (s_id,symbol_value) VALUES (1,'operator*')" );
 
@@ -915,12 +885,6 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 
 	//
 
-	hash_get = new soar_module::sqlite_statement( new_db, "SELECT id FROM temporal_symbol_hash WHERE sym_type=? AND sym_const=?" );
-	add( hash_get );
-
-	hash_add = new soar_module::sqlite_statement( new_db, "INSERT INTO temporal_symbol_hash (sym_type,sym_const) VALUES (?,?)" );
-	add( hash_add );
-
 	hash_rev_int = new soar_module::sqlite_statement( new_db, "SELECT symbol_value FROM epmem_symbols_integer WHERE s_id=?" );
 	add( hash_rev_int );
 
@@ -938,6 +902,9 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 
 	hash_get_str = new soar_module::sqlite_statement( new_db, "SELECT s_id FROM epmem_symbols_string WHERE symbol_value=?" );
 	add( hash_get_str );
+
+	hash_get_type = new soar_module::sqlite_statement( new_db, "SELECT symbol_type FROM epmem_symbols_type WHERE s_id=?" );
+	add( hash_get_type );
 
 	hash_add_type = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_symbols_type (symbol_type) VALUES (?)" );
 	add( hash_add_type );
@@ -1100,10 +1067,47 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	add( prev_episode );
 
 
-	get_nodes = new soar_module::sqlite_statement( new_db, "SELECT f.wc_id, f.parent_n_id, h1.sym_const, h2.sym_const, h1.sym_type, h2.sym_type FROM epmem_wmes_constant f, temporal_symbol_hash h1, temporal_symbol_hash h2 WHERE f.wc_id IN (SELECT n.wc_id FROM epmem_wmes_constant_now n WHERE n.start_episode_id<= ? UNION ALL SELECT p.wc_id FROM epmem_wmes_constant_point p WHERE p.episode_id=? UNION ALL SELECT e1.wc_id FROM epmem_wmes_constant_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL SELECT e2.wc_id FROM epmem_wmes_constant_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) AND f.attribute_s_id=h1.id AND f.value_s_id=h2.id ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
+//	get_nodes = new soar_module::sqlite_statement( new_db,
+//			"SELECT f.wc_id, f.parent_n_id, h1.sym_const, h2.sym_const, h1.sym_type, h2.sym_type "
+//			"FROM epmem_wmes_constant f, temporal_symbol_hash h1, temporal_symbol_hash h2 "
+//			"WHERE f.wc_id IN "
+//				"(SELECT n.wc_id FROM epmem_wmes_constant_now n WHERE n.start_episode_id<= ? UNION ALL "
+//				"SELECT p.wc_id FROM epmem_wmes_constant_point p WHERE p.episode_id=? UNION ALL "
+//				"SELECT e1.wc_id FROM epmem_wmes_constant_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
+//				"SELECT e2.wc_id FROM epmem_wmes_constant_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
+//			"AND f.attribute_s_id=h1.id AND f.value_s_id=h2.id ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
+	get_nodes = new soar_module::sqlite_statement( new_db,
+			"SELECT f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id "
+			"FROM epmem_wmes_constant f "
+			"WHERE f.wc_id IN "
+				"(SELECT n.wc_id FROM epmem_wmes_constant_now n WHERE n.start_episode_id<= ? UNION ALL "
+				"SELECT p.wc_id FROM epmem_wmes_constant_point p WHERE p.episode_id=? UNION ALL "
+				"SELECT e1.wc_id FROM epmem_wmes_constant_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
+				"SELECT e2.wc_id FROM epmem_wmes_constant_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
+			"ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
 	add( get_nodes );
 
-	get_edges = new soar_module::sqlite_statement( new_db, "SELECT f.parent_n_id, h.sym_const, f.child_n_id, h.sym_type, epmem_lti.letter, epmem_lti.num FROM epmem_wmes_identifier f INNER JOIN temporal_symbol_hash h ON f.attribute_s_id=h.id LEFT JOIN epmem_lti ON (f.child_n_id=epmem_lti.n_id AND epmem_lti.promotion_episode_id <= ?) WHERE f.wi_id IN (SELECT n.wi_id FROM epmem_wmes_identifier_now n WHERE n.start_episode_id<= ? UNION ALL SELECT p.wi_id FROM epmem_wmes_identifier_point p WHERE p.episode_id = ? UNION ALL SELECT e1.wi_id FROM epmem_wmes_identifier_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL SELECT e2.wi_id FROM epmem_wmes_identifier_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) ORDER BY f.parent_n_id ASC, f.child_n_id ASC", new_agent->epmem_timers->ncb_edge );
+//	get_edges = new soar_module::sqlite_statement( new_db,
+//			"SELECT f.parent_n_id, h.sym_const, f.child_n_id, h.sym_type, epmem_lti.letter, epmem_lti.num "
+//			"FROM epmem_wmes_identifier f "
+//			"INNER JOIN temporal_symbol_hash h ON f.attribute_s_id=h.id "
+//			"LEFT JOIN epmem_lti ON (f.child_n_id=epmem_lti.n_id AND epmem_lti.promotion_episode_id <= ?) "
+//			"WHERE f.wi_id IN "
+//				"(SELECT n.wi_id FROM epmem_wmes_identifier_now n WHERE n.start_episode_id<= ? UNION ALL "
+//				"SELECT p.wi_id FROM epmem_wmes_identifier_point p WHERE p.episode_id = ? UNION ALL "
+//				"SELECT e1.wi_id FROM epmem_wmes_identifier_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
+//				"SELECT e2.wi_id FROM epmem_wmes_identifier_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
+//			"ORDER BY f.parent_n_id ASC, f.child_n_id ASC", new_agent->epmem_timers->ncb_edge );
+	get_edges = new soar_module::sqlite_statement( new_db,
+			"SELECT f.parent_n_id, f.attribute_s_id, f.child_n_id, epmem_lti.letter, epmem_lti.num "
+			"FROM epmem_wmes_identifier f "
+			"LEFT JOIN epmem_lti ON (f.child_n_id=epmem_lti.n_id AND epmem_lti.promotion_episode_id <= ?) "
+			"WHERE f.wi_id IN "
+				"(SELECT n.wi_id FROM epmem_wmes_identifier_now n WHERE n.start_episode_id<= ? UNION ALL "
+				"SELECT p.wi_id FROM epmem_wmes_identifier_point p WHERE p.episode_id = ? UNION ALL "
+				"SELECT e1.wi_id FROM epmem_wmes_identifier_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
+				"SELECT e2.wi_id FROM epmem_wmes_identifier_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
+			"ORDER BY f.parent_n_id ASC, f.child_n_id ASC", new_agent->epmem_timers->ncb_edge );
 	add( get_edges );
 
 	//
@@ -2336,12 +2340,13 @@ inline void _epmem_promote_id( agent* my_agent, Symbol* id, epmem_time_id t )
    - The identifier symbol of each wme isn't set and is ignored. parent_id
      is used to  specify the root.
 
-************************************************************************** */
-// three cases for sharing ids amongst identifiers in two passes:
-// 1. value known in phase one (try reservation)
-// 2. value unknown in phase one, but known at phase two (try assignment adhering to constraint)
-// 3. value unknown in phase one/two (if anything is left, unconstrained assignment)
 
+	 three cases for sharing ids amongst identifiers in two passes:
+	 1. value known in phase one (try reservation)
+	 2. value unknown in phase one, but known at phase two (try assignment adhering to constraint)
+	 3. value unknown in phase one/two (if anything is left, unconstrained assignment)
+
+************************************************************************** */
 
 
 inline void _epmem_store_level( agent* my_agent,
@@ -3345,7 +3350,6 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			// relates to finite automata: child_n_id = d(parent_n_id, attribute_s_id)
 			epmem_node_id parent_n_id; // id
 			epmem_node_id child_n_id; // attribute
-			int64_t w_type; // we support any constant attribute symbol
 
 			bool val_is_short_term = false;
 			char val_letter = NIL;
@@ -3368,32 +3372,20 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// parent_n_id, attribute_s_id, child_n_id, w_type
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
-				w_type = my_q->column_int( 3 );
+				attr = epmem_reverse_hash( my_agent, my_q->column_int( 1 ), SYM_CONSTANT_SYMBOL_TYPE);
 
-				switch ( w_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						attr = make_int_constant( my_agent,my_q->column_int( 1 ) );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						attr = make_float_constant( my_agent, my_q->column_double( 1 ) );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						attr = make_sym_constant( my_agent, const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 1 ) ) ) );
-						break;
-				}
+				// I don't think we even need the symbol type.  Attributes are always strings
+				// I'm not sure why Nate was checking that here before.
 
 				// short vs. long-term
-				val_is_short_term = ( my_q->column_type( 4 ) == soar_module::null_t );
+				val_is_short_term = ( my_q->column_type( 3 ) == soar_module::null_t );
 				if ( !val_is_short_term )
 				{
-					val_letter = static_cast<char>( my_q->column_int( 4 ) );
-					val_num = static_cast<uint64_t>( my_q->column_int( 5 ) );
+					val_letter = static_cast<char>( my_q->column_int( 3 ) );
+					val_num = static_cast<uint64_t>( my_q->column_int( 4 ) );
 				}
 
 				// get a reference to the parent
@@ -3507,11 +3499,9 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			my_q->bind_int( 4, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// f.wc_id, f.parent_n_id, f.name, f.value, f.attr_type, f.value_type
+				// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
 				wc_id = my_q->column_int( 0 );
 				parent_n_id = my_q->column_int( 1 );
-				attr_type = my_q->column_int( 4 );
-				value_type = my_q->column_int( 5 );
 
 				// get a reference to the parent
 				parent = ids[ parent_n_id ];
@@ -3519,36 +3509,10 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 				if ( dont_abide_by_ids_second || parent.second )
 				{
 					// make a symbol to represent the attribute
-					switch ( attr_type )
-					{
-						case INT_CONSTANT_SYMBOL_TYPE:
-							attr = make_int_constant( my_agent, my_q->column_int( 2 ) );
-							break;
-
-						case FLOAT_CONSTANT_SYMBOL_TYPE:
-							attr = make_float_constant( my_agent, my_q->column_double( 2 ) );
-							break;
-
-						case SYM_CONSTANT_SYMBOL_TYPE:
-							attr = make_sym_constant( my_agent, const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 2 ) ) ) );
-							break;
-					}
+					attr = epmem_reverse_hash( my_agent, my_q->column_int( 2 ), SYM_CONSTANT_SYMBOL_TYPE);
 
 					// make a symbol to represent the value
-					switch ( value_type )
-					{
-						case INT_CONSTANT_SYMBOL_TYPE:
-							value = make_int_constant( my_agent,my_q->column_int( 3 ) );
-							break;
-
-						case FLOAT_CONSTANT_SYMBOL_TYPE:
-							value = make_float_constant( my_agent, my_q->column_double( 3 ) );
-							break;
-
-						case SYM_CONSTANT_SYMBOL_TYPE:
-							value = make_sym_constant( my_agent, const_cast<char *>( (const char *) my_q->column_text( 3 ) ) );
-							break;
-					}
+					value = epmem_reverse_hash( my_agent, my_q->column_int( 3 ));
 
 					epmem_buffer_add_wme( retrieval_wmes, parent.first, attr, value );
 					num_wmes++;
