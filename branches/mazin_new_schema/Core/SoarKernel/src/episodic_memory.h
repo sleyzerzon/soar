@@ -330,16 +330,16 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
 
 		soar_module::sqlite_statement *hash_get;
 		soar_module::sqlite_statement *hash_add;
-//		soar_module::sqlite_statement *hash_rev_int;
-//        soar_module::sqlite_statement *hash_rev_float;
-//        soar_module::sqlite_statement *hash_rev_str;
-//        soar_module::sqlite_statement *hash_get_int;
-//        soar_module::sqlite_statement *hash_get_float;
-//        soar_module::sqlite_statement *hash_get_str;
-//        soar_module::sqlite_statement *hash_add_type;
-//        soar_module::sqlite_statement *hash_add_int;
-//        soar_module::sqlite_statement *hash_add_float;
-//        soar_module::sqlite_statement *hash_add_str;
+		soar_module::sqlite_statement *hash_rev_int;
+        soar_module::sqlite_statement *hash_rev_float;
+        soar_module::sqlite_statement *hash_rev_str;
+        soar_module::sqlite_statement *hash_get_int;
+        soar_module::sqlite_statement *hash_get_float;
+        soar_module::sqlite_statement *hash_get_str;
+        soar_module::sqlite_statement *hash_add_type;
+        soar_module::sqlite_statement *hash_add_int;
+        soar_module::sqlite_statement *hash_add_float;
+        soar_module::sqlite_statement *hash_add_str;
 
 		epmem_common_statement_container( agent *new_agent );
 };

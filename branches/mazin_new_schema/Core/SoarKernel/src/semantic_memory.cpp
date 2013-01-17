@@ -658,15 +658,6 @@ smem_wme_list *smem_get_direct_augs_of_id( Symbol * id, tc_number tc = NIL )
 	return return_val;
 }
 
-inline bool smem_symbol_is_constant( Symbol *sym )
-{
-	return ( ( sym->common.symbol_type == SYM_CONSTANT_SYMBOL_TYPE ) ||
-		     ( sym->common.symbol_type == INT_CONSTANT_SYMBOL_TYPE ) ||
-		     ( sym->common.symbol_type == FLOAT_CONSTANT_SYMBOL_TYPE ) );
-}
-
-//
-
 inline void _smem_process_buffered_wme_list( agent* my_agent, Symbol* state, soar_module::wme_set& cue_wmes, soar_module::symbol_triple_list& my_list, bool meta )
 {
 	if ( my_list.empty() )
@@ -831,7 +822,7 @@ inline void smem_variable_create( agent *my_agent, smem_variable_key variable_id
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-inline smem_hash_id smem_temporal_hash_add( agent* my_agent, byte sym_type )
+inline smem_hash_id smem_temporal_hash_add_type( agent* my_agent, byte sym_type )
 {
 	my_agent->smem_stmts->hash_add_type->bind_int( 1, sym_type );
 	my_agent->smem_stmts->hash_add_type->execute( soar_module::op_reinit );
@@ -854,7 +845,7 @@ inline smem_hash_id smem_temporal_hash_int( agent *my_agent, int64_t val, bool a
 	if ( !return_val && add_on_fail )
 	{
 		// type first		
-		return_val = smem_temporal_hash_add( my_agent, INT_CONSTANT_SYMBOL_TYPE );
+		return_val = smem_temporal_hash_add_type( my_agent, INT_CONSTANT_SYMBOL_TYPE );
 
 		// then content
 		my_agent->smem_stmts->hash_add_int->bind_int( 1, return_val );
@@ -881,7 +872,7 @@ inline smem_hash_id smem_temporal_hash_float( agent *my_agent, double val, bool 
 	if ( !return_val && add_on_fail )
 	{
 		// type first		
-		return_val = smem_temporal_hash_add( my_agent, FLOAT_CONSTANT_SYMBOL_TYPE );
+		return_val = smem_temporal_hash_add_type( my_agent, FLOAT_CONSTANT_SYMBOL_TYPE );
 
 		// then content
 		my_agent->smem_stmts->hash_add_float->bind_int( 1, return_val );
@@ -908,7 +899,7 @@ inline smem_hash_id smem_temporal_hash_str( agent *my_agent, char* val, bool add
 	if ( !return_val && add_on_fail )
 	{
 		// type first		
-		return_val = smem_temporal_hash_add( my_agent, SYM_CONSTANT_SYMBOL_TYPE );
+		return_val = smem_temporal_hash_add_type( my_agent, SYM_CONSTANT_SYMBOL_TYPE );
 
 		// then content
 		my_agent->smem_stmts->hash_add_str->bind_int( 1, return_val );
@@ -928,7 +919,7 @@ smem_hash_id smem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail 
 	my_agent->smem_timers->hash->start();
 	////////////////////////////////////////////////////////////////////////////
 
-	if ( smem_symbol_is_constant( sym ) )
+	if ( symbol_is_constant( sym ) )
 	{
 		if ( ( !sym->common.smem_hash ) || ( sym->common.smem_valid != my_agent->smem_validation ) )
 		{
@@ -1938,7 +1929,7 @@ void smem_soar_store( agent *my_agent, Symbol *id, smem_storage_type store_type 
 
 			// create value, per type
 			v = new smem_chunk_value;
-			if ( smem_symbol_is_constant( (*w)->value ) )
+			if ( symbol_is_constant( (*w)->value ) )
 			{
 				v->val_const.val_type = value_const_t;
 				v->val_const.val_value = (*w)->value;
@@ -2153,7 +2144,7 @@ inline bool _smem_process_cue_wme( agent* my_agent, wme* w, bool pos_cue, smem_p
 		attr_hash = smem_temporal_hash( my_agent, w->attr, false );
 		if ( attr_hash != NIL )
 		{
-			if ( smem_symbol_is_constant( w->value ) )
+			if ( symbol_is_constant( w->value ) )
 			{
 				value_lti = NIL;
 				value_hash = smem_temporal_hash( my_agent, w->value, false );
