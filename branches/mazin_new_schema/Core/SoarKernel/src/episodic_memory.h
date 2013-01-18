@@ -328,8 +328,6 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
 		soar_module::sqlite_statement *rit_add_right;
 		soar_module::sqlite_statement *rit_truncate_right;
 
-		soar_module::sqlite_statement *hash_get;
-		soar_module::sqlite_statement *hash_add;
 		soar_module::sqlite_statement *hash_rev_int;
         soar_module::sqlite_statement *hash_rev_float;
         soar_module::sqlite_statement *hash_rev_str;

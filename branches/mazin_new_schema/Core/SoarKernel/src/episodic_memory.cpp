@@ -383,12 +383,17 @@ inline double epmem_reverse_hash_float( agent* my_agent, epmem_hash_id s_id_look
 
 inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id s_id_lookup, std::string& dest )
 {
-	my_agent->epmem_stmts_common->hash_rev_str->bind_int( 1, s_id_lookup );
-	soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_str->execute();
+	soar_module::exec_result res;
+	soar_module::sqlite_statement* sql_hash_rev_str = my_agent->epmem_stmts_common->hash_rev_str;
+
+	sql_hash_rev_str->bind_int( 1, s_id_lookup );
+	//fprintf(stderr, "DEBUG Executing hash_rev_str for s_id %d\n", (unsigned int) s_id_lookup);
+	res = sql_hash_rev_str->execute();
 	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
-	dest.assign( my_agent->epmem_stmts_common->hash_rev_str->column_text(0) );
-	my_agent->epmem_stmts_common->hash_rev_str->reinitialize();
+	dest.assign( sql_hash_rev_str->column_text(0) );
+	//fprintf(stderr, "   returned value is %s\n", sql_hash_rev_str->column_text(0));
+	sql_hash_rev_str->reinitialize();
 }
 
 /* **************************************************************************
@@ -401,13 +406,15 @@ inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id s_id_lookup, 
 
   How type id is handled is changed somewhat  from how smem does it and epmem
   previously did it;  that code retrieves the symbol types within the original
-  large query. The reasoning behind this change is that it we'll gain more from
-  removing a join from the big, more computationally intensive query than we
-  lose from the overhead of a second query.  This leverages the fact that id's
-  and attributes are always a known type, so we don't even need to join with
-  the type table for those.
+  large query, while this one does another retrieve as needed. Hopefully, we'll
+  gain more from removing a join from the big, more computationally intensive
+  query than we'll lose from the overhead of a second query.  This leverages
+  that we always know the symbol type for id's and attributes and don't even
+  need to join with the type table for those.
 
-  Will want to verify later.  If confirmed, could we do it for smem too?
+  Will want to verify later.  If confirmed, we should check if we could do it
+  for smem too.  We could also remove the LTI join from the big query too and
+  do those retrieves as needed.
 
 ************************************************************************** */
 
@@ -421,7 +428,6 @@ inline Symbol* epmem_reverse_hash( agent* my_agent, epmem_hash_id s_id_lookup, b
 		soar_module::exec_result res = my_agent->epmem_stmts_common->hash_get_type->execute();
 		(void)res; // quells compiler warning
 		assert( res == soar_module::row );
-		// check if should be column_int
 		sym_type = my_agent->epmem_stmts_common->hash_get_type->column_int(0);
 		my_agent->epmem_stmts_common->hash_get_type->reinitialize();
 	}
@@ -449,6 +455,18 @@ inline Symbol* epmem_reverse_hash( agent* my_agent, epmem_hash_id s_id_lookup, b
 	return return_val;
 }
 
+/* **************************************************************************
+
+                         epmem_reverse_hash_print
+
+  This function will take an s_id and stores a printable string version of the
+  content of that symbol stored in the epmem database into the dest parameter.
+  If no sym_type is passed in, this function will look up the type in the
+  symbol type database.
+
+
+************************************************************************** */
+
 inline void epmem_reverse_hash_print( agent* my_agent, epmem_hash_id s_id_lookup, std::string& dest, byte sym_type = 255)
 {
 	Symbol *return_val = NULL;
@@ -457,11 +475,11 @@ inline void epmem_reverse_hash_print( agent* my_agent, epmem_hash_id s_id_lookup
 
 	if (sym_type == 255) {
 		my_agent->epmem_stmts_common->hash_get_type->bind_int( 1, s_id_lookup );
-		soar_module::exec_result res = my_agent->epmem_stmts_common->hash_rev_str->execute();
+		soar_module::exec_result res = my_agent->epmem_stmts_common->hash_get_type->execute();
 		(void)res; // quells compiler warning
 		assert( res == soar_module::row );
 		// check if should be column_int
-		sym_type = my_agent->epmem_stmts_common->hash_rev_int->column_int(0);
+		sym_type = my_agent->epmem_stmts_common->hash_get_type->column_int(0);
 		my_agent->epmem_stmts_common->hash_get_type->reinitialize();
 	}
 
@@ -484,21 +502,19 @@ inline void epmem_reverse_hash_print( agent* my_agent, epmem_hash_id s_id_lookup
 			break;
 	}
 }
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
-// Temporal Hash Functions (epmem::hash)
-//
-// The rete has symbol hashing, but the values are
-// reliable only for the lifetime of a symbol.  This
-// isn't good for EpMem.  Hence, we implement a simple
-// lookup table, relying upon SQLite to deal with
-// efficiency issues.
-//
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
 
+/* **************************************************************************
 
-// returns a temporally unique integer representing a symbol constant
+                         epmem_temporal_hash
+
+	This function returns an s_id (symbol id) representing a symbol constant
+	stored in the epmem database. The individual hash functions will first
+	check if there already exists an identical entry in the epmem database
+	and return it if found.  If not, it will add new entries to the both the
+	type table and one of the typed constant tables.
+
+************************************************************************** */
+
 epmem_hash_id epmem_temporal_hash( agent *my_agent, Symbol *sym, bool add_on_fail = true )
 {
 	epmem_hash_id return_val = NIL;
@@ -1067,15 +1083,6 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	add( prev_episode );
 
 
-//	get_nodes = new soar_module::sqlite_statement( new_db,
-//			"SELECT f.wc_id, f.parent_n_id, h1.sym_const, h2.sym_const, h1.sym_type, h2.sym_type "
-//			"FROM epmem_wmes_constant f, temporal_symbol_hash h1, temporal_symbol_hash h2 "
-//			"WHERE f.wc_id IN "
-//				"(SELECT n.wc_id FROM epmem_wmes_constant_now n WHERE n.start_episode_id<= ? UNION ALL "
-//				"SELECT p.wc_id FROM epmem_wmes_constant_point p WHERE p.episode_id=? UNION ALL "
-//				"SELECT e1.wc_id FROM epmem_wmes_constant_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
-//				"SELECT e2.wc_id FROM epmem_wmes_constant_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
-//			"AND f.attribute_s_id=h1.id AND f.value_s_id=h2.id ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
 	get_nodes = new soar_module::sqlite_statement( new_db,
 			"SELECT f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id "
 			"FROM epmem_wmes_constant f "
@@ -1087,17 +1094,6 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 			"ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
 	add( get_nodes );
 
-//	get_edges = new soar_module::sqlite_statement( new_db,
-//			"SELECT f.parent_n_id, h.sym_const, f.child_n_id, h.sym_type, epmem_lti.letter, epmem_lti.num "
-//			"FROM epmem_wmes_identifier f "
-//			"INNER JOIN temporal_symbol_hash h ON f.attribute_s_id=h.id "
-//			"LEFT JOIN epmem_lti ON (f.child_n_id=epmem_lti.n_id AND epmem_lti.promotion_episode_id <= ?) "
-//			"WHERE f.wi_id IN "
-//				"(SELECT n.wi_id FROM epmem_wmes_identifier_now n WHERE n.start_episode_id<= ? UNION ALL "
-//				"SELECT p.wi_id FROM epmem_wmes_identifier_point p WHERE p.episode_id = ? UNION ALL "
-//				"SELECT e1.wi_id FROM epmem_wmes_identifier_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
-//				"SELECT e2.wi_id FROM epmem_wmes_identifier_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
-//			"ORDER BY f.parent_n_id ASC, f.child_n_id ASC", new_agent->epmem_timers->ncb_edge );
 	get_edges = new soar_module::sqlite_statement( new_db,
 			"SELECT f.parent_n_id, f.attribute_s_id, f.child_n_id, epmem_lti.letter, epmem_lti.num "
 			"FROM epmem_wmes_identifier f "
@@ -1889,7 +1885,7 @@ void epmem_reset( agent *my_agent, Symbol *state )
 
 #ifdef DEBUG_EPMEM_SQL
 static void profile(void *context, const char *sql, sqlite3_uint64 ns) {
-fprintf(stderr, "Execution Time: %llu ms\n", ns / 1000000);}
+fprintf(stderr, "Execution Time of %llu ms for: %s\n", ns / 1000000, sql);}
 static void trace( void* /*arg*/, const char* query )
 {	fprintf(stderr, "Query: %s\n", query );}
 #endif
@@ -3481,13 +3477,10 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		}
 
 		// then epmem_wmes_constant
+		// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
 		my_q = my_agent->epmem_stmts_graph->get_nodes;
 		{
-			epmem_node_id wc_id;
 			epmem_node_id parent_n_id;
-			int64_t attr_type;
-			int64_t value_type;
-
 			std::pair< Symbol*, bool > parent;
 			Symbol *value = NULL;
 
@@ -3499,8 +3492,6 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			my_q->bind_int( 4, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
-				wc_id = my_q->column_int( 0 );
 				parent_n_id = my_q->column_int( 1 );
 
 				// get a reference to the parent
@@ -4908,14 +4899,12 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 	{
 		soar_module::sqlite_statement *my_q;
 		std::string temp_s, temp_s2, temp_s3;
-		double temp_d;
 		int64_t temp_i;
 
 		my_q = my_agent->epmem_stmts_graph->get_edges;
 		{
 			epmem_node_id parent_n_id;
 			epmem_node_id child_n_id;
-			int64_t w_type;
 			bool val_is_short_term;
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_EDGE ] ) );
@@ -4928,28 +4917,13 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
-				w_type = my_q->column_int( 3 );
-				val_is_short_term = ( my_q->column_type( 4 ) == soar_module::null_t );
 
-				switch ( w_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 1 ) );
-						to_string( temp_i, temp_s );
-						break;
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 1 ), temp_s, SYM_CONSTANT_SYMBOL_TYPE);
 
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 1 );
-						to_string( temp_d, temp_s );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp_s.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 1 ) ) ) );
-						break;
-				}
-
+				val_is_short_term = ( my_q->column_type( 3 ) == soar_module::null_t );
 				if ( val_is_short_term )
 				{
 					temp_s2 = _epmem_print_sti( child_n_id );
@@ -4957,9 +4931,9 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 				else
 				{
 					temp_s2.assign( "@" );
-					temp_s2.push_back( static_cast< char >( my_q->column_int( 4 ) ) );
+					temp_s2.push_back( static_cast< char >( my_q->column_int( 3 ) ) );
 
-					temp_i = static_cast< uint64_t >( my_q->column_int( 5 ) );
+					temp_i = static_cast< uint64_t >( my_q->column_int( 4 ) );
 					to_string( temp_i, temp_s3 );
 					temp_s2.append( temp_s3 );
 
@@ -4972,10 +4946,10 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 			epmem_rit_clear_left_right( my_agent );
 		}
 
+		// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
 		my_q = my_agent->epmem_stmts_graph->get_nodes;
 		{
 			epmem_node_id parent_n_id;
-			int64_t attr_type, value_type;
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
 
@@ -4986,42 +4960,11 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 			while ( my_q->execute() == soar_module::row )
 			{
 				parent_n_id = my_q->column_int( 1 );
-				attr_type = my_q->column_int( 4 );
-				value_type = my_q->column_int( 5 );
-
-				switch ( attr_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 2 ) );
-						to_string( temp_i, temp_s );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 2 );
-						to_string( temp_d, temp_s );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp_s.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 2 ) ) ) );
-						break;
-				}
-
-				switch ( value_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 3 ) );
-						to_string( temp_i, temp_s2 );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 3 );
-						to_string( temp_d, temp_s2 );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp_s2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 3 ) ) ) );
-						break;
-				}
+//				fprintf(stderr, "PRINTING %d %d %d\n", (unsigned int) parent_n_id, (unsigned int) my_q->column_int( 2 ), (unsigned int) my_q->column_int( 3 ));
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 2 ), temp_s, SYM_CONSTANT_SYMBOL_TYPE);
+//				fprintf(stderr, "  - Attribute is %s\n", temp_s.data());
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 3 ), temp_s2);
+//				fprintf(stderr, "  - Value is %s\n", temp_s2.data());
 
 				ep[ parent_n_id ][ temp_s ].push_back( temp_s2 );
 			}
@@ -5108,10 +5051,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			// relates to finite automata: child_n_id = d(parent_n_id, w)
 			epmem_node_id parent_n_id; // id
 			epmem_node_id child_n_id; // attribute
-			int64_t w_type; // we support any constant attribute symbol
 			std::string temp, temp2, temp3, temp4;
-			double temp_d;
-			int64_t temp_i;
 
 			bool val_is_short_term;
 			char val_letter;
@@ -5132,10 +5072,9 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// parent_n_id, attribute_s_id, child_n_id, w_type, letter, num
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
-				w_type = my_q->column_int( 3 );
 
 				// "ID_parent_n_id"
 				temp.assign( "ID_" );
@@ -5147,7 +5086,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				to_string( child_n_id, temp2 );
 				temp3.append( temp2 );
 
-				val_is_short_term = ( my_q->column_type( 4 ) == soar_module::null_t );
+				val_is_short_term = ( my_q->column_type( 3 ) == soar_module::null_t );
 				if ( val_is_short_term )
 				{
 					sti_p = stis.find( child_n_id );
@@ -5163,9 +5102,9 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 					if ( lti_p == ltis.end() )
 					{
 						// "L#"
-						val_letter = static_cast<char>( my_q->column_int( 4 ) );
+						val_letter = static_cast<char>( my_q->column_int( 3 ) );
 						to_string( val_letter, temp4 );
-						val_num = static_cast<uint64_t>( my_q->column_int( 5 ) );
+						val_num = static_cast<uint64_t>( my_q->column_int( 4 ) );
 						to_string( val_num, temp2 );
 						temp4.append( temp2 );
 
@@ -5179,22 +5118,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 
 				// " [ label="attribute_s_id" ];\n"
 				temp.append( " [ label=\"" );
-				switch ( w_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 1 ) );
-						to_string( temp_i, temp2 );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 1 );
-						to_string( temp_d, temp2 );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 1 ) ) ) );
-						break;
-				}
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 1 ), temp2, SYM_CONSTANT_SYMBOL_TYPE);
 				temp.append( temp2 );
 				temp.append( "\" ];\n" );
 
@@ -5246,19 +5170,16 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 		}
 
 		// then epmem_wmes_constant
+
 		my_q = my_agent->epmem_stmts_graph->get_nodes;
 		{
 			epmem_node_id wc_id;
 			epmem_node_id parent_n_id;
-			int64_t attr_type;
-			int64_t value_type;
 
 			std::list< std::string > edges;
 			std::list< std::string > consts;
 
 			std::string temp, temp2;
-			double temp_d;
-			int64_t temp_i;
 
 			epmem_rit_prep_left_right( my_agent, memory_id, memory_id, &( my_agent->epmem_rit_state_graph[ EPMEM_RIT_STATE_NODE ] ) );
 
@@ -5268,11 +5189,9 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			my_q->bind_int( 4, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// f.wc_id, f.parent_n_id, f.name, f.value, f.attr_type, f.value_type
+				// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
 				wc_id = my_q->column_int( 0 );
 				parent_n_id = my_q->column_int( 1 );
-				attr_type = my_q->column_int( 4 );
-				value_type = my_q->column_int( 5 );
 
 				temp.assign( "ID_" );
 				to_string( parent_n_id, temp2 );
@@ -5281,25 +5200,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				to_string( wc_id, temp2 );
 				temp.append( temp2 );
 				temp.append( " [ label=\"" );
-
-				// make a symbol to represent the attribute
-				switch ( attr_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 2 ) );
-						to_string( temp_i, temp2 );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 2 );
-						to_string( temp_d, temp2 );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 2 ) ) ) );
-						break;
-				}
-
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 2 ), temp2, SYM_CONSTANT_SYMBOL_TYPE);
 				temp.append( temp2 );
 				temp.append( "\" ];\n" );
 				edges.push_back( temp );
@@ -5308,25 +5209,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 				to_string( wc_id, temp2 );
 				temp.append( temp2 );
 				temp.append( " [ label=\"" );
-
-				// make a symbol to represent the value
-				switch ( value_type )
-				{
-					case INT_CONSTANT_SYMBOL_TYPE:
-						temp_i = static_cast<int64_t>( my_q->column_int( 3 ) );
-						to_string( temp_i, temp2 );
-						break;
-
-					case FLOAT_CONSTANT_SYMBOL_TYPE:
-						temp_d = my_q->column_double( 3 );
-						to_string( temp_d, temp2 );
-						break;
-
-					case SYM_CONSTANT_SYMBOL_TYPE:
-						temp2.assign( const_cast<char *>( reinterpret_cast<const char *>( my_q->column_text( 3 ) ) ) );
-						break;
-				}
-
+				epmem_reverse_hash_print( my_agent, my_q->column_int( 3 ), temp2);
 				temp.append( temp2 );
 				temp.append( "\" ];\n" );
 
