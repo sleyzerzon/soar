@@ -1,6 +1,6 @@
 # SOAR COMMANDS
 
-w 0
+watch 0
 smem --set mirroring on
 
 multi-attributes area
@@ -814,7 +814,7 @@ sp {recursive-rehearse*propose*initialize
    (<o> ^name initialize)
 }
 
-sp {recurisve-rehearse*apply*initialize
+sp {recursive-rehearse*apply*initialize
    (state <s> ^name recursive-rehearse
               ^parameters.method-ecological-rehearsal-amount <amount>
               ^operator.name initialize
@@ -824,7 +824,7 @@ sp {recurisve-rehearse*apply*initialize
         ^rehearsed.lti <lti>)
 }
 
-sp {recurisve-rehearse*propose*recurse
+sp {recursive-rehearse*propose*recurse
    (state <s> ^name recursive-rehearse
               ^rehearsed <rehearsed>)
    (<rehearsed> ^lti <lti>
@@ -1068,7 +1068,7 @@ sp {record-area-wm*apply*create-neighbor-area
    (<areas> ^area.id <id>)
 }
 
-sp {record-area-wm*propose*copy-curent-area
+sp {record-area-wm*propose*copy-current-area
    (state <s> ^name record-area-wm
               ^io.input-link.area-description <description>
               ^areas <areas>
