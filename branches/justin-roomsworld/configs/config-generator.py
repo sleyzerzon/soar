@@ -72,75 +72,40 @@ def main(experiment):
 	params["experiment-name"] = (experiment,)
 	params["trial-num"] = range(0, 1)
 	params["max-patrol-circuits"] = (3,)
-	#params["rand-seed"] = (0.3607740397412259, 0.04379098940730264, 0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266, 0.6871929206606627, 0.78931705115309, 0.7819027528531993)
-	params["rand-seed"] = (0.3607740397412259, 0.04379098940730264,)
+	params["rand-seed"] = (0.5690544779, 0.7655848284, 0.7369625796, 0.8272997919, 0.7505874376, 0.2878377921, 0.1086963577, 0.2739799798, 0.5553159005, 0.8903765146)
+
 	params["num-blocks"] = (11,)
 	params["num-tasks"] = (11,)
 
-	if experiment == "ecological-task-limits":
-		params["max-patrol-circuits"] = (0,)
-		params["rand-seed"] = (0.07006882604508546, 0.22537786669043358, 0.25692781709096746, 0.6188586738375645, 0.0980532770823247, 0.41678387137142947, 0.3626522445712418, 0.42746224288858425, 0.7035482882075103, 0.0975384305874587, 0.09125975176581147, 0.23283024445841816, 0.03314801138516621, 0.879153504421756, 0.2940917155846817, 0.9801576212841999, 0.27854285620257746, 0.47307825494084377, 0.6350326544201157, 0.24095028815174035, 0.5226511061336242, 0.002732001296375519, 0.9293725910410491, 0.42862538136223727, 0.29305343002307405, 0.5410154533210964, 0.2524275931799884, 0.04649699806105134, 0.5638734797158196, 0.0021050287919592847, 0.6863811332091414, 0.7528050348554711, 0.19671461099430065, 0.8513909265861525, 0.16088577626839595, 0.7581054233389606, 0.5031286165782922, 0.616890860680216, 0.4729560934336069, 0.3522389482493895, 0.9145493209404224, 0.8853839035786348, 0.801964988509721, 0.763505771434606, 0.9969450254406105, 0.7170739681924918, 0.6277800750914091, 0.4311853354736467, 0.4161531617146135, 0.09186238423666604, 0.21070416259385483, 0.27896706388812886, 0.4698477448639269, 0.029694772307776507, 0.9257233556578373, 0.3492932851101018, 0.759203218114568, 0.6077441588232426, 0.26033741989294756, 0.22369424707123498, 0.7972801646551011, 0.9297271581090589, 0.5908470722623552, 0.5488501561484037, 0.4194963650031087, 0.4084509336508072, 0.4966338885887345, 0.9777593034281377, 0.11394984677983389, 0.10268029360468178, 0.7390309027453477, 0.5320765306636919, 0.10554319645690591, 0.3376006473373482, 0.002300487043233712, 0.9981584322236615, 0.8399677981675663, 0.2646055254797227, 0.10762275563180346, 0.8935510198677603, 0.7452228639901098, 0.12214101562598068, 0.5226206270726433, 0.12596835960367958, 0.5828627834714297, 0.8109872383114022, 0.7897486670785232, 0.012545051667930407, 0.8283591801906518, 0.8760719216593436, 0.8837332333952379, 0.09026078972816953, 0.45530159708069773, 0.13005247384993512, 0.03918840660779155, 0.9814324135130286, 0.10485346785013472, 0.785900949779522, 0.41378604336682456, 0.8737126492525892)
-		params["num-blocks"] = (1,)
-		params["num-tasks"] = range(10, 51, 10)
-		params["decay-rate"] = [float(n) / 10 for n in range(7, 10)]
-		params["filename-template"] = (r"{experiment-name}_{decay-rate}_{num-tasks:03}_{rand-seed}_{trial-num}",)
-
-	elif experiment == "optimal-rehearsals-decay":
-		params["linear-velocity"] = (0.7,)
-		params["decay-rate"] = [float(n) / 100 for n in range(30, 51, 2)]
-		params["method-ecological-timing"] = ("true",)
-		params["method-ecological-timing-interval"] = (400,)
+	if experiment == "rehearsal-entry":
+		params["method-ecological-entry"] = ("true",)
 		params["method-ecological-rehearsal"] = ("true",)
-		params["method-ecological-rehearsal-amount"] = [pow(2, n) for n in range(2, 7)]
-		params["filename-template"] = (r"{experiment-name}_{method-ecological-rehearsal-amount}_{decay-rate}_{rand-seed}_{trial-num}",)
-	elif experiment == "optimal-rehearsals-velocity":
+		params["method-ecological-rehearsal-amount"] = range(10, 61, 10)
+		params["decay-rate"] = [float(n) / 100 for n in range(35, 46, 2)]
 		params["linear-velocity"] = [float(n) / 10 for n in range(3, 12, 2)]
-		params["decay-rate"] = (0.4,)
+		params["filename-template"] = (r"{experiment-name}_{decay-rate:.2f}_{linear-velocity}_{method-ecological-rehearsal-amount}_{rand-seed}",)
+	elif experiment == "rehearsal-timing":
 		params["method-ecological-timing"] = ("true",)
 		params["method-ecological-timing-interval"] = (400,)
 		params["method-ecological-rehearsal"] = ("true",)
-		params["method-ecological-rehearsal-amount"] = [pow(2, n) for n in range(1, 11, 2)]
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{linear-velocity}_{trial-num}",)
+		params["method-ecological-rehearsal-amount"] = range(10, 61, 10)
+		params["decay-rate"] = [float(n) / 100 for n in range(35, 46, 2)]
+		params["linear-velocity"] = [float(n) / 10 for n in range(3, 12, 2)]
+		params["filename-template"] = (r"{experiment-name}_{decay-rate:.2f}_{linear-velocity}_{method-ecological-rehearsal-amount}_{rand-seed}",)
 
-	elif experiment == "doors-retrieval":
-		params["method-ecological-doors"] = ("true",)
-		params["method-ecological-retrieval"] = ("true",)
-		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{trial-num}",)
-	elif experiment == "entry-retrieval":
+	elif experiment == "retrieval-entry":
 		params["method-ecological-entry"] = ("true",)
 		params["method-ecological-retrieval"] = ("true",)
-		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{trial-num}",)
-	elif experiment == "timing-retrieval":
+		params["decay-rate"] = [float(n) / 100 for n in range(65, 76, 2)]
+		params["linear-velocity"] = [float(n) / 10 for n in range(3, 12, 2)]
+		params["filename-template"] = (r"{experiment-name}_{decay-rate:.2f}_{linear-velocity}_{rand-seed}",)
+	elif experiment == "retrieval-timing":
 		params["method-ecological-timing"] = ("true",)
 		params["method-ecological-retrieval"] = ("true",)
-		params["method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)]
-		params["decay-rate"] = [float(n) / 10 for n in range(5, 10)]
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{decay-rate}_{method-ecological-timing-interval}_{trial-num}",)
-
-	elif experiment == "doors-robustness":
-		params["method-ecological-doors"] = ("true",)
-		params["method-ecological-retrieval"] = ("true",)
-		params["decay-rate"] = (0.7,)
-		params["linear-velocity"] = (0.3, 1.1)
-		params["rand-seed"] = (0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266)
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{linear-velocity}_{trial-num}",)
-	elif experiment == "entry-robustness":
-		params["method-ecological-entry"] = ("true",)
-		params["method-ecological-retrieval"] = ("true",)
-		params["decay-rate"] = (0.7,)
-		params["linear-velocity"] = (0.3, 1.1)
-		params["rand-seed"] = (0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266)
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{linear-velocity}_{trial-num}",)
-	elif experiment == "timing-robustness":
-		params["method-ecological-timing"] = ("true",)
-		params["method-ecological-retrieval"] = ("true",)
-		params["method-ecological-timing-interval"] = [100 * pow(2, n) for n in range(2, 9, 2)] # FIXME pick based on results
-		params["decay-rate"] = (0.7,)
-		params["linear-velocity"] = (0.3, 1.1)
-		params["rand-seed"] = (0.2554303853654126, 0.32718370539428654, 0.28781945867564607, 0.21508445060171022, 0.43672484330869266)
-		params["filename-template"] = (r"{experiment-name}_{rand-seed}_{linear-velocity}_{method-ecological-timing-interval}_{trial-num}",)
+		params["method-ecological-timing-interval"] = (400,)
+		params["decay-rate"] = [float(n) / 100 for n in range(65, 76, 2)]
+		params["linear-velocity"] = [float(n) / 10 for n in range(3, 12, 2)]
+		params["filename-template"] = (r"{experiment-name}_{decay-rate:.2f}_{linear-velocity}_{rand-seed}",)
 
 	else:
 		print("unknown experiment name: {}".format(experiment))
