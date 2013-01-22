@@ -1226,3 +1226,11 @@ Bool passes_wme_filtering(agent* thisAgent, wme * w, Bool isAdd) {
   }
   return TRUE; /* no defined filters match -> w passes */
 }
+
+extern void print_trace_message(agent* thisAgent, int64_t sysParamIndex, const char* buf){
+	if ( (sysParamIndex ==0) || thisAgent->sysparams[ sysParamIndex ] )
+	{
+		print( thisAgent, buf );
+		xml_generate_warning( thisAgent, buf );
+	}
+}

@@ -137,6 +137,10 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	database->add_mapping( file, "file" );
 	add( database );
 
+	// append database or dump data on init
+	append_db = new soar_module::boolean_param( "append-database", soar_module::off, new epmem_db_predicate<soar_module::boolean>( my_agent ) );
+	add( append_db );
+
 	// path
 	path = new epmem_path_param( "path", "", new soar_module::predicate<const char *>(), new epmem_db_predicate<const char *>( my_agent ), my_agent );
 	add( path );
@@ -144,7 +148,6 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	// auto-commit
 	lazy_commit = new soar_module::boolean_param( "lazy-commit", soar_module::on, new epmem_db_predicate<soar_module::boolean>( my_agent ) );
 	add( lazy_commit );
-
 
 	////////////////////
 	// Retrieval
@@ -221,7 +224,7 @@ void epmem_path_param::set_value( const char *new_value )
 		my_agent->epmem_first_switch = false;
 		my_agent->epmem_params->database->set_value( epmem_param_container::file );
 
-		const char *msg = "Database set to file";
+		const char *msg = "\nDatabase set to file.\n";
 		print( my_agent, const_cast<char *>( msg ) );
 		xml_generate_message( my_agent, const_cast<char *>( msg ) );
 	}
@@ -840,29 +843,68 @@ epmem_timer::epmem_timer(const char *new_name, agent *new_agent, soar_module::ti
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+void epmem_common_statement_container::create_graph_tables() {
+
+	add_structure( "CREATE TABLE IF NOT EXISTS versions (system TEXT PRIMARY KEY,version_number TEXT)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_persistent_variables (variable_id INTEGER PRIMARY KEY,variable_value NONE)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_left_nodes (rit_min INTEGER, rit_max INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_right_nodes (rit_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_type (s_id INTEGER PRIMARY KEY, symbol_type INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_integer (s_id INTEGER PRIMARY KEY, symbol_value INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_float (s_id INTEGER PRIMARY KEY, symbol_value REAL)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_string (s_id INTEGER PRIMARY KEY, symbol_value TEXT)" );
+
+}
+
+void epmem_common_statement_container::create_graph_indices() {
+
+	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_int_const ON epmem_symbols_integer (symbol_value)" );
+	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_float_const ON epmem_symbols_float (symbol_value)" );
+	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_str_const ON epmem_symbols_string (symbol_value)" );
+
+}
+
+void epmem_common_statement_container::drop_graph_tables() {
+
+	// Note: We don't want to dump versions database because it might also contain other version information
+	// if we ever combine epmem and smem into one database, which is something that has been discussed
+	// (perhaps because a single database works better with server-based db backends like mysql?)
+
+	add_structure( "DROP TABLE IF EXISTS epmem_persistent_variables" );
+	add_structure( "DROP TABLE IF EXISTS epmem_rit_left_nodes" );
+	add_structure( "DROP TABLE IF EXISTS epmem_rit_right_nodes" );
+	add_structure( "DROP TABLE IF EXISTS epmem_symbols_type" );
+	add_structure( "DROP TABLE IF EXISTS epmem_symbols_integer" );
+	add_structure( "DROP TABLE IF EXISTS epmem_symbols_float" );
+	add_structure( "DROP TABLE IF EXISTS epmem_symbols_string" );
+
+}
+
 epmem_common_statement_container::epmem_common_statement_container( agent *new_agent ): soar_module::sqlite_statement_container( new_agent->epmem_db )
 {
 	soar_module::sqlite_database *new_db = new_agent->epmem_db;
 
-	//
+	// Drop tables in the database if append setting is off.  (Tried DELETE before, but it had problems.)
+	if ( new_agent->epmem_params->append_db->get_value() == soar_module::off ) {
+		fprintf(stderr, "Dropping epmem tables!!!!!\n");
+		drop_graph_tables();
+	}
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_persistent_variables (variable_id INTEGER PRIMARY KEY,variable_value NONE)" );
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_left_nodes (rit_min INTEGER, rit_max INTEGER)" );
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_rit_right_nodes (rit_id INTEGER)" );
+	create_graph_tables();
+	create_graph_indices();
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_type (s_id INTEGER PRIMARY KEY, symbol_type INTEGER)" );
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_integer (s_id INTEGER PRIMARY KEY, symbol_value INTEGER)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_int_const ON epmem_symbols_integer (symbol_value)" );
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_float (s_id INTEGER PRIMARY KEY, symbol_value REAL)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_float_const ON epmem_symbols_float (symbol_value)" );
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_symbols_string (s_id INTEGER PRIMARY KEY, symbol_value TEXT)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS symbols_str_const ON epmem_symbols_string (symbol_value)" );
+	// Update the schema version number
+	add_structure("INSERT OR REPLACE INTO versions (system, version_number) VALUES ('epmem_schema'," EPMEM_SCHEMA_VERSION ")");
 
-	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
+	// Add symbol lookups for special cases
+
+	// Root node of tree
+	// Note:  I don't think root node string is ever actually looked up.  Set to root instead of
+	//        previous NULL for compatibility with other db systems.
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_type (s_id,symbol_type) VALUES (0,2)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_string (s_id,symbol_value) VALUES (0,'root')" );
 
-	// workaround for acceptable preference wmes: id 1 = "operator+"
+	// Acceptable preference wmes: id 1 = "operator+"
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_type (s_id,symbol_type) VALUES (1,2)" );
 	add_structure( "INSERT OR IGNORE INTO epmem_symbols_string (s_id,symbol_value) VALUES (1,'operator*')" );
 
@@ -936,94 +978,117 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 
 }
 
-epmem_graph_statement_container::epmem_graph_statement_container( agent *new_agent ): soar_module::sqlite_statement_container( new_agent->epmem_db )
-{
-	soar_module::sqlite_database *new_db = new_agent->epmem_db;
-
-	//
+void epmem_graph_statement_container::create_graph_tables() {
 
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_nodes (n_id INTEGER PRIMARY KEY)" );
-	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
-	add_structure( "INSERT OR IGNORE INTO epmem_nodes (n_id) VALUES (0)" );
-
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_episodes (episode_id INTEGER PRIMARY KEY)" );
-
 	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant_now (wc_id INTEGER,start_episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_now (wi_id INTEGER,start_episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant_point (wc_id INTEGER,episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_point (wi_id INTEGER,episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant_range (rit_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,wc_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_range (rit_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,wi_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant (wc_id INTEGER PRIMARY KEY AUTOINCREMENT,parent_n_id INTEGER,attribute_s_id INTEGER, value_s_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier (wi_id INTEGER PRIMARY KEY AUTOINCREMENT,parent_n_id INTEGER,attribute_s_id INTEGER,child_n_id INTEGER, last_episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_lti (n_id INTEGER PRIMARY KEY, soar_letter INTEGER, soar_number INTEGER, promotion_episode_id INTEGER)" );
+	add_structure( "CREATE TABLE IF NOT EXISTS epmem_ascii (ascii_num INTEGER PRIMARY KEY, ascii_chr TEXT)" );
+}
+
+void epmem_graph_statement_container::create_graph_indices() {
+
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_constant_now_start ON epmem_wmes_constant_now (start_episode_id)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_constant_now_id_start ON epmem_wmes_constant_now (wc_id,start_episode_id DESC)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_now (wi_id INTEGER,start_episode_id INTEGER)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_identifier_now_start ON epmem_wmes_identifier_now (start_episode_id)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_identifier_now_id_start ON epmem_wmes_identifier_now (wi_id,start_episode_id DESC)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant_point (wc_id INTEGER,episode_id INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_constant_point_id_start ON epmem_wmes_constant_point (wc_id,episode_id DESC)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_constant_point_start ON epmem_wmes_constant_point (episode_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_point (wi_id INTEGER,episode_id INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_identifier_point_id_start ON epmem_wmes_identifier_point (wi_id,episode_id DESC)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_identifier_point_start ON epmem_wmes_identifier_point (episode_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant_range (rit_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,wc_id INTEGER)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_constant_range_lower ON epmem_wmes_constant_range (rit_id,start_episode_id)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_constant_range_upper ON epmem_wmes_constant_range (rit_id,end_episode_id)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_constant_range_id_start ON epmem_wmes_constant_range (wc_id,start_episode_id DESC)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_constant_range_id_end_start ON epmem_wmes_constant_range (wc_id,end_episode_id DESC,start_episode_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier_range (rit_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,wi_id INTEGER)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_identifier_range_lower ON epmem_wmes_identifier_range (rit_id,start_episode_id)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_identifier_range_upper ON epmem_wmes_identifier_range (rit_id,end_episode_id)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_identifier_range_id_start ON epmem_wmes_identifier_range (wi_id,start_episode_id DESC)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_identifier_range_id_end_start ON epmem_wmes_identifier_range (wi_id,end_episode_id DESC,start_episode_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_constant (wc_id INTEGER PRIMARY KEY AUTOINCREMENT,parent_n_id INTEGER,attribute_s_id INTEGER, value_s_id INTEGER)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_constant_parent_attribute_s_id_value ON epmem_wmes_constant (parent_n_id,attribute_s_id,value_s_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_wmes_identifier (wi_id INTEGER PRIMARY KEY AUTOINCREMENT,parent_n_id INTEGER,attribute_s_id INTEGER,child_n_id INTEGER, last_episode_id INTEGER)" );
 	add_structure( "CREATE INDEX IF NOT EXISTS epmem_wmes_identifier_parent_n_id_w_last_episode_id ON epmem_wmes_identifier (parent_n_id,attribute_s_id,last_episode_id)" );
 	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_wmes_identifier_parent_n_id_w_child_n_id ON epmem_wmes_identifier (parent_n_id,attribute_s_id,child_n_id)" );
 
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_lti (n_id INTEGER PRIMARY KEY, letter INTEGER, num INTEGER, promotion_episode_id INTEGER)" );
-	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_lti_letter_num ON epmem_lti (letter,num)" );
+	add_structure( "CREATE UNIQUE INDEX IF NOT EXISTS epmem_lti_letter_num ON epmem_lti (soar_letter,soar_number)" );
 
-	// adding an ascii table just to make lti queries easier when inspecting database
-	add_structure( "CREATE TABLE IF NOT EXISTS epmem_ascii (ascii_num INTEGER PRIMARY KEY, ascii_chr TEXT)" );
-	add_structure( "DELETE FROM epmem_ascii" );
+}
+
+void epmem_graph_statement_container::drop_graph_tables() {
+	add_structure( "DROP TABLE IF EXISTS epmem_nodes" );
+	add_structure( "DROP TABLE IF EXISTS epmem_episodes" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_constant_now" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_identifier_now" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_constant_point" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_identifier_point" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_constant_range" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_identifier_range" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_constant" );
+	add_structure( "DROP TABLE IF EXISTS epmem_wmes_identifier" );
+	add_structure( "DROP TABLE IF EXISTS epmem_lti" );
+}
+
+epmem_graph_statement_container::epmem_graph_statement_container( agent *new_agent ): soar_module::sqlite_statement_container( new_agent->epmem_db )
+{
+	soar_module::sqlite_database *new_db = new_agent->epmem_db;
+
+	// Delete all entries from the tables in the database if append seting is off
+	if ( new_agent->epmem_params->append_db->get_value() == soar_module::off ) {
+		print_trace_message(new_agent, TRACE_EPMEM_SYSPARAM, "...erasing contents of episodic memory database because append mode is off.\n" );
+		drop_graph_tables();
+	}
+
+	create_graph_tables();
+	create_graph_indices();
+
+	// workaround for tree: type 1 = IDENTIFIER_SYMBOL_TYPE
+	add_structure( "INSERT OR IGNORE INTO epmem_nodes (n_id) VALUES (0)" );
 	{
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (65,'A')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (66,'B')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (67,'C')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (68,'D')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (69,'E')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (70,'F')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (71,'G')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (72,'H')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (73,'I')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (74,'J')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (75,'K')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (76,'L')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (77,'M')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (78,'N')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (79,'O')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (80,'P')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (81,'Q')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (82,'R')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (83,'S')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (84,'T')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (85,'U')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (86,'V')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (87,'W')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (88,'X')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (89,'Y')" );
-		add_structure( "INSERT INTO epmem_ascii (ascii_num, ascii_chr) VALUES (90,'Z')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (65,'A')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (66,'B')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (67,'C')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (68,'D')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (69,'E')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (70,'F')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (71,'G')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (72,'H')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (73,'I')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (74,'J')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (75,'K')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (76,'L')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (77,'M')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (78,'N')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (79,'O')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (80,'P')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (81,'Q')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (82,'R')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (83,'S')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (84,'T')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (85,'U')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (86,'V')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (87,'W')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (88,'X')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (89,'Y')" );
+		add_structure( "INSERT OR IGNORE INTO epmem_ascii (ascii_num, ascii_chr) VALUES (90,'Z')" );
 	}
 
 	//
 
 	add_time = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_episodes (episode_id) VALUES (?)" );
 	add( add_time );
-
-	//
 
 	add_node = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_nodes (n_id) VALUES (?)" );
 	add( add_node );
@@ -1040,14 +1105,11 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	add_epmem_wmes_constant_range = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_wmes_constant_range (rit_id,start_episode_id,end_episode_id,wc_id) VALUES (?,?,?,?)" );
 	add( add_epmem_wmes_constant_range );
 
-
 	add_epmem_wmes_constant = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_wmes_constant (parent_n_id,attribute_s_id,value_s_id) VALUES (?,?,?)" );
 	add( add_epmem_wmes_constant );
 
 	find_epmem_wmes_constant = new soar_module::sqlite_statement( new_db, "SELECT wc_id FROM epmem_wmes_constant WHERE parent_n_id=? AND attribute_s_id=? AND value_s_id=?" );
 	add( find_epmem_wmes_constant );
-
-	//
 
 	add_epmem_wmes_identifier_now = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_wmes_identifier_now (wi_id,start_episode_id) VALUES (?,?)" );
 	add( add_epmem_wmes_identifier_now );
@@ -1061,7 +1123,6 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	add_epmem_wmes_identifier_range = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_wmes_identifier_range (rit_id,start_episode_id,end_episode_id,wi_id) VALUES (?,?,?,?)" );
 	add( add_epmem_wmes_identifier_range );
 
-
 	add_epmem_wmes_identifier = new soar_module::sqlite_statement( new_db, "INSERT INTO epmem_wmes_identifier (parent_n_id,attribute_s_id,child_n_id,last_episode_id) VALUES (?,?,?,?)" );
 	add( add_epmem_wmes_identifier );
 
@@ -1070,8 +1131,6 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 
 	find_epmem_wmes_identifier_shared = new soar_module::sqlite_statement( new_db, "SELECT wi_id, child_n_id FROM epmem_wmes_identifier WHERE parent_n_id=? AND attribute_s_id=? AND child_n_id=?" );
 	add( find_epmem_wmes_identifier_shared );
-
-	//
 
 	valid_episode = new soar_module::sqlite_statement( new_db, "SELECT COUNT(*) AS ct FROM epmem_episodes WHERE episode_id=?" );
 	add( valid_episode );
@@ -1082,8 +1141,7 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	prev_episode = new soar_module::sqlite_statement( new_db, "SELECT episode_id FROM epmem_episodes WHERE episode_id<? ORDER BY episode_id DESC LIMIT 1" );
 	add( prev_episode );
 
-
-	get_nodes = new soar_module::sqlite_statement( new_db,
+	get_wmes_with_constant_values = new soar_module::sqlite_statement( new_db,
 			"SELECT f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id "
 			"FROM epmem_wmes_constant f "
 			"WHERE f.wc_id IN "
@@ -1092,10 +1150,10 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 				"SELECT e1.wc_id FROM epmem_wmes_constant_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
 				"SELECT e2.wc_id FROM epmem_wmes_constant_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
 			"ORDER BY f.wc_id ASC", new_agent->epmem_timers->ncb_node );
-	add( get_nodes );
+	add( get_wmes_with_constant_values );
 
-	get_edges = new soar_module::sqlite_statement( new_db,
-			"SELECT f.parent_n_id, f.attribute_s_id, f.child_n_id, epmem_lti.letter, epmem_lti.num "
+	get_wmes_with_identifier_values = new soar_module::sqlite_statement( new_db,
+			"SELECT f.parent_n_id, f.attribute_s_id, f.child_n_id, epmem_lti.soar_letter, epmem_lti.soar_number "
 			"FROM epmem_wmes_identifier f "
 			"LEFT JOIN epmem_lti ON (f.child_n_id=epmem_lti.n_id AND epmem_lti.promotion_episode_id <= ?) "
 			"WHERE f.wi_id IN "
@@ -1104,25 +1162,19 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 				"SELECT e1.wi_id FROM epmem_wmes_identifier_range e1, epmem_rit_left_nodes lt WHERE e1.rit_id=lt.rit_min AND e1.end_episode_id >= ? UNION ALL "
 				"SELECT e2.wi_id FROM epmem_wmes_identifier_range e2, epmem_rit_right_nodes rt WHERE e2.rit_id = rt.rit_id AND e2.start_episode_id <= ?) "
 			"ORDER BY f.parent_n_id ASC, f.child_n_id ASC", new_agent->epmem_timers->ncb_edge );
-	add( get_edges );
+	add( get_wmes_with_identifier_values );
 
-	//
-
-	promote_id = new soar_module::sqlite_statement( new_db, "INSERT OR IGNORE INTO epmem_lti (n_id,letter,num,promotion_episode_id) VALUES (?,?,?,?)" );
+	promote_id = new soar_module::sqlite_statement( new_db, "INSERT OR IGNORE INTO epmem_lti (n_id,soar_letter,soar_number,promotion_episode_id) VALUES (?,?,?,?)" );
 	add( promote_id );
 
-	find_lti = new soar_module::sqlite_statement( new_db, "SELECT n_id FROM epmem_lti WHERE letter=? AND num=?" );
+	find_lti = new soar_module::sqlite_statement( new_db, "SELECT n_id FROM epmem_lti WHERE soar_letter=? AND soar_number=?" );
 	add( find_lti );
 
 	find_lti_promotion_time = new soar_module::sqlite_statement( new_db, "SELECT promotion_episode_id FROM epmem_lti WHERE n_id=?" );
 	add( find_lti_promotion_time );
 
-	//
-
 	update_epmem_wmes_identifier_last_episode_id = new soar_module::sqlite_statement( new_db, "UPDATE epmem_wmes_identifier SET last_episode_id=? WHERE wi_id=?" );
 	add( update_epmem_wmes_identifier_last_episode_id );
-
-	//
 
 	// init statement pools
 	{
@@ -1707,6 +1759,38 @@ void epmem_rit_insert_interval( agent *my_agent, int64_t lower, int64_t upper, e
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+void epmem_clear_transient_structures( agent *my_agent)
+{
+	epmem_parent_id_pool::iterator p;
+	epmem_hashed_id_pool::iterator p_p;
+
+	for ( p=my_agent->epmem_id_repository->begin(); p!=my_agent->epmem_id_repository->end(); p++ )
+	{
+		for ( p_p=p->second->begin(); p_p!=p->second->end(); p_p++ )
+		{
+			delete p_p->second;
+		}
+
+		delete p->second;
+	}
+
+	my_agent->epmem_id_repository->clear();
+	my_agent->epmem_id_replacement->clear();
+	for ( epmem_id_ref_counter::iterator rf_it=my_agent->epmem_id_ref_counts->begin(); rf_it!=my_agent->epmem_id_ref_counts->end(); rf_it++ )
+	{
+		delete rf_it->second;
+	}
+	my_agent->epmem_id_ref_counts->clear();
+
+	my_agent->epmem_wme_adds->clear();
+
+	for ( epmem_symbol_set::iterator p_it=my_agent->epmem_promotions->begin(); p_it!=my_agent->epmem_promotions->end(); p_it++ )
+	{
+		symbol_remove_ref( my_agent, (*p_it) );
+	}
+	my_agent->epmem_promotions->clear();
+}
+
 /***************************************************************************
  * Function     : epmem_close
  * Author		: Nate Derbinsky
@@ -1715,6 +1799,8 @@ void epmem_rit_insert_interval( agent *my_agent, int64_t lower, int64_t upper, e
  **************************************************************************/
 void epmem_close( agent *my_agent )
 {
+	fprintf(stderr, "Closing epmem database!!!\n");
+
 	if ( my_agent->epmem_db->get_status() == soar_module::connected )
 	{
 		// if lazy, commit
@@ -1761,37 +1847,7 @@ void epmem_close( agent *my_agent )
 		delete my_agent->epmem_stmts_common;
 		delete my_agent->epmem_stmts_graph;
 
-		// de-allocate local data structures
-		{
-			epmem_parent_id_pool::iterator p;
-			epmem_hashed_id_pool::iterator p_p;
-
-			for ( p=my_agent->epmem_id_repository->begin(); p!=my_agent->epmem_id_repository->end(); p++ )
-			{
-				for ( p_p=p->second->begin(); p_p!=p->second->end(); p_p++ )
-				{
-					delete p_p->second;
-				}
-
-				delete p->second;
-			}
-
-			my_agent->epmem_id_repository->clear();
-			my_agent->epmem_id_replacement->clear();
-			for ( epmem_id_ref_counter::iterator rf_it=my_agent->epmem_id_ref_counts->begin(); rf_it!=my_agent->epmem_id_ref_counts->end(); rf_it++ )
-			{
-				delete rf_it->second;
-			}
-			my_agent->epmem_id_ref_counts->clear();
-
-			my_agent->epmem_wme_adds->clear();
-
-			for ( epmem_symbol_set::iterator p_it=my_agent->epmem_promotions->begin(); p_it!=my_agent->epmem_promotions->end(); p_it++ )
-			{
-				symbol_remove_ref( my_agent, (*p_it) );
-			}
-			my_agent->epmem_promotions->clear();
-		}
+		epmem_clear_transient_structures(my_agent);
 
 		// close the database
 		my_agent->epmem_db->disconnect();
@@ -1865,6 +1921,13 @@ void epmem_reset( agent *my_agent, Symbol *state )
 	}
 }
 
+inline void epmem_switch_to_memory_db(agent *my_agent, std::string& buf, bool readonly)
+{
+	print_trace_message(my_agent, 0, buf.c_str());
+	my_agent->epmem_params->database->set_value(epmem_param_container::memory);
+	my_agent->epmem_db->disconnect();
+	epmem_init_db( my_agent, readonly );
+}
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -1890,12 +1953,14 @@ static void trace( void* /*arg*/, const char* query )
 {	fprintf(stderr, "Query: %s\n", query );}
 #endif
 
-void epmem_init_db( agent *my_agent, bool readonly = false )
+void epmem_init_db( agent *my_agent, bool readonly )
 {
 	if ( my_agent->epmem_db->get_status() != soar_module::disconnected )
 	{
+		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "ERROR:  Cannot initialize episodic memory database.  It is already connected!" );
 		return;
 	}
+
 
 	////////////////////////////////////////////////////////////////////////////
 	my_agent->epmem_timers->init->start();
@@ -1905,10 +1970,12 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 	if ( my_agent->epmem_params->database->get_value() == epmem_param_container::memory )
 	{
 		db_path = ":memory:";
+		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "Initializing episodic memory database in cpu memory.\n" );
 	}
 	else
 	{
 		db_path = my_agent->epmem_params->path->get_value();
+		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "Initializing episodic memory database on disk.\n" );
 	}
 
 	// attempt connection
@@ -1933,6 +2000,65 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 		soar_module::sqlite_statement *temp_q = NULL;
 		soar_module::sqlite_statement *temp_q2 = NULL;
 
+		// If the database is on file, make sure the database contents use the current schema
+		// If it does not, switch to memory-based database
+
+		if (strcmp(db_path, ":memory:")) // Only worry about database version if writing to disk
+		{
+			bool switch_to_memory, versions_exists, sql_is_new;
+			std::string schema_version, version_error_message;
+
+			switch_to_memory = true;
+
+			if (my_agent->epmem_db->sql_is_new_db(sql_is_new))
+			{
+				if (sql_is_new)
+				{
+					switch_to_memory = false;
+					print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "...episodic memory database is new.\n" );
+				}
+				else
+				{	// Check if table exists already
+					temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "CREATE TABLE IF NOT EXISTS versions (system TEXT PRIMARY KEY,version_number TEXT)" );
+					temp_q->prepare();
+					if ( temp_q->get_status() == soar_module::ready )
+					{
+						if (my_agent->epmem_db->sql_simple_get_string("SELECT version_number FROM versions WHERE system = 'epmem_schema'", schema_version ))
+						{
+							if (schema_version != EPMEM_SCHEMA_VERSION) { // Incompatible version
+								version_error_message.assign("...Error:  Cannot load episodic memory database with schema version ");
+								version_error_message.append(schema_version.c_str());
+								version_error_message.append(".\n...Please convert old database or start a new database by "
+										"setting a new database file path.\n...Switching to memory-based database.\n");
+							} else { // Version is OK
+								print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "...version of episodic memory database ok.\n" );
+								switch_to_memory = false;
+							}
+
+						} else { // Some sort of error reading version info from version database
+							version_error_message.assign("...Error:  Cannot read version number from file-based episodic memory database.\n"
+									"...Switching to memory-based database.\n");
+						}
+					} else { // Non-empty database exists with no version table.  Probably schema 1.0
+						version_error_message.assign("...Error:  Cannot load an episodic memory database with an old schema version.\n...Please convert "
+								"old database or start a new database by setting a new database file path.\n...Switching "
+								"to memory-based database.\n");
+					}
+					delete temp_q;
+					temp_q = NULL;
+				}
+			} else {
+				version_error_message.assign("...Error:  Cannot read database meta info from file-based episodic memory database.\n"
+						"...Switching to memory-based database.\n");
+			}
+			if (switch_to_memory)
+			{
+				// Memory mode will be set on, database will be disconnected to and then init_db
+				// will be called again to reinitialize database.
+				epmem_switch_to_memory_db(my_agent, version_error_message, readonly);
+				return;
+			}
+		}
 		// apply performance options
 		{
 			// page_size
@@ -1940,38 +2066,33 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				switch ( my_agent->epmem_params->page_size->get_value() )
 				{
 					case ( epmem_param_container::page_1k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 1024" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 1024" );
 						break;
 
 					case ( epmem_param_container::page_2k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 2048" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 2048" );
 						break;
 
 					case ( epmem_param_container::page_4k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 4096" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 4096" );
 						break;
 
 					case ( epmem_param_container::page_8k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 8192" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 8192" );
 						break;
 
 					case ( epmem_param_container::page_16k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 16384" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 16384" );
 						break;
 
 					case ( epmem_param_container::page_32k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 32768" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 32768" );
 						break;
 
 					case ( epmem_param_container::page_64k ):
-						temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA page_size = 65536" );
+						my_agent->epmem_db->sql_execute( "PRAGMA page_size = 65536" );
 						break;
 				}
-
-				temp_q->prepare();
-				temp_q->execute();
-				delete temp_q;
-				temp_q = NULL;
 			}
 
 			// cache_size
@@ -1982,37 +2103,20 @@ void epmem_init_db( agent *my_agent, bool readonly = false )
 				free(str);
 				str = NULL;
 
-				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, cache_sql.c_str() );
-
-				temp_q->prepare();
-				temp_q->execute();
-				delete temp_q;
-				temp_q = NULL;
+				my_agent->epmem_db->sql_execute( cache_sql.c_str() );
 			}
 
 			// optimization
 			if ( my_agent->epmem_params->opt->get_value() == epmem_param_container::opt_speed )
 			{
 				// synchronous - don't wait for writes to complete (can corrupt the db in case unexpected crash during transaction)
-				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA synchronous = OFF" );
-				temp_q->prepare();
-				temp_q->execute();
-				delete temp_q;
-				temp_q = NULL;
+				my_agent->epmem_db->sql_execute( "PRAGMA synchronous = OFF" );
 
 				// journal_mode - no atomic transactions (can result in database corruption if crash during transaction)
-				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA journal_mode = OFF" );
-				temp_q->prepare();
-				temp_q->execute();
-				delete temp_q;
-				temp_q = NULL;
+				my_agent->epmem_db->sql_execute( "PRAGMA journal_mode = OFF" );
 
 				// locking_mode - no one else can view the database after our first write
-				temp_q = new soar_module::sqlite_statement( my_agent->epmem_db, "PRAGMA locking_mode = EXCLUSIVE" );
-				temp_q->prepare();
-				temp_q->execute();
-				delete temp_q;
-				temp_q = NULL;
+				my_agent->epmem_db->sql_execute( "PRAGMA locking_mode = EXCLUSIVE" );
 			}
 		}
 
@@ -2312,7 +2416,7 @@ void epmem_schedule_promotion( agent* my_agent, Symbol* id )
 
 inline void _epmem_promote_id( agent* my_agent, Symbol* id, epmem_time_id t )
 {
-	// n_id,letter,num,promotion_episode_id
+	// n_id,soar_letter,soar_number,promotion_episode_id
 	my_agent->epmem_stmts_graph->promote_id->bind_int( 1, id->id.epmem_id );
 	my_agent->epmem_stmts_graph->promote_id->bind_int( 2, static_cast<uint64_t>( id->id.name_letter ) );
 	my_agent->epmem_stmts_graph->promote_id->bind_int( 3, static_cast<uint64_t>( id->id.name_number ) );
@@ -3341,7 +3445,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 		ids[ EPMEM_NODEID_ROOT ] = std::make_pair< Symbol*, bool >( retrieved_header, true );
 
 		// first identifiers (i.e. reconstruct)
-		my_q = my_agent->epmem_stmts_graph->get_edges;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_identifier_values;
 		{
 			// relates to finite automata: child_n_id = d(parent_n_id, attribute_s_id)
 			epmem_node_id parent_n_id; // id
@@ -3368,7 +3472,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.soar_letter, epmem_lti.soar_number
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
 				attr = epmem_reverse_hash( my_agent, my_q->column_int( 1 ), SYM_CONSTANT_SYMBOL_TYPE);
@@ -3478,7 +3582,7 @@ void epmem_install_memory( agent *my_agent, Symbol *state, epmem_time_id memory_
 
 		// then epmem_wmes_constant
 		// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
-		my_q = my_agent->epmem_stmts_graph->get_nodes;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_constant_values;
 		{
 			epmem_node_id parent_n_id;
 			std::pair< Symbol*, bool > parent;
@@ -4901,7 +5005,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 		std::string temp_s, temp_s2, temp_s3;
 		int64_t temp_i;
 
-		my_q = my_agent->epmem_stmts_graph->get_edges;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_identifier_values;
 		{
 			epmem_node_id parent_n_id;
 			epmem_node_id child_n_id;
@@ -4917,7 +5021,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.soar_letter, epmem_lti.soar_number
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
 
@@ -4947,7 +5051,7 @@ void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string*
 		}
 
 		// f.wc_id, f.parent_n_id, f.attribute_s_id, f.value_s_id
-		my_q = my_agent->epmem_stmts_graph->get_nodes;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_constant_values;
 		{
 			epmem_node_id parent_n_id;
 
@@ -5039,7 +5143,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 		soar_module::sqlite_statement *my_q;
 
 		// first identifiers (i.e. reconstruct)
-		my_q = my_agent->epmem_stmts_graph->get_edges;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_identifier_values;
 		{
 			// for printing
 			std::map< epmem_node_id, std::string > stis;
@@ -5072,7 +5176,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 			my_q->bind_int( 5, memory_id );
 			while ( my_q->execute() == soar_module::row )
 			{
-				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.letter, epmem_lti.num
+				// parent_n_id, attribute_s_id, child_n_id, epmem_lti.soar_letter, epmem_lti.soar_number
 				parent_n_id = my_q->column_int( 0 );
 				child_n_id = my_q->column_int( 2 );
 
@@ -5171,7 +5275,7 @@ void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::str
 
 		// then epmem_wmes_constant
 
-		my_q = my_agent->epmem_stmts_graph->get_nodes;
+		my_q = my_agent->epmem_stmts_graph->get_wmes_with_constant_values;
 		{
 			epmem_node_id wc_id;
 			epmem_node_id parent_n_id;

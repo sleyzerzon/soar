@@ -153,6 +153,19 @@ bool CommandLineInterface::DoEpMem( const char pOp, const std::string* pAttr, co
             AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
         }
 
+        temp = "append-database: ";
+        temp2 = agnt->epmem_params->append_db->get_string();
+        temp += temp2;
+        delete temp2;
+        if ( m_RawOutput )
+        {
+            m_Result << temp << "\n";
+        }
+        else
+        {
+            AppendArgTagFast( sml_Names::kParamValue, sml_Names::kTypeString, temp.c_str() );
+        }
+
         temp = "lazy-commit: ";
         temp2 = agnt->epmem_params->lazy_commit->get_string();
         temp += temp2;

@@ -187,6 +187,8 @@ extern void print_instantiation_with_wmes (agent* thisAgent,
 
 extern void print_list_of_conditions(agent* thisAgent, condition *cond); 
 
+extern void print_trace_message(agent* thisAgent, int64_t sysParamIndex, const char* buf);
+
 #ifdef __cplusplus
 //}
 #endif

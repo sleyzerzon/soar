@@ -33,6 +33,8 @@
 //////////////////////////////////////////////////////////
 
 //#define EPMEM_EXPERIMENT
+//#define DEBUG_EPMEM_SQL
+//#define DEBUG_EPMEM_WME_ADD
 
 
 //////////////////////////////////////////////////////////
@@ -69,14 +71,7 @@ enum epmem_variable_key
 #define EPMEM_RIT_STATE_NODE						0
 #define EPMEM_RIT_STATE_EDGE						1
 
-// provides a distinct prefix to be used by all
-// tables for two reasons:
-// - distinguish from other modules
-// - distinguish between smem versions
-#define EPMEM_SCHEMA_VERSION 2.0
-
-//#define DEBUG_EPMEM_SQL
-//#define DEBUG_EPMEM_WME_ADD
+#define EPMEM_SCHEMA_VERSION "2.0"
 
 //////////////////////////////////////////////////////////
 // EpMem Typedefs
@@ -133,6 +128,7 @@ class epmem_param_container: public soar_module::param_container
 		soar_module::constant_param<db_choices> *database;
 		epmem_path_param *path;
 		soar_module::boolean_param *lazy_commit;
+		soar_module::boolean_param *append_db;
 
 		// retrieval
 		soar_module::boolean_param *graph_match;
@@ -341,6 +337,13 @@ class epmem_common_statement_container: public soar_module::sqlite_statement_con
         soar_module::sqlite_statement *hash_add_str;
 
 		epmem_common_statement_container( agent *new_agent );
+
+	private:
+
+		void create_graph_tables();
+		void drop_graph_tables();
+		void create_graph_indices();
+
 };
 
 class epmem_graph_statement_container: public soar_module::sqlite_statement_container
@@ -376,8 +379,8 @@ class epmem_graph_statement_container: public soar_module::sqlite_statement_cont
 		soar_module::sqlite_statement *next_episode;
 		soar_module::sqlite_statement *prev_episode;
 
-		soar_module::sqlite_statement *get_nodes;
-		soar_module::sqlite_statement *get_edges;
+		soar_module::sqlite_statement *get_wmes_with_identifier_values;
+		soar_module::sqlite_statement *get_wmes_with_constant_values;
 
 		//
 
@@ -399,6 +402,12 @@ class epmem_graph_statement_container: public soar_module::sqlite_statement_cont
 		//
 		
 		epmem_graph_statement_container( agent *new_agent );
+
+	private:
+		void create_graph_tables();
+		void drop_graph_tables();
+		void create_graph_indices();
+
 };
 
 
@@ -519,12 +528,13 @@ extern bool epmem_enabled( agent *my_agent );
 // init, end
 extern void epmem_reset( agent *my_agent, Symbol *state = NULL );
 extern void epmem_close( agent *my_agent );
+extern void epmem_clear_transient_structures( agent *my_agent);
 
 // perform epmem actions
 extern void epmem_go( agent *my_agent, bool allow_store = true );
 extern bool epmem_backup_db( agent* my_agent, const char* file_name, std::string *err );
 extern void epmem_schedule_promotion( agent* my_agent, Symbol* id );
-
+extern void epmem_init_db( agent *my_agent, bool readonly = false );
 // visualization
 extern void epmem_visualize_episode( agent* my_agent, epmem_time_id memory_id, std::string* buf );
 extern void epmem_print_episode( agent* my_agent, epmem_time_id memory_id, std::string* buf );
