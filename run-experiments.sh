@@ -14,6 +14,6 @@ case "$uname" in
 esac
 
 cd "$release_dir"
-find ../../configs/experiments -name "multiple.runs" | while read line; do
+find ../../configs/experiments -name "*.runs" | while read line; do
 	./$cmd "$line"
 done
