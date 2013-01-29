@@ -74,9 +74,12 @@ displays a summary of the parameter settings.
 The `learning` parameter turns the episodic memory module on or off.
 When `learning` is set to `off`, no new episodes are encoded and no
 commands put on the epmem link are processed.  This is the same as
-using the enable and disable commands. The `phase` parameter
-determines which decision cycle phase episode encoding and retrieval
-will be performed.  The `trigger` parameter controls when new episodes
+using the enable and disable commands. 
+
+The `phase` parameter determines which decision cycle phase episode encoding and retrieval
+will be performed.  
+
+The `trigger` parameter controls when new episodes
 will be encoded.  When it is set to `output`, new episodes will be
 encoded only if the agent made modifications to the output-link during
 that decision cycle.  When set to 'dc', new episodes will be encoded
@@ -97,9 +100,7 @@ parameter behaves differently from other parameters in that issuing
 Instead, it will toggle the membership of `<val>` in the `exclusions`
 list.
 
-Various runtime behaviors for the SQLite database backing episodic
-memory can be set via the parameters.  The most commonly used is
-`path`, which specifies the file system path the database is stored
+The `path` parameter specifies the file system path the database is stored
 in.  When `path` is empty, the database is stored in main memory and
 will be lost when the agent exits.  When `path` is set to a valid file
 system path, the SQLite database is written to that path.  
