@@ -8,6 +8,9 @@ Control the behavior of semantic memory.
 
 {{{
 smem
+smem -e|--enable|--on
+smem -d|--disable|--off
+smem -i|--init
 smem -g|--get <parameter>
 smem -s|--set <parameter> <value>
 smem -S|--stats [<statistic>]
@@ -15,20 +18,21 @@ smem -t|--timers [<timer>]
 smem -a|--add <concept>
 smem -p|--print [<lti>] [<depth>]
 smem -v|--viz [<lti>] [<depth>]
-smem -i|--init
 smem -b|--backup <file name>
 }}}
 
 == Options ==
 
+|| `-e, --enable, --on` || Enable semantic memory. ||
+|| `-d, --disable, --off` || Disable semantic memory. ||
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
+|| `-i, --init` || Reinitialize ALL memories ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
 || `-t, --timers` || Print timer summary or specific statistic ||
 || `-a, --add` || Add concepts to semantic memory ||
 || `-p, --print` || Print semantic store in user-readable format ||
 || `-v, --viz` || Print semantic store in graphviz format ||
-|| `-i, --init` || Reinitialize ALL memories ||
 || `-b, --backup` || Creates a backup of the semantic database on disk ||
 
 == Description ==
@@ -46,11 +50,54 @@ displays a summary of the parameter settings.
 
 ==== Main Parameters ====
 || *Parameter* || *Description* || *Possible values* || *Default* ||
+|| `append-database` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `learning` || Semantic memory enabled || `on`, `off` || `off` ||
 || `merge` || Controls how retrievals interact with long-term identifiers in working memory || `none`, `add` || `add` ||
 || `mirroring` || Controls automatic encoding of working-memory changes || `on`, `off` || `off` ||
 || `path` ||  Location of database file || _empty_, _some path_ || _empty_ ||
+
+Various runtime behaviors for the SQLite database backing semantic
+memory can be set via the parameters.  The most commonly used is
+`path`, which specifies the file system path the database is stored
+in.  When `path` is empty, the database is stored in main memory and
+will be lost when the agent exits.  When `path` is set to a valid file
+system path, the SQLite database is written to that path.  
+
+The append-database parameter will determine
+whether all existing facts stored in a database on disk will be erased
+when semantic memory loads it. Note that this affects semantic memory re-initialization
+also, i.e. if the append setting is off, all semantic facts
+stored to disk will be lost when an init-soar is performed. 
+
+Note that changes to database, path and append-database will not have
+an effect until the database is used after an initialization.  This
+happens either at launch or when an init-soar or database initialization
+command is issued.  To switch databases or database storage types on the 
+fly, set your new parameters and then either perform an init-soar or `smem --init`.
+
+The `smem --backup` command can be used to make 
+a copy of the current state of the database, whether in memory or on
+disk. This command will commit all outstanding changes before
+initiating the copy.  
+
+For semantic memory to be reinitialized, all
+references to long-term identifiers in all of Soar's memories must be
+removed.  Consequently,
+`smem --init`
+will reinitialize episodic, semantic, procedural, and working
+memories.  It is equivalent to wiping the semantic store and executing
+these commands:
+
+{{{
+epmem --close
+excise --all
+init-soar
+}}}
+
+The `merge` parameter controls how the augmentations of retrieved long-term identifiers (LTIs) interact with an existing LTI in working memory. If the LTI is not in working memory or has no augmentations in working memory, this parameter has no effect. If the augmentation is in working memory and has augmentations, by default (`add`), semantic memory will add any augmentations that augmented the LTI in a retrieved LTI are added to working memory. If the parameter is set to `none` then semantic memory will not augment the LTI. Note this is opposite of the value of the same parameter in episodic memory.
+
+The `mirroring` parameter controls a useful form of automatic encoding. If enabled (`on`), all changes to long-term identifiers (LTIs) in working memory are "mirrored" to semantic memory (assuming the LTI in working memory has at least one augmentation - i.e. no accidental clearing). The `mirrors` statistic is incremented for each LTI that is updated in this way.
 
 ==== Activation Parameters ====
 || *Parameter* || *Description* || *Possible values* || *Default* ||
@@ -61,6 +108,8 @@ displays a summary of the parameter settings.
 || `base-incremental-threshes` || Sets time deltas after which base-level activation is re-computed for old memories || 1, 2, 3, ... || 10 ||
 || `thresh` || Threshold for activation locality || 0, 1, ... || 100 ||
 
+If `activation-mode` is `base-level`, three parameters control bias values. The `base-decay` parameter sets the free decay parameter in the base-level model. Note that we do implement the (Petrov, 2006) approximation, with a history size set as a compile-time parameter (default=10). The `base-update-policy` sets the frequency with which activation is recomputed. The default, `stable`, only recomputes activation when a memory is referenced (through storage or retrieval). The `naive` setting will update the entire candidate set of memories (defined as those that match the most constraining cue WME) during a retrieval, which has severe performance detriment and should be used for experimentation or those agents that require high-fidelity retrievals. The `incremental` policy updates a constant number of memories, those with last-access ages defined by the `base-incremental-threshes` set.
+
 ==== Performance Parameters ====
 || *Parameter* || *Description* || *Possible values* || *Default* ||
 || `cache-size` || Number of memory pages used in the SQLite cache || 1, 2, ... || 10000 ||
@@ -69,16 +118,16 @@ displays a summary of the parameter settings.
 || `page-size` || Size of each memory page used in the SQLite cache || 1k, 2k, 4k, 8k, 16k, 32k, 64k || 8k ||
 || `timers` || Timer granularity || `off`, `one`, `two`, `three` || `off` ||
 
-If `activation-mode` is `base-level`, three parameters control bias values. The `base-decay` parameter sets the free decay parameter in the base-level model. Note that we do implement the (Petrov, 2006) approximation, with a history size set as a compile-time parameter (default=10). The `base-update-policy` sets the frequency with which activation is recomputed. The default, `stable`, only recomputes activation when a memory is referenced (through storage or retrieval). The `naive` setting will update the entire candidate set of memories (defined as those that match the most constraining cue WME) during a retrieval, which has severe performance detriment and should be used for experimentation or those agents that require high-fidelity retrievals. The `incremental` policy updates a constant number of memories, those with last-access ages defined by the `base-incremental-threshes` set.
-
-The `smem --backup` command can be used to make 
-a copy of the current state of the database, whether in memory or on
-disk. This command will commit all outstanding changes before
-initiating the copy.
-
-The `merge` parameter controls how the augmentations of retrieved long-term identifiers (LTIs) interact with an existing LTI in working memory. If the LTI is not in working memory or has no augmentations in working memory, this parameter has no effect. If the augmentation is in working memory and has augmentations, by default (`add`), semantic memory will add any augmentations that augmented the LTI in a retrieved LTI are added to working memory. If the parameter is set to `none` then semantic memory will not augment the LTI. Note this is opposite of the value of the same parameter in episodic memory.
-
-The `mirroring` parameter controls a useful form of automatic encoding. If enabled (`on`), all changes to long-term identifiers (LTIs) in working memory are "mirrored" to semantic memory (assuming the LTI in working memory has at least one augmentation - i.e. no accidental clearing). The `mirrors` statistic is incremented for each LTI that is updated in this way.
+When the database is stored to disk, the 
+`lazy-commit` and `optimization` parameters control how
+often cached database changes are written to disk.  These parameters
+trade off safety in the case of a program crash with database
+performance.  When `optimization` is set to `performance`, the agent
+will have an exclusive lock on the database, meaning it cannot be
+opened concurrently by another SQLite process such as SQLiteMan.  The
+lock can be relinquished by setting the database to memory or another
+database and issuing init-soar/`smem --init` or by shutting down
+the Soar kernel.
 
 === Statistics ===
 
@@ -162,22 +211,6 @@ inspect the contents of the semantic store.  Running
 will output the concept rooted at `<ltid>` to depth `<depth>` in
 graphviz format, including long-term identifier activation levels.  If `<ltid>` is omitted, the entire contents of the semantic store are outputted.  For more information on
 this format and visualization tools, see http://www.graphviz.org. The `smem --print` option has the same syntax, but outputs text that is similar to using the `print` command to get the substructure of an identifier in working memory, which is possibly more useful for interactive debugging.
-
-=== Reinitialization ===
-
-If, for experimentation/debugging, it is necessary to reinitialize an agent, including its long-term memory, semantic memory supports reinitialization.  For semantic memory to be reinitialized, all
-references to long-term identifiers in all of Soar's memories must be
-removed.  Consequently,
-`smem --init`
-will reinitialize episodic, semantic, procedural, and working
-memories.  It is equivalent to wiping the semantic store and executing
-these commands:
-
-{{{
-epmem --close
-excise --all
-init-soar
-}}}
 
 == See Also ==
 

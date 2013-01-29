@@ -8,11 +8,13 @@ Control the behavior of episodic memory.
 
 {{{
 epmem
+epmem -e|--enable|--on
+epmem -d|--disable|--off
+epmem -i|--init
 epmem -g|--get <parameter>
 epmem -s|--set <parameter> <value>
 epmem -S|--stats [<statistic>]
 epmem -t|--timers [<timer>]
-epmem -c|--close
 epmem -v|--viz <episode id>
 epmem -p|--print <episode id>
 epmem -b|--backup <file name>
@@ -20,11 +22,13 @@ epmem -b|--backup <file name>
 
 == Options ==
 
+|| `-e, --enable, --on` || Enable episodic memory. ||
+|| `-d, --disable, --off` || Disable episodic memory. ||
+|| `-i, --init` || Re-initialize episodic memory ||
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
 || `-t, --timers` || Print timer summary or specific statistic ||
-|| `-c, --close` || Close epmem database and commit to disk (if applicable) ||
 || `-v, --viz` || Print episode in graphviz format ||
 || `-p, --print` || Print episode in user-readable format ||
 || `-b, --backup` || Creates a backup of the episodic database on disk ||
@@ -45,6 +49,7 @@ displays a summary of the parameter settings.
 ==== Main Parameters ====
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
+|| `append-database` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
 || `balance` || Linear weight of match cardinality (1) vs. working memory activation (0) used in calculating match score || `[`0, 1`]` || 1 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
@@ -68,7 +73,8 @@ displays a summary of the parameter settings.
 
 The `learning` parameter turns the episodic memory module on or off.
 When `learning` is set to `off`, no new episodes are encoded and no
-commands put on the epmem link are processed.  The `phase` parameter
+commands put on the epmem link are processed.  This is the same as
+using the enable and disable commands. The `phase` parameter
 determines which decision cycle phase episode encoding and retrieval
 will be performed.  The `trigger` parameter controls when new episodes
 will be encoded.  When it is set to `output`, new episodes will be
@@ -96,22 +102,35 @@ memory can be set via the parameters.  The most commonly used is
 `path`, which specifies the file system path the database is stored
 in.  When `path` is empty, the database is stored in main memory and
 will be lost when the agent exits.  When `path` is set to a valid file
-system path, the SQLite database is written to that path.  When this
-is the case, the `commit` and `optimization` parameters control how
+system path, the SQLite database is written to that path.  
+
+The append-database parameter will determine
+whether all existing episodes recorded in a database on disk will be erased
+when epmem loads it. Note that this affects episodic memory re-initialization
+also, i.e. if the append setting is off, all episodic memories
+stored to disk will be lost when an init-soar is performed. 
+
+Note that changes to database, path and append-database will not have
+an effect until the database is used after an initialization.  This
+happens either at launch or when an init-soar or database initialization
+command is issued.  To switch databases or database storage types on the 
+fly, set your new parameters and then either perform an init-soar or `epmem --init`.
+
+The `epmem --backup` command can be used to make 
+a copy of the current state of the database, whether in memory or on
+disk. This command will commit all outstanding changes before
+initiating the copy.  
+
+When the database is stored to disk, the 
+`lazy-commit` and `optimization` parameters control how
 often cached database changes are written to disk.  These parameters
 trade off safety in the case of a program crash with database
 performance.  When `optimization` is set to `performance`, the agent
 will have an exclusive lock on the database, meaning it cannot be
 opened concurrently by another SQLite process such as SQLiteMan.  The
-lock can be relinquished by issuing `epmem --close` or shutting down
-the Soar kernel. The `epmem --backup` command can be used to make 
-a copy of the current state of the database, whether in memory or on
-disk. This command will commit all outstanding changes before
-initiating the copy.
-
-When the `path` parameter is set to a non-empty value
-for the first time, the value of the `database` parameter is
-automatically changed to `file`.
+lock can be relinquished by setting the database to memory or another
+database and issuing init-soar/`epmem --init` or by shutting down
+the Soar kernel.
 
 The `balance` parameter sets the linear weight of match cardinality vs. cue activation. As a performance optimization, when the value is 1 (default), activation is not computed. If this value is not 1 (even close, such as 0.99), and working memory activation is enabled, this value will be computed for each leaf WME, which may incur a noticeable cost, depending upon the overall complexity of the retrieval.
 
