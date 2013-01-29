@@ -76,17 +76,17 @@ smem_param_container::smem_param_container( agent *new_agent ): soar_module::par
 	add( learning );
 
 	// database
-	database = new soar_module::constant_param<db_choices>( "database", memory, new smem_db_predicate<db_choices>( my_agent ) );
+	database = new soar_module::constant_param<db_choices>( "database", memory, new soar_module::f_predicate<db_choices>(  ) );
 	database->add_mapping( memory, "memory" );
 	database->add_mapping( file, "file" );
 	add( database );
 
 	// append database or dump data on init
-	append_db = new soar_module::boolean_param( "append-database", soar_module::on, new smem_db_predicate<soar_module::boolean>( my_agent ) );
+	append_db = new soar_module::boolean_param( "append-database", soar_module::on, new soar_module::f_predicate<soar_module::boolean>(  ) );
 	add( append_db );
 
 	// path
-	path = new smem_path_param( "path", "", new soar_module::predicate<const char *>(), new smem_db_predicate<const char *>( my_agent ), my_agent );
+	path = new smem_path_param( "path", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>(  ), my_agent );
 	add( path );
 
 	// auto-commit
@@ -169,15 +169,10 @@ smem_path_param::smem_path_param( const char *new_name, const char *new_value, s
 
 void smem_path_param::set_value( const char *new_value )
 {
-	if ( my_agent->smem_first_switch )
-	{
-		my_agent->smem_first_switch = false;
-		my_agent->smem_params->database->set_value( smem_param_container::file );
-
-		const char *msg = "\nDatabase set to file.\n";
-		print( my_agent, const_cast<char *>( msg ) );
-		xml_generate_message( my_agent, const_cast<char *>( msg ) );
-	}
+	/* Removed automatic switching to disk database mode when first setting path.  Now
+	   that switching databases and database modes on the fly seems to work, there's
+	   no need to attach special significance to the first time the path is set.
+	   MMA 2013 */
 
 	value->assign( new_value );
 }
@@ -411,7 +406,7 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	// Delete all entries from the tables in the database if append setting is off
 	if (( new_agent->smem_params->database->get_value() != smem_param_container::memory ) &&
 		( new_agent->smem_params->append_db->get_value() == soar_module::off )) {
-		print_trace_message(new_agent, TRACE_SMEM_SYSPARAM, "...erasing contents of semantic memory database because append mode is off.\n" );
+		print_trace(new_agent, 0, "SMem| Erasing contents of semantic memory database because append mode is off.\n" );
 		drop_tables(new_agent);
 	}
 
@@ -2577,7 +2572,7 @@ void smem_reset( agent *my_agent, Symbol *state )
 
 inline void smem_switch_to_memory_db(agent *my_agent, std::string& buf)
 {
-	print_trace_message(my_agent, 0, buf.c_str() );
+	print_trace(my_agent, 0, buf.c_str() );
 	my_agent->smem_params->database->set_value(smem_param_container::memory);
 	my_agent->smem_db->disconnect();
 	smem_init_db( my_agent );
@@ -2602,12 +2597,12 @@ void smem_init_db( agent *my_agent )
 	{
 		db_path = ":memory:";
 		tabula_rasa = true;
-		print_trace_message(my_agent, TRACE_SMEM_SYSPARAM, "Initializing semantic memory database in cpu memory.\n" );
+		print_trace(my_agent, TRACE_SMEM_SYSPARAM, "SMem| Initializing semantic memory database in cpu memory.\n" );
 	}
 	else
 	{
 		db_path = my_agent->smem_params->path->get_value();
-		print_trace_message(my_agent, TRACE_SMEM_SYSPARAM, "Initializing semantic memory database on disk.\n" );
+		print_trace(my_agent, TRACE_SMEM_SYSPARAM, "SMem| Initializing semantic memory memory database at %s\n", db_path );
 	}
 
 	// attempt connection
@@ -2615,11 +2610,7 @@ void smem_init_db( agent *my_agent )
 
 	if ( my_agent->smem_db->get_status() == soar_module::problem )
 	{
-		char buf[256];
-		SNPRINTF( buf, 254, "DB ERROR: %s", my_agent->smem_db->get_errmsg() );
-
-		print( my_agent, buf );
-		xml_generate_warning( my_agent, buf );
+		print_trace(my_agent, 0, "SMem| Database Error: %s\n", my_agent->smem_db->get_errmsg() );
 	}
 	else
 	{
@@ -2640,7 +2631,7 @@ void smem_init_db( agent *my_agent )
 			{
 				if (sql_is_new)
 				{
-					print_trace_message(my_agent, TRACE_SMEM_SYSPARAM, "...semantic memory database is new.\n" );
+					print_trace(my_agent, TRACE_SMEM_SYSPARAM, "SMem| ...semantic memory database is new.\n" );
 					switch_to_memory = false;
 					tabula_rasa = true;
 				}
@@ -2658,7 +2649,7 @@ void smem_init_db( agent *my_agent )
 								version_error_message.append(".\n...Please convert old semantic memory database or start a new database by "
 										"setting a new database file path.\n...Switching to memory-based database.\n");
 							} else {
-								print_trace_message(my_agent, TRACE_SMEM_SYSPARAM, "...version of semantic memory database ok.\n" );
+								print_trace(my_agent, TRACE_SMEM_SYSPARAM, "SMem| ...version of semantic memory database ok.\n" );
 								switch_to_memory = false;
 								tabula_rasa = false;
 							}
@@ -3313,6 +3304,9 @@ bool smem_parse_chunks( agent *my_agent, const char *chunks_str, std::string **e
 
 	// consume next token
 	get_lexeme( my_agent );
+
+	if ( my_agent->lexeme.type != L_PAREN_LEXEME )
+		good_chunk = false;
 
 	// while there are chunks to consume
 	while ( ( my_agent->lexeme.type == L_PAREN_LEXEME ) && ( good_chunk ) )

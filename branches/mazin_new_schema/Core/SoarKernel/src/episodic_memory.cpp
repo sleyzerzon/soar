@@ -5,14 +5,15 @@
  * FOR LICENSE AND COPYRIGHT INFORMATION.
  *************************************************************************/
 
-/*************************************************************************
- *
- *  file:  episodic_memory.cpp
- *
- * =======================================================================
- * Description  :  Various functions for Soar-EpMem
- * =======================================================================
- */
+/*------------------------------------------------------------------
+					   episodic_memory.cpp
+
+   @brief Soar's episodic memory system
+
+   @detailed
+
+------------------------------------------------------------------ */
+
 
 #include <cmath>
 #include <algorithm>
@@ -109,7 +110,7 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	add( phase );
 
 	// trigger
-	trigger = new soar_module::constant_param<trigger_choices>( "trigger", output, new soar_module::f_predicate<trigger_choices>() );
+	trigger = new soar_module::constant_param<trigger_choices>( "trigger", dc, new soar_module::f_predicate<trigger_choices>() );
 	trigger->add_mapping( none, "none" );
 	trigger->add_mapping( output, "output" );
 	trigger->add_mapping( dc, "dc" );
@@ -132,17 +133,17 @@ epmem_param_container::epmem_param_container( agent *new_agent ): soar_module::p
 	////////////////////
 
 	// database
-	database = new soar_module::constant_param<db_choices>( "database", memory, new epmem_db_predicate<db_choices>( my_agent ) );
+	database = new soar_module::constant_param<db_choices>( "database", memory, new soar_module::f_predicate<db_choices>(  ) );
 	database->add_mapping( memory, "memory" );
 	database->add_mapping( file, "file" );
 	add( database );
 
 	// append database or dump data on init
-	append_db = new soar_module::boolean_param( "append-database", soar_module::off, new epmem_db_predicate<soar_module::boolean>( my_agent ) );
+	append_db = new soar_module::boolean_param( "append-database", soar_module::off, new soar_module::f_predicate<soar_module::boolean>(  ) );
 	add( append_db );
 
 	// path
-	path = new epmem_path_param( "path", "", new soar_module::predicate<const char *>(), new epmem_db_predicate<const char *>( my_agent ), my_agent );
+	path = new epmem_path_param( "path", "", new soar_module::predicate<const char *>(), new soar_module::f_predicate<const char *>(  ), my_agent );
 	add( path );
 
 	// auto-commit
@@ -219,15 +220,10 @@ epmem_path_param::epmem_path_param( const char *new_name, const char *new_value,
 
 void epmem_path_param::set_value( const char *new_value )
 {
-	if ( my_agent->epmem_first_switch )
-	{
-		my_agent->epmem_first_switch = false;
-		my_agent->epmem_params->database->set_value( epmem_param_container::file );
-
-		const char *msg = "\nDatabase set to file.\n";
-		print( my_agent, const_cast<char *>( msg ) );
-		xml_generate_message( my_agent, const_cast<char *>( msg ) );
-	}
+	/* Removed automatic switching to disk database mode when first setting path.  Now
+	   that switching databases and database modes on the fly seems to work, there's
+	   no need to attach special significance to the first time the path is set.
+	   MMA 2013 */
 
 	value->assign( new_value );
 }
@@ -390,12 +386,10 @@ inline void epmem_reverse_hash_str( agent* my_agent, epmem_hash_id s_id_lookup, 
 	soar_module::sqlite_statement* sql_hash_rev_str = my_agent->epmem_stmts_common->hash_rev_str;
 
 	sql_hash_rev_str->bind_int( 1, s_id_lookup );
-	//fprintf(stderr, "DEBUG Executing hash_rev_str for s_id %d\n", (unsigned int) s_id_lookup);
 	res = sql_hash_rev_str->execute();
 	(void)res; // quells compiler warning
 	assert( res == soar_module::row );
 	dest.assign( sql_hash_rev_str->column_text(0) );
-	//fprintf(stderr, "   returned value is %s\n", sql_hash_rev_str->column_text(0));
 	sql_hash_rev_str->reinitialize();
 }
 
@@ -868,7 +862,6 @@ void epmem_common_statement_container::drop_graph_tables() {
 
 	// Note: We don't want to dump versions database because it might also contain other version information
 	// if we ever combine epmem and smem into one database, which is something that has been discussed
-	// (perhaps because a single database works better with server-based db backends like mysql?)
 
 	add_structure( "DROP TABLE IF EXISTS epmem_persistent_variables" );
 	add_structure( "DROP TABLE IF EXISTS epmem_rit_left_nodes" );
@@ -885,8 +878,8 @@ epmem_common_statement_container::epmem_common_statement_container( agent *new_a
 	soar_module::sqlite_database *new_db = new_agent->epmem_db;
 
 	// Drop tables in the database if append setting is off.  (Tried DELETE before, but it had problems.)
-	if ( new_agent->epmem_params->append_db->get_value() == soar_module::off ) {
-		fprintf(stderr, "Dropping epmem tables!!!!!\n");
+	if (( new_agent->epmem_params->database->get_value() != epmem_param_container::memory ) &&
+		( new_agent->epmem_params->append_db->get_value() == soar_module::off )) {
 		drop_graph_tables();
 	}
 
@@ -1045,9 +1038,10 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 {
 	soar_module::sqlite_database *new_db = new_agent->epmem_db;
 
-	// Delete all entries from the tables in the database if append seting is off
-	if ( new_agent->epmem_params->append_db->get_value() == soar_module::off ) {
-		print_trace_message(new_agent, TRACE_EPMEM_SYSPARAM, "...erasing contents of episodic memory database because append mode is off.\n" );
+	// Delete all entries from the tables in the database if append setting is off
+	if (( new_agent->epmem_params->database->get_value() != epmem_param_container::memory ) &&
+		( new_agent->epmem_params->append_db->get_value() == soar_module::off )) {
+		print_trace(new_agent, 0, "EpMem| Erasing contents of database because append mode is off.\n" );
 		drop_graph_tables();
 	}
 
@@ -1764,6 +1758,45 @@ void epmem_clear_transient_structures( agent *my_agent)
 	epmem_parent_id_pool::iterator p;
 	epmem_hashed_id_pool::iterator p_p;
 
+	// de-allocate statement pools
+	{
+		int j, k, m;
+
+		for ( j=EPMEM_RIT_STATE_NODE; j<=EPMEM_RIT_STATE_EDGE; j++ )
+		{
+			for ( k=0; k<=1; k++ )
+			{
+				delete my_agent->epmem_stmts_graph->pool_find_edge_queries[ j ][ k ];
+			}
+		}
+
+		for ( j=EPMEM_RIT_STATE_NODE; j<=EPMEM_RIT_STATE_EDGE; j++ )
+		{
+			for ( k=EPMEM_RANGE_START; k<=EPMEM_RANGE_END; k++ )
+			{
+				for( m=EPMEM_RANGE_EP; m<=EPMEM_RANGE_POINT; m++ )
+				{
+					delete my_agent->epmem_stmts_graph->pool_find_interval_queries[ j ][ k ][ m ];
+				}
+			}
+		}
+
+		for ( k=EPMEM_RANGE_START; k<=EPMEM_RANGE_END; k++ )
+		{
+			for( m=EPMEM_RANGE_EP; m<=EPMEM_RANGE_POINT; m++ )
+			{
+				delete my_agent->epmem_stmts_graph->pool_find_lti_queries[ k ][ m ];
+			}
+		}
+
+		delete my_agent->epmem_stmts_graph->pool_dummy;
+	}
+
+	// de-allocate statements
+	delete my_agent->epmem_stmts_common;
+	delete my_agent->epmem_stmts_graph;
+
+	// de-allocate id repository
 	for ( p=my_agent->epmem_id_repository->begin(); p!=my_agent->epmem_id_repository->end(); p++ )
 	{
 		for ( p_p=p->second->begin(); p_p!=p->second->end(); p_p++ )
@@ -1773,15 +1806,15 @@ void epmem_clear_transient_structures( agent *my_agent)
 
 		delete p->second;
 	}
-
 	my_agent->epmem_id_repository->clear();
 	my_agent->epmem_id_replacement->clear();
+
+	// de-allocate id ref counts
 	for ( epmem_id_ref_counter::iterator rf_it=my_agent->epmem_id_ref_counts->begin(); rf_it!=my_agent->epmem_id_ref_counts->end(); rf_it++ )
 	{
 		delete rf_it->second;
 	}
 	my_agent->epmem_id_ref_counts->clear();
-
 	my_agent->epmem_wme_adds->clear();
 
 	for ( epmem_symbol_set::iterator p_it=my_agent->epmem_promotions->begin(); p_it!=my_agent->epmem_promotions->end(); p_it++ )
@@ -1799,53 +1832,14 @@ void epmem_clear_transient_structures( agent *my_agent)
  **************************************************************************/
 void epmem_close( agent *my_agent )
 {
-	fprintf(stderr, "Closing epmem database!!!\n");
-
 	if ( my_agent->epmem_db->get_status() == soar_module::connected )
 	{
+		print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| Closing database %s.\n", my_agent->epmem_params->path->get_value());
 		// if lazy, commit
 		if ( my_agent->epmem_params->lazy_commit->get_value() == soar_module::on )
 		{
 			my_agent->epmem_stmts_common->commit->execute( soar_module::op_reinit );
 		}
-
-		// de-allocate statement pools
-		{
-			int j, k, m;
-
-			for ( j=EPMEM_RIT_STATE_NODE; j<=EPMEM_RIT_STATE_EDGE; j++ )
-			{
-				for ( k=0; k<=1; k++ )
-				{
-					delete my_agent->epmem_stmts_graph->pool_find_edge_queries[ j ][ k ];
-				}
-			}
-
-			for ( j=EPMEM_RIT_STATE_NODE; j<=EPMEM_RIT_STATE_EDGE; j++ )
-			{
-				for ( k=EPMEM_RANGE_START; k<=EPMEM_RANGE_END; k++ )
-				{
-					for( m=EPMEM_RANGE_EP; m<=EPMEM_RANGE_POINT; m++ )
-					{
-						delete my_agent->epmem_stmts_graph->pool_find_interval_queries[ j ][ k ][ m ];
-					}
-				}
-			}
-
-			for ( k=EPMEM_RANGE_START; k<=EPMEM_RANGE_END; k++ )
-			{
-				for( m=EPMEM_RANGE_EP; m<=EPMEM_RANGE_POINT; m++ )
-				{
-					delete my_agent->epmem_stmts_graph->pool_find_lti_queries[ k ][ m ];
-				}
-			}
-
-			delete my_agent->epmem_stmts_graph->pool_dummy;
-		}
-
-		// de-allocate statements
-		delete my_agent->epmem_stmts_common;
-		delete my_agent->epmem_stmts_graph;
 
 		epmem_clear_transient_structures(my_agent);
 
@@ -1867,7 +1861,19 @@ void epmem_close( agent *my_agent )
 	}
 #endif
 }
-
+/**
+ * @name    epmem_reinit
+ * @param   my_agent
+ * @brief	The function closes and then intializes the episodic memory
+ *          database.  All data structures should be cleaned up and
+ *          re-initialized properly, so this can be used for other database
+ *          setting changes
+ */
+void epmem_reinit( agent *my_agent)
+{
+	epmem_close(my_agent);
+	epmem_init_db(my_agent, true);
+}
 /***************************************************************************
  * Function     : epmem_clear_result
  * Author		: Nate Derbinsky
@@ -1923,7 +1929,7 @@ void epmem_reset( agent *my_agent, Symbol *state )
 
 inline void epmem_switch_to_memory_db(agent *my_agent, std::string& buf, bool readonly)
 {
-	print_trace_message(my_agent, 0, buf.c_str());
+	print_trace(my_agent, 0, buf.c_str());
 	my_agent->epmem_params->database->set_value(epmem_param_container::memory);
 	my_agent->epmem_db->disconnect();
 	epmem_init_db( my_agent, readonly );
@@ -1957,7 +1963,7 @@ void epmem_init_db( agent *my_agent, bool readonly )
 {
 	if ( my_agent->epmem_db->get_status() != soar_module::disconnected )
 	{
-		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "ERROR:  Cannot initialize episodic memory database.  It is already connected!" );
+		print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| ERROR:  Cannot initialize episodic memory database.  It is already connected!" );
 		return;
 	}
 
@@ -1970,12 +1976,12 @@ void epmem_init_db( agent *my_agent, bool readonly )
 	if ( my_agent->epmem_params->database->get_value() == epmem_param_container::memory )
 	{
 		db_path = ":memory:";
-		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "Initializing episodic memory database in cpu memory.\n" );
+		print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| Initializing episodic memory database in cpu memory.\n" );
 	}
 	else
 	{
 		db_path = my_agent->epmem_params->path->get_value();
-		print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "Initializing episodic memory database on disk.\n" );
+		print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| Initializing episodic memory database at %s\n", db_path );
 	}
 
 	// attempt connection
@@ -1988,11 +1994,7 @@ void epmem_init_db( agent *my_agent, bool readonly )
 
 	if ( my_agent->epmem_db->get_status() == soar_module::problem )
 	{
-		char buf[256];
-		SNPRINTF( buf, 254, "DB ERROR: %s", my_agent->epmem_db->get_errmsg() );
-
-		print( my_agent, buf );
-		xml_generate_warning( my_agent, buf );
+		print_trace(my_agent, 0, "Epmem| Database Error: %s\n", my_agent->epmem_db->get_errmsg() );
 	}
 	else
 	{
@@ -2015,7 +2017,7 @@ void epmem_init_db( agent *my_agent, bool readonly )
 				if (sql_is_new)
 				{
 					switch_to_memory = false;
-					print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "...episodic memory database is new.\n" );
+					print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| ...episodic memory database is new.\n" );
 				}
 				else
 				{	// Check if table exists already
@@ -2031,7 +2033,7 @@ void epmem_init_db( agent *my_agent, bool readonly )
 								version_error_message.append(".\n...Please convert old database or start a new database by "
 										"setting a new database file path.\n...Switching to memory-based database.\n");
 							} else { // Version is OK
-								print_trace_message(my_agent, TRACE_EPMEM_SYSPARAM, "...version of episodic memory database ok.\n" );
+								print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| ...version of episodic memory database ok.\n" );
 								switch_to_memory = false;
 							}
 
@@ -2634,7 +2636,7 @@ inline void _epmem_store_level( agent* my_agent,
 					}
 				}
 
-				// now perform deliberate edge search
+				// now perform deliberate wme_i search
 				// ltis don't use the pools, so we make a direct search in the epmem_wmes_identifier table
 				// if failure, drop below and use standard channels
 				{
@@ -3011,15 +3013,7 @@ void epmem_new_episode( agent *my_agent )
 	epmem_time_id time_counter = my_agent->epmem_stats->time->get_value();
 
 	// provide trace output
-	if ( my_agent->sysparams[ TRACE_EPMEM_SYSPARAM ] )
-	{
-		char buf[256];
-
-		SNPRINTF( buf, 254, "NEW EPISODE: %ld", static_cast<long int>(time_counter) );
-
-		print( my_agent, buf );
-		xml_generate_warning( my_agent, buf );
-	}
+	print_trace(my_agent, TRACE_EPMEM_SYSPARAM,  "EpMem| NEW EPISODE: %ld\n", static_cast<long int>(time_counter));
 
 	// perform storage
 	{
@@ -3127,7 +3121,7 @@ void epmem_new_episode( agent *my_agent )
 			epmem_dc_interval_removes = 0;
 #endif
 
-			// nodes
+			// wme's with constant values
 			r = my_agent->epmem_node_removals->begin();
 			while ( r != my_agent->epmem_node_removals->end() )
 			{
@@ -3166,7 +3160,7 @@ void epmem_new_episode( agent *my_agent )
 			}
 			my_agent->epmem_node_removals->clear();
 
-			// edges
+			// wme's with identifier values
 			r = my_agent->epmem_edge_removals->begin();
 			while ( r != my_agent->epmem_edge_removals->end() )
 			{
@@ -4776,12 +4770,7 @@ void epmem_process_query(agent *my_agent, Symbol *state, Symbol *pos_query, Symb
 					epmem_print_retrieval_state(literal_cache, pedge_caches, uedge_caches);
 				}
 
-				if (my_agent->sysparams[TRACE_EPMEM_SYSPARAM]) {
-					char buf[256];
-					SNPRINTF(buf, 254, "CONSIDERING EPISODE (time, cardinality, score) (%lld, %ld, %f)\n", static_cast<long long int>(current_episode), current_cardinality, current_score);
-					print(my_agent, buf);
-					xml_generate_warning(my_agent, buf);
-				}
+				print_trace(my_agent, TRACE_EPMEM_SYSPARAM, "EpMem| Considering episode (time, cardinality, score) (%lld, %ld, %f)\n", static_cast<long long int>(current_episode), current_cardinality, current_score);
 
 #ifdef EPMEM_EXPERIMENT
 				epmem_episodes_searched++;
