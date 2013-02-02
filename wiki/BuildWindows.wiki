@@ -32,7 +32,7 @@ The batch file may ask you for the paths to Java, SWIG, or Python, if it can't f
 
 SCons can generate Visual Studio project and solution files that allow users to more easily modify and debug the kernel source code.  When performing 'build all', these files will also be generated.  You can also manually generate these files by typing
 {{{
-  scons msvs
+  build msvs
 }}}
 Note that the generated projects are not stand-alone, they still call SCons under the hood to build targets.
 
