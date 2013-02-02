@@ -1,11 +1,11 @@
-= Mac OS X =
+= Building Soar on Mac OS X =
 
 == Install the Prerequisites ==
 
   * *Java Developers Package*:  10.6 is the only one we support. You can find this at http://connect.apple.com/ under Java downloads.  You do not have to pay for a developers account.  There's a link at the bottom that will let you register for free resources.
     * *Note*: If you get an error with "jni.h", visit the [http://discussions.apple.com/thread.jspa?threadID=2630649&tstart=0 following page] to see how to resolve it.
   * *XCode*: XCode is the Mac OS development environment under which you'll build Soar.  It is free with the latest version of MacOS.  If you don't already have it, you can download it [http://developer.apple.com/tools/xcode/ here].
-  * *Python*: Soar uses the SCons build system (scons.org), which requires Python. This should already be installed on OSX.  Just make sure you're running an appropriate version.  2.7.2 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  To check your version, type {{{python --version}}}
+  * *Python*: Python 2 is required to build Soar, and should be installed by default in OSX. Please make sure the installed version is 2.x (where x >= 5), as Python 3 doesn't work. To check your version, run `python --version` in a terminal.
   
 == Build Soar ==
 
@@ -20,20 +20,28 @@ For more detailed information about the Scons script, see the [BuildSconsScript 
 
 == Set Up Environment Variables ==
 
-While you don't need any environment variables to build Soar, you may need a few set when running or developing for Soar.  To make these changes permanent, edit the `.bashrc` file in your home diretory and put them at the bottom.
+(The following assumes that you're using the Bash shell)
 
-Soar binaries are, by default, installed to a prefix `SoarSuite/out`.  Java-based Soar application may need to be able to load relevant dynamic libraries on the fly, so you need to make sure that it can find the libraries it needs. Java will look `DYLD_LIBRARY_PATH`, so you can use that to tell it where to look.
-
-{{{
-# The exact path here will depend on your system settings.
-export DYLD_LIBRARY_PATH=/home/$USER/soar/SoarSuite/out/
-}}}
-
-Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, !SpawnDebugger uses it to find the !SoarDebugger.jar.
+In order to build and run a program that uses Soar, your system needs to know the locations of the Soar libraries and header files. Specify the library location by setting the `LD_LIBRARY_PATH` environment variable:
 
 {{{
-# The exact path here will depend on your system settings.
-export SOAR_HOME=/home/$USER/soar/SoarSuite/out/
+export DYLD_LIBRARY_PATH=$HOME/SoarSuite/out:$DYLD_LIBRARY_PATH
 }}}
 
-For more detailed information about library search paths, see our wiki page on [BuildLibrarySearchPaths how library search paths work].
+The exact path depends on where you put the Soar distribution. It should contain the file `libSoar.dylib`. Specify the headers location by setting the `CPATH` environment variable:
+
+{{{
+export CPATH=$HOME/SoarSuite/out/include:$CPATH
+}}}
+
+Please make sure that the `include` directory actually exists. If it does not, you need to build the `headers` target with SCons.
+
+Certain functions in the kernel may also use the SOAR_HOME environment variable to find binaries.  For example, !SpawnDebugger uses it to find !SoarDebugger.jar. Set it like this:
+
+{{{
+export SOAR_HOME=$HOME/SoarSuite/out
+}}}
+
+You can add these commands to the `.bashrc` file in your home directory to automatically set these variables each time you start a Bash shell.
+
+For more detailed information about library search paths, see the wiki page on [BuildLibrarySearchPaths how library search paths work].
