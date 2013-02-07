@@ -7,6 +7,8 @@ Stensrud, B., Purcel, E., Fragomeni, G., Woods, A., Wintermute, S., and Garrity,
 
 Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
 
+Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.shiwali.me/content/mohan_AAAIFS_2012.pdf Learning Grounded Language through Situated Interactive Instruction], In Papers from Robots Learning Interactively from Human Teachers (AAAI Fall Symposium Series), November 2012, Washington D.C.
+
 Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
 
 Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
