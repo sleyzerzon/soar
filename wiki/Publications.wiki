@@ -3,18 +3,6 @@
 
 = 2012 =
 
-Stenger A., Fernando B., Heni M.  (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AMP_FOR_UAVS_A_COGNITIVE_APPROACH.pdf Autonomous Mission Planning for UAVs: A Cognitive Approach], Proceedings des Deutschen Luft- und Raumfahrtkongress, Berlin, 10.09.-12.09.2012, DLRK 2012.
-
-Stensrud, B., Purcel, E., Fragomeni, G., Woods, A., Wintermute, S., and Garrity, P. (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/12045.pdf No More Zombies! High-Fidelity Character Autonomy for Virtual Small-Unit Training], Proceedings of the Interservice/Industry Training, Simulation and Education Conference (I/ITSEC) 2012, Orlando, FL, December 3-6, 2012.
-
-Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
-
-Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.shiwali.me/content/mohan_AAAIFS_2012.pdf Learning Grounded Language through Situated Interactive Instruction], In Papers from Robots Learning Interactively from Human Teachers (AAAI Fall Symposium Series), November 2012, Washington D.C.
-
-Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
-
-Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
-
 Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
 
 Derbinsky, N., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/iccm_2012_competence.pdf Competence-Preserving Retention of Learned Knowledge in Soar's Working and Procedural Memories]. Proc. of the 11th International Conference on Cognitive Modeling (ICCM). Berlin, Germany.
@@ -27,6 +15,8 @@ Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/
 
 Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z.: (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
+Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
+
 Laird, J.E.: [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture], 2012, MIT Press.
 
 Laird, J.E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AISB_quarterly_134.pdf The Soar Cognitive Architecture], AISB Quarterly, #134, 2012
@@ -37,7 +27,17 @@ Mohan, S. and Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs
 
 Mohan, S., and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/mohan_AAAIGPS_2012.pdf Situated Comprehension of Imperative Sentences in Embodied, Cognitive Agents], In The AAAI 2012 Workshop on Grounding Language for Physical Systems, Toronto CA.
 
+Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
+
+Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.shiwali.me/content/mohan_AAAIFS_2012.pdf Learning Grounded Language through Situated Interactive Instruction], In Papers from Robots Learning Interactively from Human Teachers (AAAI Fall Symposium Series), November 2012, Washington D.C.
+
 Nuxoll, A. M. Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/1-s2.0-S1389041711000428-main.pdf Enhancing Intelligent Agents with Episodic Memory], Cognitive systems Research, 17-18,34-48.
+
+Shiquan Zhong, Hongwei Ma, Lizhen Zhou, Xuelian Wang, Shoufeng Ma, and Ning Jia: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/530561.pdf Guidance Compliance Behavior on VMS Based on SOAR Cognitive Architecture]. Mathematical Problems in Engineering, vol. 2012, Article ID 530561, 21 pages, 2012.
+
+Stenger A., Fernando B., Heni M.  (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AMP_FOR_UAVS_A_COGNITIVE_APPROACH.pdf Autonomous Mission Planning for UAVs: A Cognitive Approach], Proceedings des Deutschen Luft- und Raumfahrtkongress, Berlin, 10.09.-12.09.2012, DLRK 2012.
+
+Stensrud, B., Purcel, E., Fragomeni, G., Woods, A., Wintermute, S., and Garrity, P. (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/12045.pdf No More Zombies! High-Fidelity Character Autonomy for Virtual Small-Unit Training], Proceedings of the Interservice/Industry Training, Simulation and Education Conference (I/ITSEC) 2012, Orlando, FL, December 3-6, 2012.
 
 Wintermute, S.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/wintermute2012.pdf Imagery in Cognitive Architecture: Representation and Control at Multiple Levels of Abstraction], Cognitive Systems Research, 19-20,1-29.
 
