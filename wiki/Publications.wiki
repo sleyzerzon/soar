@@ -3,6 +3,8 @@
 
 = 2012 =
 
+Stenger A., Fernando B., Heni M.  (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/AMP_FOR_UAVS_A_COGNITIVE_APPROACH.pdf Autonomous Mission Planning for UAVs: A Cognitive Approach], Proceedings des Deutschen Luft- und Raumfahrtkongress, Berlin, 10.09.-12.09.2012, DLRK 2012.
+
 Stensrud, B., Purcel, E., Fragomeni, G., Woods, A., Wintermute, S., and Garrity, P. (2012), [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/12045.pdf No More Zombies! High-Fidelity Character Autonomy for Virtual Small-Unit Training], Proceedings of the Interservice/Industry Training, Simulation and Education Conference (I/ITSEC) 2012, Orlando, FL, December 3-6, 2012.
 
 Mohan, S., Mininger, A., Kirk, J. and Laird, J. E.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-136.pdf Acquiring Grounded Representations of Words with Situated Interactive Instruction], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
