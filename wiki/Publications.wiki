@@ -149,6 +149,8 @@ Cohen, M. A., Ritter, F. E., Haynes, S. R. (2007). _[http://www.eecs.umich.edu/~
 
 Gorski, N. A. and Laird, J. E. (2007). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CCA-TR-2007-02.pdf Investigating Transfer Learning in the Urban Combat Testbed.]_ (Report No. CCA-TR-2007-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan.
 
+Gunetti, P., Thompson, H.:  [Soar_Planning_Agent_for_Gas-Turbine_Engine_Control.pdf A Soar-Based Planning Agent for Gas-Turbine Engine Control and Health Management],  Proceedings of the 17th IFAC World Congress, 2008, Volume # 17, part 1.
+
 Hogewoning, E., Broekens, J., Eggermont, J., Bovenkamp, E.G.P. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Hogewoning_Broekens_Eggermont_Bovenkamp_IWINAC2007.pdf Strategies for Affect-Controlled Action-Selection in Soar-RL.]_ Proceedings of the 2nd. International Work-Conference on the Interplay between Natural and Artificial Computation (IWINAC), 2007. Murcia, Spain. LNCS 4528 (pp. 501-510), Springer.
 
 Jones, R. M., Lebiere, C., & Crossman, J. A. (2007). _Comparing modeling idioms in ACT-R and Soar._ Proceedings of the Eighth International Conference on Cognitive Modeling. Ann Arbor, MI.
