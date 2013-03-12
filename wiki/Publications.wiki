@@ -13,6 +13,8 @@ Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/
 
 Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aamas2012.pdf Algorithms for Scaling in a General Episodic Memory (Extended Abstract)]. Proc. of the 11th International Conference on Autonomous Agents and Multiagent Systems (AAMAS). Valencia, Spain.
 
+Gunetti, P., Dodd, T., Thompson, H.:  [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70.
+
 Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z.: (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
 Laird, J. E., Derbinsky, N. and Tinkerhess, M.: (2012). [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/paper-3-2-38.pdf Online Determination of Value-Function Structure and Action-value Estimates for Reinforcement Learning in a Cognitive Architecture], Advances in Cognitive Systems, Volume 2, December 2012, Palo Alto, California.
