@@ -13,7 +13,7 @@ Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/
 
 Derbinsky, N., Li, J., Laird, J. E.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aamas2012.pdf Algorithms for Scaling in a General Episodic Memory (Extended Abstract)]. Proc. of the 11th International Conference on Autonomous Agents and Multiagent Systems (AAMAS). Valencia, Spain.
 
-Gunetti, P., Dodd, T., Thompson, H.:  [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70.
+Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Sim_Soar_Autonomous_Mission_Management_Unmanned_Aircraft.pdf Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70. [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic AIAA link]
 
 Laird, J. E., Kinkade, K. R., Mohan, S., and Xu, J. Z.: (2012) [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/CognitiveRobotics_AAAI-12.pdf Cognitive Robotics using the Soar Cognitive Architecture], 8th International Conference on Cognitive Robotics, (Cognitive Robotics Workshop, Twenty-Sixth Conference on Artificial Intelligence (AAAI-12)), Toronto, CA.
 
@@ -77,6 +77,10 @@ Derbinsky, N., Laird, J. E., Smith, B.: _[http://www.eecs.umich.edu/~soar/sitema
 
 Derbinsky, N., Laird, J.E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/aisb2010_rwwa_soar9.pdf Extending Soar with Dissociated Symbolic Memories.]_ Proceedings of the 1st Symposium on Human Memory for Artificial Agents, AISB, 31-37. Leicester, England.
 
+Gunetti, Dodd, Thompson, _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Software_Arch_Autonomous_UAV_Mission_Management.pdf A Software Architecture for Autonomous Mission Management and Control], American Institute of Aeronautics and Astronautics, AIAA InfoTech Aerospace Conference 2010, Paper No. 2010-3305
+
+Gunetti, Thompson, _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Dev_Eval_MAS_Gas-Turbine_Engine_Health_Management.pdf Development and Evaluation of a Multi-Agent System for Gas-Turbine Engine Health Management], Automatic Control in Aerospace Online Journal, Year 3, Number 1, May 2010
+
 Laird, J. E., Wray III, R. E.  (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-Wray-AGI.pdf Cognitive Architecture Requirements for Achieving AGI]_. Proceedings of the Third Conference on Artificial General Intelligence (AGI)
 
 Laird, J. E., Xu, J. Z., and Wintermute, S. (2010). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird-ICCM-final.pdf Using Diverse Cognitive Mechanisms for Action Modeling]_. Proceedings of the Tenth International Conference on Cognitive Modeling, Philadelphia, PA.
@@ -132,6 +136,8 @@ Xu, J., Wintermute, S., Wang, Y. J., Laird, J. _[http://www.eecs.umich.edu/~soar
 = 2008 =
 
 Gunetti, P., Thompson, H.:  _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Soar_Planning_Agent_for_Gas-Turbine_Engine_Control.pdf A Soar-Based Planning Agent for Gas-Turbine Engine Control and Health Management]_,  Proceedings of the 17th IFAC World Congress, 2008, Volume # 17, part 1.
+
+Gunetti, Mills, Thompson, _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Distrib_Intell_Agent_Arch_Gas-Turbine_Engine_Management.pdf A Distributed Intelligent Agent architecture for Gas-Turbine Engine Health Monitoring], Proceedings of the 46th AIAA Aerospace Sciences Meeting and Exhibit, Reno, NV, 2008
 
 Laird, J. E. (2008). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Laird%20-%202008%20-%20Extending%20the%20Soar%20Cognitive%20Architecture.pdf Extending the Soar Cognitive Architecture.]_ In Proceedings of the First Conference on Artificial General Intelligence (AGI-08).
 
