@@ -10,6 +10,7 @@ updated via reinforcement learning.
 {{{
 rl -g|--get <parameter>
 rl -s|--set <parameter> <value>
+rl -t|--trace <parameter> <value>
 rl -S|--stats <statistic>
 }}}
 
@@ -17,6 +18,7 @@ rl -S|--stats <statistic>
 
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
+|| `-t, --trace` || Print, clear, or init traces ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
 
 == Description ==
@@ -45,6 +47,7 @@ displays a summary of the parameter settings.
 || `meta` || Store rule metadata in header string || `on`, `off` || `off` ||
 || `temporal-discount` || Discount RL updates over gaps  || `on`, `off` || `on` ||
 || `temporal-extension` || Propagation of RL updates over gaps  || `on`, `off` || `on` ||
+|| `trace` || Update the trace || `on`, `off` || `off` ||
 || `update-log-path` || File to log information about RL rule updates  || `""`, `<filename>` || `""` ||
 
 ==== Apoptosis Parameters ====
@@ -80,6 +83,27 @@ Note that DBD is a different feature than "meta". Meta determines whether metada
 === RL Update Logging ===
 
 Sets a path to a file that Soar RL will write to whenever a production's RL value gets updated. This can be useful for logging these updates without having to capture all of Soar's output and parse it for these updates. Enable with e.g. "rl --set update-log-path rl_log.txt". Disable with <rl --set update-log-path ""> - that is, use the empty string "" as the log path. The current log path appears under the experimental section when you execute "rl".
+
+=== RL Trace ===
+
+If "rl --set trace on" has been called, then proposed operators will be recorded in the trace for all goal levels. Along with operator names and other attribute-value pairs, transition probabilities derived from their numeric preferences are recorded.
+
+Legal arguments following "rl -t" or "rl --trace" are as follows:
+
+|| `print` ||  Print the trace for the top state. ||
+|| `clear` ||  Erase the traces for all goal levels. ||
+|| `init` || Restart recording from the beginning of the traces for all goal levels. ||
+
+These may be followed by an optional numeric argument specifying a specific goal level to print, clear, or init. "rl -t init" is called automatically whenever Soar is reinitialized. However, "rl -t clear" is never called automatically.
+
+The format in which the trace is printed is designed to be used by the program dot, as part of the <a href="http://www.graphviz.org/">Graphviz</a> suite. The command "ctf rl.dot rl -t" will print the trace for the top state to the file "rl.dot".
+
+Here are some sample dot invocations for the top state:
+
+|| `dot -Tps rl.dot -o rl.ps` || `ps2pdf rl.ps` || Generate a .ps file and convert it to .pdf. ||
+|| `dot -Tsvg rl.dot -o rl.svg` || `inkscape -f rl.svg -A rl.pdf` || Generate a .svg file and convert it to .pdf. ||
+
+The .svg format works better for large traces.
 
 == See Also ==
 
