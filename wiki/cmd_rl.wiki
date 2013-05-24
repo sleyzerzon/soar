@@ -96,7 +96,7 @@ Legal arguments following "rl -t" or "rl --trace" are as follows:
 
 These may be followed by an optional numeric argument specifying a specific goal level to print, clear, or init. "rl -t init" is called automatically whenever Soar is reinitialized. However, "rl -t clear" is never called automatically.
 
-The format in which the trace is printed is designed to be used by the program dot, as part of the <a href="http://www.graphviz.org/">Graphviz</a> suite. The command "ctf rl.dot rl -t" will print the trace for the top state to the file "rl.dot".
+The format in which the trace is printed is designed to be used by the program dot, as part of the <a href="http://www.graphviz.org/">Graphviz</a> suite. The command "ctf rl.dot rl -t" will print the trace for the top state to the file "rl.dot". (The default behavior for "rl -t" is to print the trace for the top state.)
 
 Here are some sample dot invocations for the top state:
 
