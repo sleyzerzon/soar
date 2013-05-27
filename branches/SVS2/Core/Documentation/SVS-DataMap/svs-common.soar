@@ -1,3 +1,0 @@
-pushd svs-common
-source svs-common_source.soar
-popd
