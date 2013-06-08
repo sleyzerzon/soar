@@ -164,7 +164,7 @@ if compiler == 'g++':
 		if GetOption('static'):
 			cflags.extend(['-DSTATIC_LINKED', '-fPIC'])
 
-	libs += [ 'pthread', 'dl', 'm' ]
+	libs += [ 'pthread', 'dl', 'm', 'rt']
 
 elif compiler == 'msvc':
 	cflags = ['/EHsc', '/D', '_CRT_SECURE_NO_DEPRECATE', '/D', '_WIN32', '/W2', '/bigobj']
