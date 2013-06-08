@@ -1,7 +1,0 @@
-sp {propose*update*preference*at*end
-   (state <s> ^name mario-soar-common
-        ^io.input-link <il>)
-   (<il> ^init yes)
---> 
-   (halt)
- }

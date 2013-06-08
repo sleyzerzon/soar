@@ -1,3 +1,0 @@
-pushd clean-house-new-x
-source clean-house-new-x_source.soar
-popd
