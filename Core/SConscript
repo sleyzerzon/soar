@@ -49,10 +49,13 @@ srcs = {
 if compiler == 'msvc':
 	srcs['pcre'] = ('pcre/pcre.cxx', Glob('pcre/*.c'))
 
+svs_objs, svs_inc = SConscript('SVS/SConscript')
+kernel_env.Prepend(CPPPATH = svs_inc)
+
 if GetOption('static'):
-	soarlib = kernel_env.Library('Soar', [srcs[c][scu] for c in srcs])
+	soarlib = kernel_env.Library('Soar', [srcs[c][scu] for c in srcs] + svs_objs)
 else:
-	soarlib = kernel_env.SharedLibrary('Soar', [srcs[c][scu] for c in srcs])[:2]
+	soarlib = kernel_env.SharedLibrary('Soar', [srcs[c][scu] for c in srcs] + svs_objs)[:2]
 	if compiler == 'msvc':
 		kernel_env.Append(CPPFLAGS = ['/D', '_USRDLL'])
 
