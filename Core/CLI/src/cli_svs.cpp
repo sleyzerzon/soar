@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "cli_CommandLineInterface.h"
 #include "sml_AgentSML.h"
 #include "agent.h"
