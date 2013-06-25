@@ -134,6 +134,7 @@ cflags = []
 lnflags = []
 libs = ['Soar']
 if compiler == 'g++':
+	libs += [ 'pthread', 'dl', 'm']
 	if GetOption('defflags'):
 		cflags.append('-Wreturn-type')
 
@@ -158,14 +159,13 @@ if compiler == 'g++':
 
 		if sys.platform == 'linux2':
 			lnflags.append(env.Literal(r'-Wl,-rpath,$ORIGIN'))
+			libs.append('rt')
 		elif 'freebsd' in sys.platform:
 			lnflags.append(env.Literal(r'-Wl,-z,origin,-rpath,$ORIGIN'))
 		# For OSX, use -install_name (specified in Core/SConscript)
 
 		if GetOption('static'):
 			cflags.extend(['-DSTATIC_LINKED', '-fPIC'])
-
-	libs += [ 'pthread', 'dl', 'm']
 
 elif compiler == 'msvc':
 	cflags = ['/EHsc', '/D', '_CRT_SECURE_NO_DEPRECATE', '/D', '_WIN32', '/W2', '/bigobj']
