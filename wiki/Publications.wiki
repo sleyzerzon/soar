@@ -7,7 +7,7 @@ Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker
 
 Li, J., Laird, J.: The Computational Problem of Prospective Memory. Proceedings of the 17th International Conference on Cognitive Modeling. Ottawa, Canada
 
-Li, J. Z., Laird, J. E. (2013). Preemptive Strategies for Overcoming the Forgetting of Goals. In Proceedings of the 27th AAAI Conference on Artificial Intelligence. Bellevue, WA.
+Li, J. Z., Laird, J.: Preemptive Strategies for Overcoming the Forgetting of Goals. Proceedings of the 27th AAAI Conference on Artificial Intelligence. Bellevue, WA.
 
 Mohan, S., Kirk, J., Laird, J.: [http://www.shiwali.me/content/mohan_ICCM_2013.pdf A Computational Model of Situated Task Learning with Interactive Instruction]. Proceedings of the 12th International Conference on Cognitive Modeling. Ottawa, Canada.
 
