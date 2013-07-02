@@ -3,6 +3,9 @@
 
 = 2013 =
 
+Mohan, S., Kirk, J., Laird, J.: [http://www.shiwali.me/content/mohan_ICCM_2013.pdf A Computational Model of Situated Task Learning with Interactive Instruction], In Proceedings of the 17th International Conference on Cognitive Modeling, 2013.
+
+
 Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Sim_Soar_Autonomous_Mission_Management_Unmanned_Aircraft.pdf Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70. [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic AIAA link]
 
 = 2012 =
