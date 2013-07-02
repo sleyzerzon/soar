@@ -7,6 +7,8 @@ Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker
 
 Mohan, S., Kirk, J., Laird, J.: [http://www.shiwali.me/content/mohan_ICCM_2013.pdf A Computational Model of Situated Task Learning with Interactive Instruction], In Proceedings of the 17th International Conference on Cognitive Modeling, 2013.
 
+Xu, J. Z., Laird, J. E. (2013). _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/xu_aaai2013.pdf Learning Integrated Symbolic and Continuous Action Models for Continuous Domains]_. Proceedings of the 27th AAAI Conference on Artificial Intelligence. Bellevue, WA.
+
 = 2012 =
 
 Derbinsky, N., Essl, G.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/nime2012.pdf Exploring Reinforcement Learning for Mobile Percussive Collaboration]. Proc. of the 12th International Conference on New Interfaces for Musical Expression (NIME). Ann Arbor, MI, USA.
