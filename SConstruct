@@ -134,7 +134,7 @@ cflags = []
 lnflags = []
 libs = ['Soar']
 if compiler == 'g++':
-	libs += [ 'pthread', 'dl', 'm']
+	libs += [ 'pthread', 'dl', 'm' ]
 	if GetOption('defflags'):
 		cflags.append('-Wreturn-type')
 
