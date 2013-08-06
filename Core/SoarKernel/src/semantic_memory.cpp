@@ -614,6 +614,88 @@ smem_statement_container::smem_statement_container( agent *new_agent ): soar_mod
 	add( vis_value_lti );
 }
 
+/*This is a test of whether or not the SMEM database with no version number is the one
+that smem_update_schema_one_to_two can convert
+
+It tests for the existance of a table name to determine if this is the old version.
+-Steven Jones*/
+bool smem_version_one(agent *old_agent) {
+	double check_num_tables;
+	old_agent->smem_db->sql_simple_get_float("SELECT count(type) FROM sqlite_master WHERE type='table' AND name='smem7_lti'",check_num_tables);
+	if(check_num_tables==0)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
+//Supposing a database exists with the old version, this should update it. - Steven Jones
+void smem_update_schema_one_to_two(agent *old_agent) {
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_symbols_type (s_id INTEGER PRIMARY KEY,symbol_type INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_symbols_type (s_id, symbol_type) SELECT id, sym_type FROM smem7_symbols_type");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_symbols_type");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_symbols_string (s_id INTEGER PRIMARY KEY,symbol_value TEXT)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_symbols_string (s_id, symbol_value) SELECT id, sym_const FROM smem7_symbols_str");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_symbols_str");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_symbols_integer (s_id INTEGER PRIMARY KEY,symbol_value INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_symbols_integer (s_id, symbol_value) SELECT id, sym_const FROM smem7_symbols_int");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_symbols_int");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_ascii (ascii_num INTEGER PRIMARY KEY,ascii_chr TEXT)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_ascii (ascii_num, ascii_chr) SELECT ascii_num, ascii_num FROM smem7_ascii");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_ascii");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_symbols_float (s_id INTEGER PRIMARY KEY,symbol_value REAL)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_symbols_float (s_id, symbol_value) SELECT id, sym_const FROM smem7_symbols_float");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_symbols_float");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_lti (lti_id INTEGER PRIMARY KEY,soar_letter INTEGER,soar_number INTEGER,total_augmentations INTEGER,activation_value REAL,activations_total INTEGER,activations_last INTEGER,activations_first INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_lti (lti_id, soar_letter, soar_number, total_augmentations, activation_value, activations_total, activations_last, activations_first) SELECT id, letter, num, child_ct, act_value, access_n, access_t, access_1 FROM smem7_lti");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_lti");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_activation_history (lti_id INTEGER PRIMARY KEY,t1 INTEGER,t2 INTEGER,t3 INTEGER,t4 INTEGER,t5 INTEGER,t6 INTEGER,t7 INTEGER,t8 INTEGER,t9 INTEGER,t10 INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_activation_history (lti_id, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10) SELECT id, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 FROM smem7_history");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_history");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_augmentations (lti_id INTEGER,attribute_s_id INTEGER,value_constant_s_id INTEGER,value_lti_id INTEGER,activation_value REAL)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_augmentations (lti_id, attribute_s_id, value_constant_s_id, value_lti_id, activation_value) SELECT parent_id, attr, val_const, val_lti, act_value FROM smem7_web");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_web");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_attribute_frequency (attribute_s_id INTEGER PRIMARY KEY,edge_frequency INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_attribute_frequency (attribute_s_id, edge_frequency) SELECT attr, ct FROM smem7_ct_attr");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_ct_attr");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_wmes_constant_frequency (attribute_s_id INTEGER,value_constant_s_id INTEGER,edge_frequency INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_wmes_constant_frequency (attribute_s_id, value_constant_s_id, edge_frequency) SELECT attr, val_const, ct FROM smem7_ct_const");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_ct_const");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_wmes_lti_frequency (attribute_s_id INTEGER,value_lti_id INTEGER,edge_frequency INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_wmes_lti_frequency (attribute_s_id, value_lti_id, edge_frequency) SELECT attr, val_lti, ct FROM smem7_ct_lti");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_ct_lti");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE smem_persistent_variables (variable_id INTEGER PRIMARY KEY,variable_value INTEGER)");
+	old_agent->smem_db->sql_execute("INSERT INTO smem_persistent_variables (variable_id, variable_value) SELECT id, value FROM smem7_vars");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_vars");
+
+	old_agent->smem_db->sql_execute("CREATE TABLE IF NOT EXISTS versions (system TEXT PRIMARY KEY,version_number TEXT)");
+	old_agent->smem_db->sql_execute("INSERT INTO versions (system, version_number) VALUES ('smem_schema','2.0')");
+	old_agent->smem_db->sql_execute("DROP TABLE smem7_signature");
+
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_symbols_int_const ON smem_symbols_integer (symbol_value)");
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_ct_lti_attr_val ON smem_wmes_lti_frequency (attribute_s_id, value_lti_id)");
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_symbols_float_const ON smem_symbols_float (symbol_value)");
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_symbols_str_const ON smem_symbols_string (symbol_value)");
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_lti_letter_num ON smem_lti (soar_letter,soar_number)");
+	old_agent->smem_db->sql_execute("CREATE INDEX smem_lti_t ON smem_lti (activations_last)");
+	old_agent->smem_db->sql_execute("CREATE INDEX smem_augmentations_parent_attr_val_lti ON smem_augmentations (lti_id, attribute_s_id, value_constant_s_id,value_lti_id)");
+	old_agent->smem_db->sql_execute("CREATE INDEX smem_augmentations_attr_val_lti_cycle ON smem_augmentations (attribute_s_id, value_constant_s_id, value_lti_id, activation_value)");
+	old_agent->smem_db->sql_execute("CREATE INDEX smem_augmentations_attr_cycle ON smem_augmentations (attribute_s_id, activation_value)");
+	old_agent->smem_db->sql_execute("CREATE UNIQUE INDEX smem_wmes_constant_frequency_attr_val ON smem_wmes_constant_frequency (attribute_s_id, value_constant_s_id)");
+}
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -2655,8 +2737,16 @@ void smem_init_db( agent *my_agent )
 							}
 
 						} else {
-							version_error_message.assign("...Error: Cannot read version number from file-based semantic memory database.\n"
-									"...Switching to memory-based database.\n");
+							print_trace(my_agent, 0, "...Cannot read version number from file-based semantic memory database.\n"
+													"...Version of semantic memory database is old.\n"
+													"...Converting to version 2.0.\n" );
+							if (smem_version_one(my_agent)) {
+								smem_update_schema_one_to_two(my_agent);
+								switch_to_memory = false;
+								tabula_rasa = false;
+							} else {
+								version_error_message.assign("...Error: Cannot convert.\n...Switching to memory-based database.\n");
+							}
 						}
 					} else { // Non-empty database exists with no version table.  Probably schema 1.0
 						version_error_message.assign("...Error: Cannot load a semantic memory database with an old schema version.\n...Please convert "

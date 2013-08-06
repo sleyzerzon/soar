@@ -1252,6 +1252,156 @@ epmem_graph_statement_container::epmem_graph_statement_container( agent *new_age
 	}
 }
 
+/*This checks if the database without version number is the type we can convert,
+ * using a naive test of a table name. - Steven Jones*/
+bool epmem_version_one(agent *old_agent) {
+	double check_num_tables;
+	old_agent->epmem_db->sql_simple_get_float("SELECT count(type) FROM sqlite_master WHERE type='table' AND name='edge_now'",check_num_tables);
+	if(check_num_tables==0)
+	{
+		return false;
+	}
+	return true;
+}
+
+/*This converts the old database to the second schema. - Steven Jones*/
+void epmem_update_schema_one_to_two(agent *old_agent)
+{
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_identifier (wi_id INTEGER PRIMARY KEY,parent_n_id INTEGER,attribute_s_id INTEGER,child_n_id INTEGER,last_episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_identifier (wi_id, parent_n_id, attribute_s_id, child_n_id) SELECT parent_id, q0, w, q1 FROM edge_unique");
+	old_agent->epmem_db->sql_execute("DROP TABLE edge_unique");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_constant (wc_id INTEGER PRIMARY KEY,parent_n_id INTEGER,attribute_s_id INTEGER,value_s_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_constant (wc_id, parent_n_id, attribute_s_id, value_s_id) SELECT child_id, parent_id, attrib, value FROM node_unique");
+	old_agent->epmem_db->sql_execute("DROP TABLE node_unique");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_identifier_now (wi_id INTEGER,start_episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_identifier_now (wi_id, start_episode_id) SELECT id, start FROM edge_now");
+	old_agent->epmem_db->sql_execute("DROP TABLE edge_now");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_identifier_point (wi_id INTEGER,episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_identifier_point (wi_id, episode_id) SELECT id, start FROM edge_point");
+	old_agent->epmem_db->sql_execute("DROP TABLE edge_point");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_identifier_range (wi_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,rit_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_identifier_range (wi_id, start_episode_id, end_episode_id, rit_id) SELECT id, start, [end], rit_node FROM edge_range");
+	old_agent->epmem_db->sql_execute("DROP TABLE edge_range");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_constant_now (wc_id INTEGER,start_episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_constant_now (wc_id, start_episode_id) SELECT id, start FROM node_now");
+	old_agent->epmem_db->sql_execute("DROP TABLE node_now");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_constant_point (wc_id INTEGER,episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_constant_point (wc_id, episode_id) SELECT id, start FROM node_point");
+	old_agent->epmem_db->sql_execute("DROP TABLE node_point");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_wmes_constant_range (wc_id INTEGER,start_episode_id INTEGER,end_episode_id INTEGER,rit_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_wmes_constant_range (wc_id, start_episode_id, end_episode_id, rit_id) SELECT id, start, [end], rit_node FROM node_range");
+	old_agent->epmem_db->sql_execute("DROP TABLE node_range");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_symbols_type (s_id INTEGER PRIMARY KEY,symbol_type INTEGER)");
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_symbols_string (s_id INTEGER PRIMARY KEY,symbol_value TEXT)");
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_symbols_integer (s_id INTEGER PRIMARY KEY,symbol_value INTEGER)");
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_symbols_float (s_id INTEGER PRIMARY KEY,symbol_value REAL)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_symbols_type (s_id, symbol_type) SELECT id, sym_type FROM temporal_symbol_hash");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_symbols_string (s_id, symbol_value) SELECT id, sym_const FROM temporal_symbol_hash WHERE sym_type=2");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_symbols_integer (s_id, symbol_value) SELECT id, sym_const FROM temporal_symbol_hash WHERE sym_type=3");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_symbols_float (s_id, symbol_value) SELECT id, sym_const FROM temporal_symbol_hash WHERE sym_type=1");
+	old_agent->epmem_db->sql_execute("DROP TABLE temporal_symbol_hash");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_lti (n_id INTEGER PRIMARY KEY,soar_letter INTEGER,soar_number INTEGER,promotion_episode_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_lti (n_id, soar_letter, soar_number, promotion_episode_id) SELECT parent_id, letter, num, time_id FROM lti");
+	old_agent->epmem_db->sql_execute("DROP TABLE lti");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_ascii (ascii_num INTEGER PRIMARY KEY,ascii_chr TEXT)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_ascii (ascii_num, ascii_chr) SELECT ascii_num, ascii_chr FROM ascii");
+	old_agent->epmem_db->sql_execute("DROP TABLE ascii");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_persistent_variables (variable_id INTEGER PRIMARY KEY,variable_value NONE)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_persistent_variables (variable_id, variable_value) SELECT id, value FROM vars");
+	old_agent->epmem_db->sql_execute("DROP TABLE vars");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_rit_left_nodes (rit_min INTEGER,rit_max INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_rit_left_nodes (rit_min, rit_max) SELECT min, max FROM rit_left_nodes");
+	old_agent->epmem_db->sql_execute("DROP TABLE rit_left_nodes");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_rit_right_nodes (rit_id INTEGER)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_rit_right_nodes (rit_id) SELECT node FROM rit_right_nodes");
+	old_agent->epmem_db->sql_execute("DROP TABLE rit_right_nodes");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_episodes (episode_id INTEGER PRIMARY KEY)");
+	old_agent->epmem_db->sql_execute("INSERT INTO epmem_episodes (episode_id) SELECT id FROM times");
+	old_agent->epmem_db->sql_execute("DROP TABLE times");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE epmem_nodes (n_id INTEGER PRIMARY KEY)");
+
+
+	old_agent->epmem_db->sql_execute("CREATE TABLE versions (system TEXT PRIMARY KEY,version_number TEXT)");
+	old_agent->epmem_db->sql_execute("INSERT INTO versions (system, version_number) VALUES ('epmem_schema','2.0')");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX symbols_int_const ON epmem_symbols_integer (symbol_value)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_identifier_point_id_start ON epmem_wmes_identifier_point(episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_identifier_point_start ON epmem_wmes_identifier_point(episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_constant_range_lower ON epmem_wmes_constant_range(rit_id, start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_constant_range_upper ON epmem_wmes_constant_range(rit_id, end_episode_id DESC)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_constant_range_id_start ON epmem_wmes_constant_range(wc_id, start_episode_id DESC)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_constant_range_id_end_start ON epmem_wmes_constant_range(wc_id, end_episode_id DESC, start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_identifier_range_lower ON epmem_wmes_identifier_range(rit_id, start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_identifier_range_upper ON epmem_wmes_identifier_range(rit_id, end_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_identifier_range_start ON epmem_wmes_identifier_range(wi_id, end_episode_id DESC, start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_identifier_range_end_start ON epmem_wmes_identifier_range(wi_id, end_episode_id DESC, start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX symbols_float_const ON epmem_symbols_float(symbol_value)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_constant_parent_attribute_value ON epmem_wmes_identifier(parent_n_id, attribute_s_id, last_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_identifier_parent_attribute_last ON epmem_wmes_identifier(parent_n_id, attribute_s_id, last_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_identifier_parent_attribute_child ON epmem_wmes_identifier(parent_n_id, attribute_s_id, child_n_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_lti_letter_num ON epmem_lti(soar_letter, soar_number)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX symbols_str_const ON epmem_symbols_string(symbol_value)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_constant_now_start ON epmem_wmes_constant_now(start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_constant_now_id_start ON epmem_wmes_constant_now(wc_id, start_episode_id DESC)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_identifier_now_start ON epmem_wmes_identifier_now(start_episode_id)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_identifier_now_id_start ON epmem_wmes_identifier_now(wi_id, start_episode_id DESC)");
+
+	old_agent->epmem_db->sql_execute("CREATE UNIQUE INDEX epmem_wmes_constant_point_id_start ON epmem_wmes_constant_point(wc_id, episode_id DESC)");
+
+	old_agent->epmem_db->sql_execute("CREATE INDEX epmem_wmes_constant_point_start ON epmem_wmes_constant_point(episode_id)");
+}
+
+
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -2003,9 +2153,18 @@ void epmem_init_db( agent *my_agent, bool readonly )
 								switch_to_memory = false;
 							}
 
-						} else { // Some sort of error reading version info from version database
-							version_error_message.assign("...Error:  Cannot read version number from file-based episodic memory database.\n"
-									"...Switching to memory-based database.\n");
+						} else {
+							// Some sort of error reading version info from version database
+							print_trace(my_agent,0,"...Cannot read version number from file-based episodic memory database.\n"
+							"...Version of episodic memory database is old.\n"
+							"...Converting to version 2.0.\n");
+							if (epmem_version_one(my_agent)) {
+								epmem_update_schema_one_to_two(my_agent);
+								switch_to_memory = false;
+							} else {
+								//Someone likely just loaded the wrong database. (Example: smem instead of epmem)
+								version_error_message.assign("...Error: Cannot convert.\n...Switching to memory-based database.\n");
+							}
 						}
 					} else { // Non-empty database exists with no version table.  Probably schema 1.0
 						version_error_message.assign("...Error:  Cannot load an episodic memory database with an old schema version.\n...Please convert "
