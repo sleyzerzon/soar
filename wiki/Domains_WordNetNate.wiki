@@ -23,7 +23,7 @@ The data files in this project contain ACT-R chunks. The conversion to Soar's se
 
 cat WNChunks.data | php wnlexical.php smem > wn.soar
 
-This conversion is very fast (~30s) and produces about 84MB of text data. Sourcing the resulting data into Soar takes a few minutes and a good amount of memory (~1GB). To make this a one-time cost, switch semantic memory to write to a file before sourcing the data. 
+This conversion is very fast (~30s) and produces about 84MB of text data. Sourcing the resulting data into Soar takes a few minutes and a good amount of memory (~1GB). To make this a one-time cost, switch semantic memory to write to a file before sourcing the data:
 
 {{{
 smem --set database file
