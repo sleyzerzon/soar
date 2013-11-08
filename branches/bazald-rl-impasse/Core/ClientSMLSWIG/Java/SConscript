@@ -6,6 +6,7 @@ import os
 import sys
 import itertools
 import SCons.Script
+from subprocess import check_output
 
 # adapted from http://www.scons.org/wiki/JavaNativeInterface
 def ConfigureJNI(env):
@@ -13,7 +14,7 @@ def ConfigureJNI(env):
 	if not base:
 		if sys.platform == 'darwin':
 			# Apple's OS X has its own special java base directory
-			base = '/System/Library/Frameworks/JavaVM.framework'
+			base = check_output(('/usr/libexec/java_home')).split('\n')[0]
 
 		else:
 			# Search for the java compiler
@@ -25,18 +26,16 @@ def ConfigureJNI(env):
 			# /usr/jdkX.X/bin/javac, java's home directory is /usr/jdkX.X
 			base = os.path.split(jcdir)[0]
 
-	if sys.platform == 'darwin':
-		headers = [os.path.join(base, 'Headers')]
-		libs = [os.path.join(base, 'Libraries')]
+	headers = [os.path.join(base, 'include')]
+	libs = [os.path.join(base, 'lib')]
+	if sys.platform == 'win32':
+		headers.append(os.path.join(base, 'include', 'win32'))
+	elif sys.platform == 'darwin':
+		headers.append(os.path.join(base, 'include', 'darwin'))
+	elif sys.platform.startswith('linux'):
+		headers.append(os.path.join(base, 'include', 'linux'))
 	else:
-		headers = [os.path.join(base, 'include')]
-		libs = [os.path.join(base, 'lib')]
-		if sys.platform == 'win32':
-			headers.append(os.path.join(base, 'include', 'win32'))
-		elif sys.platform.startswith('linux'):
-			headers.append(os.path.join(base, 'include', 'linux'))
-		else:
-			return None
+		return None
 	
 	return (headers, libs)
 
