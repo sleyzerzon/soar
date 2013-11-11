@@ -443,6 +443,7 @@ public:
 	
 	static char const* const kCommand_SVSInput ;
 	static char const* const kCommand_SVSOutput ;
+	static char const* const kCommand_SVSQuery ;
 } ;
 
 }
