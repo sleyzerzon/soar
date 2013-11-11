@@ -792,6 +792,7 @@ public:
 
 	void        SendSVSInput(const std::string &txt);
 	std::string GetSVSOutput();
+	std::string SVSQuery(const std::string &query);
 	
 	/*************************************************************
 	* @brief Get last command line result

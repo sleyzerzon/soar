@@ -949,6 +949,8 @@ protected:
 
 	void        SendSVSInput(const char* agentName, const std::string &txt);
 	std::string GetSVSOutput(const char* agentName);
+	std::string SVSQuery(const char* agentName, const std::string &query);
+	
 };
 
 }//closes namespace

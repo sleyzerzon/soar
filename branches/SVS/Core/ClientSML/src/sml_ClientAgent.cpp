@@ -1430,3 +1430,7 @@ void Agent::SendSVSInput(const std::string &txt) {
 std::string Agent::GetSVSOutput() {
 	return GetKernel()->GetSVSOutput(GetAgentName());
 }
+
+std::string Agent::SVSQuery(const std::string &query){
+	return GetKernel()->SVSQuery(GetAgentName(), query);
+}
