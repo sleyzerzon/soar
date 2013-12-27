@@ -2,6 +2,7 @@
 #labels Featured
 
 = 2013 =
+Mohan, S., Mininger, A., Laird J.: [http://www.cogsys.org/papers/2013conference29.pdf Towards an Indexical Model of Situated Language Comprehension for Real-World Cognitive Agents]_. Proceedings of the 2nd Conference on Advances in Cognitive Systems. Baltimore, Maryland
 
 Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Sim_Soar_Autonomous_Mission_Management_Unmanned_Aircraft.pdf Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70. [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic AIAA link]
 
