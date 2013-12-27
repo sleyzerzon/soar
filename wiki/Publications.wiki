@@ -4,6 +4,10 @@
 = 2013 =
 Mohan, S., Mininger, A., Laird J.: _[http://www.cogsys.org/papers/2013conference29.pdf Towards an Indexical Model of Situated Language Comprehension for Real-World Cognitive Agents]_. Proceedings of the 2nd Conference on Advances in Cognitive Systems. Baltimore, Maryland
 
+Laird, J. E. _Reflections on Abstractions for General Artificial Intelligence_, AAAI Fall Symposium on Abstractions for Intelligence, Washington, D.C.
+
+Laird, J. E. and Mohan, S. _A Case Study of Knowledge Integration Across Multiple Memories in Soar_, AAAI Fall Symposium on Abstractions for Intelligence, Washington, D.C.
+
 Gunetti, P., Dodd, T., Thompson, H.:  [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Sim_Soar_Autonomous_Mission_Management_Unmanned_Aircraft.pdf Simulation of a Soar-Based Autonomous Mission Management System for Unmanned Aircraft], Journal of Aerospace Computing, Information, and Communication, Vol. 10, No. 2 (2013), pp. 53-70. [http://arc.aiaa.org/doi/abs/10.2514/1.53282?journalCode=jacic AIAA link]
 
 Li, J., Laird, J.: [http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Li2013TheComputationalProblem.pdf The Computational Problem of Prospective Memory]_. Proceedings of the 17th International Conference on Cognitive Modeling. Ottawa, Canada
