@@ -11,7 +11,7 @@ It might also run on older versions of Windows, but they are not officially supp
     * [http://msdn.microsoft.com/en-us/windowsserver/bb980924.aspx Windows SDK]. Free, and includes both the 32 and 64 bit compilers, but no IDE. You can also install this alongside VC++ Express to get access to the 64-bit compiler in the IDE. See [http://stackoverflow.com/questions/1865069/how-to-compile-a-64-bit-application-using-visual-c-2010-express this Stack Overflow answer] for details. 
     * Note that because Soar is built by [http://scons.org SCons], you don't need the Visual Studio IDE or project configurations to build it. You only need the command-line compiler, linker, and runtime libraries.
   # *Python*
-    * SCons requires Python. Python version 2.7 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  You can download Python from [http://www.python.org/download/releases/2.7.3/ python.org]. We recommend using the installer. 
+    * SCons requires Python. Python version 2.7 is recommended, but anything from 2.5 onward should work. The Python 3.x series WILL NOT WORK.  You can download Python from [http://www.python.org/download/releases/2.7.6/ python.org]. We recommend using the installer. 
     * As with SWIG, please install Python to a path without spaces. If you use the installer from python.org, the default `C:\Python2X` is a good choice.
     * You don't need to download SCons itself, as it is included in the Soar distribution.
   # *SWIG*
