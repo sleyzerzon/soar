@@ -2,7 +2,7 @@
 #labels Featured
 
 = 2013 =
-Kirk, J. and Laird J. E. 2013. Learning Task Formulations through Situated Interactive Instruction. Proceedings of the 2nd Conference on Advances in Cognitive Systems. Baltimore, Maryland
+Kirk, J. and Laird J. E. 2013. _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/kirklairdACS2013.pdf Learning Task Formulations through Situated Interactive Instruction]_. Proceedings of the 2nd Conference on Advances in Cognitive Systems. Baltimore, Maryland
 
 Mohan, S., Mininger, A., Laird J.: _[http://www.cogsys.org/papers/2013conference29.pdf Towards an Indexical Model of Situated Language Comprehension for Real-World Cognitive Agents]_. Proceedings of the 2nd Conference on Advances in Cognitive Systems. Baltimore, Maryland
 
