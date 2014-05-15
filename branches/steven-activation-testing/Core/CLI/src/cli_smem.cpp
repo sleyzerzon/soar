@@ -178,6 +178,27 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         PrintCLIMessage(&viz);
         return true;
     }
+	else if ( pOp == 'q' )
+	{
+		std::string *err = NULL;
+		std::string *retrieved = NULL;
+		bool result = smem_parse_cues( agnt, pAttr->c_str(), &( err ), &( retrieved ), false );
+		/*
+		 * This will be changed after the initial case works.
+		 * The next step is to allow an additional argument of the number of candidate matches besides the first match to display.
+		 * */
+
+
+		if ( !result )
+		{
+			SetError( "Error while parsing query " + *err + ".");
+		} else {
+			PrintCLIMessage( retrieved );
+			PrintCLIMessage("SMem| Query complete.");
+		}
+
+		return result;
+	}
     else if ( pOp == 's' )
     {
         soar_module::param *my_param = agnt->smem_params->get( pAttr->c_str() );
