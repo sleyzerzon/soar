@@ -3484,6 +3484,246 @@ bool smem_parse_chunks( agent *my_agent, const char *chunks_str, std::string **e
 	return return_val;
 }
 
+/*
+ * The smem_parse_chunks function is actually very focused on reading in the
+ * lexemes and turning them into LTIs, then directly adding them in.
+ * The plan for the function below (smem_parse_chunks_for_query) is to similarly
+ * make cue wmes for passing to smem_process_query. The function may even directly call smem_process_query
+ * rather than pass some intermediate result. (Right now, the function here does nothing useful.)
+ * */
+
+bool smem_parse_cues( agent *my_agent, const char *chunks_str, std::string **err_msg, std::string **result_message, bool add)//new argument "add" distinguishes between "smem --add" and "smem --query"
+{
+	bool return_val = false; //This is essentially a success or failure flag.
+	uint64_t clause_count = 0; //This is counting how many things are in the cue. Useful for debugging.
+
+	// parsing chunks requires an open semantic database
+	smem_attach( my_agent );
+
+	// copied primarily from cli_sp
+	my_agent->alternate_input_string = chunks_str;
+	my_agent->alternate_input_suffix = const_cast<char *>( ") " );
+	my_agent->current_char = ' ';
+	my_agent->alternate_input_exit = true;
+	set_lexer_allow_ids( my_agent, true );//This is the end of the incantation.
+
+    bool good_cue = true;
+
+	std::map<std::string, Symbol*> cue_ids; //TOCLARIFY: I believe the point of this is to keep track of previous references when adding new clauses.
+	std::map<std::string, Symbol*>::iterator c_old;
+
+	std::set<wme*> newbies;
+	std::set<wme*>::iterator c_new;
+
+
+	// consume next token
+	get_lexeme( my_agent );
+
+	if ( my_agent->lexeme.type != L_PAREN_LEXEME )
+		good_cue = false;
+
+//	//This is the actual id that gets passed to smem_process_query.
+//	//It needs to be able to spit out augmentations.
+
+	Symbol* root_cue_id;
+	Symbol* negative_cues;
+
+	//This keeps track of the current id being given attributes.
+	//Symbol* current_id;
+
+	bool trigger_first = true;
+	bool minus_ever = false;
+	// while there are chunks to consume
+	while ( ( my_agent->lexeme.type == L_PAREN_LEXEME ) && ( good_cue ) )//This is just setting up the loop
+	{
+		// consume left paren
+		get_lexeme( my_agent );
+
+		//If we are on the first make the cue, otherwise, make sure it is the cue variable.
+		if (trigger_first)
+		{
+			good_cue = (my_agent->lexeme.type == VARIABLE_LEXEME);
+			if ( good_cue )
+			{
+				root_cue_id = make_new_identifier(my_agent,(char)my_agent->lexeme.string[1],1);
+				cue_ids[my_agent->lexeme.string] = root_cue_id;
+				negative_cues = make_new_identifier(my_agent,(char)my_agent->lexeme.string[1],1);
+			}
+
+
+		}
+		else
+		{
+			good_cue = (cue_ids[my_agent->lexeme.string] == root_cue_id);
+		}
+
+		if ( good_cue )
+		{
+			//Consume the id.
+			get_lexeme( my_agent );
+
+			Symbol * attribute;
+			slot* temp_slot;
+
+			//Now, we process the attributes of the id that we have retrieved.
+			bool minus = false;
+
+			bool first_attribute = true;
+			while ( my_agent->lexeme.type == UP_ARROW_LEXEME || my_agent->lexeme.type == MINUS_LEXEME)
+			{
+				if (my_agent->lexeme.type == MINUS_LEXEME) {
+					minus_ever = true;
+					if (first_attribute) {
+						good_cue = false;
+						break;
+					}
+					get_lexeme( my_agent );
+					good_cue = ( my_agent->lexeme.type == UP_ARROW_LEXEME );
+					minus = true;
+				} else {
+					minus = false;
+				}
+				get_lexeme( my_agent );//This consumes the up arrow and gives the attribute.
+
+				attribute = smem_parse_constant_attr( my_agent, &( my_agent->lexeme ) );//This gives the sym, float, or string constant type of the attribute.
+
+				Symbol * value;
+				wme * temp_wme;
+
+				if ( minus )
+				{
+					temp_slot = make_slot(my_agent,negative_cues,attribute);
+				}
+				else
+				{
+					temp_slot = make_slot(my_agent,root_cue_id,attribute);//Make a slot for this attribute, or return slot it already has.
+				}
+
+				if (attribute != NIL)//If some constant attribute, continue on to the value(s)
+				{
+					//Consume the attribute
+					get_lexeme( my_agent );
+
+
+					do //Add value by type.
+					{
+						value = NIL;
+						if (my_agent->lexeme.type == SYM_CONSTANT_LEXEME)
+						{
+							value = make_sym_constant(my_agent, static_cast<const char *>(my_agent->lexeme.string));
+							get_lexeme(my_agent);
+						}
+						else if (my_agent->lexeme.type == INT_CONSTANT_LEXEME)
+						{
+							value = make_int_constant(my_agent, my_agent->lexeme.int_val);
+							get_lexeme(my_agent);
+						}
+						else if (my_agent->lexeme.type == FLOAT_CONSTANT_LEXEME)
+						{
+							value = make_float_constant(my_agent, my_agent->lexeme.float_val);
+							get_lexeme(my_agent);
+						}
+						else if (my_agent->lexeme.type == AT_LEXEME)
+						{
+							//If the LTI isn't recognized, then it cannot be a good cue.
+							//Don't know how to handle negative cues for this.
+							get_lexeme( my_agent );
+							value = find_identifier(my_agent, my_agent->lexeme.id_letter, my_agent->lexeme.id_number);
+							good_cue = (value != NIL);
+							get_lexeme(my_agent);
+						}
+						else if (my_agent->lexeme.type == VARIABLE_LEXEME || my_agent->lexeme.type == IDENTIFIER_LEXEME)
+						{
+							std::map<std::basic_string<char>, symbol_union*>::iterator value_iterator;
+							value_iterator = cue_ids.find(my_agent->lexeme.string);
+
+							if( value_iterator == cue_ids.end() )
+							{
+								value = make_new_identifier(my_agent,(char)my_agent->lexeme.string[0],1);
+							}
+							get_lexeme(my_agent);
+						}
+						else
+						{
+							good_cue = ( my_agent->lexeme.type == R_PAREN_LEXEME || my_agent->lexeme.type == UP_ARROW_LEXEME || my_agent->lexeme.type == MINUS_LEXEME);
+						}
+
+						if (value != NIL && good_cue) //Value might be nil, but R_paren could make it a good cue.
+						{
+							if (minus) {
+								temp_wme = make_wme(my_agent, negative_cues, attribute, value, false);
+							}
+							else
+							{
+								temp_wme = make_wme(my_agent, root_cue_id, attribute, value, false);
+							}
+							insert_at_head_of_dll (temp_slot->wmes, temp_wme, next, prev);//Put the wme in the slot for the attribute.
+						}
+						//get_lexeme(my_agent);//Consume the value.
+					} while (value != NIL); //Loop until there are no more value lexemes to add to that final attribute.
+
+				} else {
+					good_cue = false;
+					break;
+				}
+				first_attribute = false;
+			}
+
+		}
+		else
+		{
+			break;
+		}
+
+		while (my_agent->lexeme.type == R_PAREN_LEXEME) {//This should consume the right paren. (For some reason, I get more than one.)
+			get_lexeme(my_agent);
+		}
+
+		if ( good_cue )
+		{
+
+			// increment clause counter
+			clause_count++;
+		}
+		trigger_first = false; //It is no longer the first clause.
+	}
+
+    return_val = good_cue;
+
+	// produce error message on failure
+	if ( !return_val )
+	{
+		std::string num;
+		to_string( clause_count, num );
+
+		(*err_msg) = new std::string( "Error parsing clause #" );
+		(*err_msg)->append( num );
+	}
+	else
+	{
+		smem_lti_set *prohibit = new smem_lti_set;
+		soar_module::wme_set cue_wmes;
+		soar_module::symbol_triple_list meta_wmes;
+		soar_module::symbol_triple_list retrieval_wmes;
+		(*result_message) = new std::string();
+		if (!minus_ever)
+		{
+			negative_cues = NIL;
+		}
+
+		//un-NIL the NIL after "root_cue_id". I need negative cues. It should be easy to handle, but I'm going to test what I have first.
+		smem_lti_id retrieved_id = smem_process_query(my_agent,NIL,root_cue_id,negative_cues,prohibit,cue_wmes,meta_wmes,retrieval_wmes,qry_search);
+		if (retrieved_id != NIL)
+		{
+			smem_print_lti( my_agent, retrieved_id, 1, *result_message ); //"1" is the depth
+		}
+		else
+		{
+			(*result_message)->append( "SMem| No results for query." );
+		}
+	}
+	return return_val;
+}
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
