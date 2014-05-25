@@ -24,7 +24,7 @@ The `cli` command is used to interface to special libraries that extend the func
 
 The first time that you turn a module on, Soar will attempt to look for a dynamically-linked library based on the module-name passed to the cli command.  Specifically, it looks for a dll named `[dllprefix][language]SoarLib.[dllextension]`.  (The dll prefix and extension vary depending on the platform.)
 
-When the `on` parameter is given, all future Soar commands will be passed to the module for processing.  This allows the module to provide additional functionality. Similarly, the off message will send the CLI library an “off” message that will cause it to unregister all relevant callback handlers and stop processing Soar commands.
+When the `on` parameter is given, all future Soar commands will be passed to the module for processing.  This allows the module to provide additional functionality. Similarly, the off message will send the CLI library an `off` message that will cause it to unregister all relevant callback handlers and stop processing Soar commands.
 
 == Examples ==
 
