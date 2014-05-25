@@ -12,6 +12,7 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_capture_input capture-input]
  * [cmd_cd cd]
  * [cmd_chunk_name_format chunk-name-format]
+ * [cmd_cli cli]
  * [cmd_clog clog]
  * [cmd_command_to_file command-to-file]
  * [cmd_default_wme_depth default-wme-depth]
