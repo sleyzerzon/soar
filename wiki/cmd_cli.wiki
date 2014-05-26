@@ -39,7 +39,3 @@ To turn off Tcl mode:
 {{{
 cli tcl off
 }}}
-
-== See Also ==
-
-[cmd_echo]
