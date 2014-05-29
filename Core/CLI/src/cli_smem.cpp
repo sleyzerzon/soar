@@ -138,7 +138,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
     {
         smem_lti_id lti_id = NIL;
         unsigned int depth = 1;
-
+        bool history = false;
 		smem_attach(agnt);
 
 		if ( pAttr )
@@ -152,7 +152,14 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 
 					if ( ( lti_id != NIL ) && pVal )
 					{
-						from_c_string( depth, pVal->c_str() );
+						if (!strcmp(pVal->c_str(),"h") || !strcmp(pVal->c_str(),"history"))
+						{
+							history = true;
+						}
+						else
+						{
+							from_c_string( depth, pVal->c_str() );
+						}
 					}
 				}
 			}
@@ -169,7 +176,7 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
         }
         else
         {
-            smem_print_lti( agnt, lti_id, depth, &( viz ) );
+            smem_print_lti( agnt, lti_id, depth, &( viz ), history );
         }
         if (viz.empty())
         	return SetError("SMem| Semantic memory is empty.");
@@ -180,13 +187,15 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
     }
 	else if ( pOp == 'q' )
 	{
-		std::string *err = NULL;
-		std::string *retrieved = NULL;
-		bool result = smem_parse_cues( agnt, pAttr->c_str(), &( err ), &( retrieved ), false );
-		/*
-		 * This will be changed after the initial case works.
-		 * The next step is to allow an additional argument of the number of candidate matches besides the first match to display.
-		 * */
+		std::string *err = new std::string;
+		std::string *retrieved = new std::string;
+		unsigned int number_to_retrieve = 1;
+		if ( pVal )
+		{
+			from_c_string( number_to_retrieve, pVal->c_str() );
+		}
+		bool result = smem_parse_cues( agnt, pAttr->c_str(), &( err ), &( retrieved ), number_to_retrieve);
+
 
 
 		if ( !result )
@@ -196,7 +205,24 @@ bool CommandLineInterface::DoSMem( const char pOp, const std::string* pAttr, con
 			PrintCLIMessage( retrieved );
 			PrintCLIMessage("SMem| Query complete.");
 		}
-
+		delete err;
+		delete retrieved;
+		return result;
+	}
+	else if ( pOp == 'r' )
+	{
+		std::string *err = new std::string;
+		std::string *retrieved = new std::string;
+		bool result = smem_parse_remove( agnt, pAttr->c_str(), &( err ), &( retrieved ));
+		if ( !result )
+		{
+			SetError( "Error while attempting removal." );// " + *err + ".");
+		} else {
+			PrintCLIMessage( retrieved );
+			PrintCLIMessage("SMem| Removal complete.");
+		}
+		delete err;
+		delete retrieved;
 		return result;
 	}
     else if ( pOp == 's' )

@@ -3074,6 +3074,7 @@ namespace cli
                 {'i', "init",       OPTARG_NONE},
 				{'p', "print",      OPTARG_NONE},
 				{'q', "query",      OPTARG_NONE},//TEST: Just added this for a new smem api I'm making.
+				{'r', "remove",     OPTARG_NONE},//TEST: Just added this for a new smem api I'm making.
                 {'s', "set",        OPTARG_NONE},
                 {'S', "stats",      OPTARG_NONE},
                 {'t', "timers",     OPTARG_NONE},
@@ -3146,10 +3147,21 @@ namespace cli
                 }
 			case 'q':
 				{
-					// case: query requires one non-option argument
-					if (!opt.CheckNumNonOptArgs(1, 1)) return cli.SetError( opt.GetError().c_str());
+					// case: query requires one non-option argument, but can have a depth argument.
+					if (!opt.CheckNumNonOptArgs(1, 2)) return cli.SetError( opt.GetError().c_str());
 
-					return cli.DoSMem( option, &( argv[2] ) );
+					if (opt.GetNonOptionArguments() == 1)
+						return cli.DoSMem( option, &( argv[2] ) );
+
+					return cli.DoSMem( option, &(argv[2]), &(argv[3]) );//This includes depth.
+				}
+			case 'r':
+				{
+					// case: remove requires one non-option argument.
+					if (opt.GetNonOptionArguments() == 1)
+						return cli.DoSMem( option, &( argv[2] ) );
+					else
+						return cli.SetError( opt.GetError().c_str());
 				}
             case 's':
                 {

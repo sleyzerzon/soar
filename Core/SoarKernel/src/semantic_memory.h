@@ -447,6 +447,7 @@ typedef struct smem_vis_lti_struct
 //
 
 enum smem_query_levels { qry_search, qry_full };
+enum smem_install_type {wm_install, fake_install};
 
 
 //////////////////////////////////////////////////////////
@@ -456,13 +457,14 @@ enum smem_query_levels { qry_search, qry_full };
 extern bool smem_enabled( agent *my_agent );
 extern void smem_attach( agent *my_agent );
 
-extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg );
-extern bool smem_parse_cues( agent *my_agent, const char *chunks_str, std::string **err_msg, std::string **result_message, bool add);
+extern bool smem_parse_chunks( agent *my_agent, const char *chunks, std::string **err_msg);
+extern bool smem_parse_cues( agent *my_agent, const char *chunks, std::string **err_msg, std::string **result_message, int number_to_receive);
+extern bool smem_parse_remove( agent *my_agent, const char *chunks, std::string **err_msg, std::string **result_message);
 
 extern void smem_visualize_store( agent *my_agent, std::string *return_val );
 extern void smem_visualize_lti( agent *my_agent, smem_lti_id lti_id, unsigned int depth, std::string *return_val );
 extern void smem_print_store( agent *my_agent, std::string *return_val );
-extern void smem_print_lti( agent *my_agent, smem_lti_id lti_id, unsigned int depth, std::string *return_val );
+extern void smem_print_lti( agent *my_agent, smem_lti_id lti_id, unsigned int depth, std::string *return_val, bool history = false);
 
 typedef struct condition_struct condition;
 typedef struct action_struct action;
