@@ -374,6 +374,7 @@ Bool add_to_chunk_cond_set (agent* thisAgent, chunk_cond_set *set, chunk_cond *n
     free_with_pool (&thisAgent->chunk_cond_pool, new_cc);
     return FALSE;
   }
+
   /* --- add new_cc to the table --- */
   insert_at_head_of_dll (set->all, new_cc, next, prev);
   insert_at_head_of_dll (set->table[new_cc->compressed_hash_value], new_cc,
@@ -433,26 +434,30 @@ void build_chunk_conds_for_grounds_and_add_negateds (agent* thisAgent,
     ground = static_cast<condition_struct *>(c->first);
     free_cons (thisAgent, c);
     /* --- make the instantiated condition --- */
-    allocate_with_pool (thisAgent, &thisAgent->chunk_cond_pool, &cc);
-    cc->cond = ground;
-    cc->instantiated_cond = copy_condition (thisAgent, cc->cond);
-    cc->variablized_cond = copy_condition (thisAgent, cc->cond);
-    if (prev_cc) {
-      prev_cc->next = cc;
-      cc->prev = prev_cc;
-      cc->variablized_cond->prev = prev_cc->variablized_cond;
-      prev_cc->variablized_cond->next = cc->variablized_cond;
-      cc->instantiated_cond->prev = prev_cc->instantiated_cond;
-      prev_cc->instantiated_cond->next = cc->instantiated_cond;
-    } else {
-      first_cc = cc;
-      cc->prev = NIL;
-      cc->variablized_cond->prev = NIL;
-      cc->instantiated_cond->prev = NIL;
+    // SM 2014: lti substructure should not be a part of the chunk
+    // as ltis are assumed to be constants
+    if(ground->bt.wme_->id->id.smem_lti == NIL){
+      allocate_with_pool (thisAgent, &thisAgent->chunk_cond_pool, &cc);
+      cc->cond = ground;
+      cc->instantiated_cond = copy_condition (thisAgent, cc->cond);
+      cc->variablized_cond = copy_condition (thisAgent, cc->cond);
+      if (prev_cc) {
+	prev_cc->next = cc;
+	cc->prev = prev_cc;
+	cc->variablized_cond->prev = prev_cc->variablized_cond;
+	prev_cc->variablized_cond->next = cc->variablized_cond;
+	cc->instantiated_cond->prev = prev_cc->instantiated_cond;
+	prev_cc->instantiated_cond->next = cc->instantiated_cond;
+      } else {
+	first_cc = cc;
+	cc->prev = NIL;
+	cc->variablized_cond->prev = NIL;
+	cc->instantiated_cond->prev = NIL;
+      }
+      prev_cc = cc;
+      /* --- add this in to the TC --- */
+      add_cond_to_tc (thisAgent, ground, tc_to_use, NIL, NIL);
     }
-    prev_cc = cc;
-    /* --- add this in to the TC --- */
-    add_cond_to_tc (thisAgent, ground, tc_to_use, NIL, NIL);
   }
 
   /* --- scan through negated conditions and check which ones are connected
@@ -944,6 +949,17 @@ bool should_variablize(agent *thisAgent, instantiation *inst) {
 	{
 		return false;
 	}
+
+	/* if a result is created in a state higher than the immediate		
+	   superstate, don't make chunks for intermediate justifications.		
+	*/		
+	for (p=inst->preferences_generated; p; p=p->inst_next)		
+	  {		
+	    if (p->id->id.level < inst->match_goal_level-1)		
+	      {		
+		return false;		
+	      }		
+	  }
 
 	return true;
 }
