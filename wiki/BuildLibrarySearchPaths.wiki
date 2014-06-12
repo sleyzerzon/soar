@@ -1,32 +1,7 @@
 === OS-Specific Library Search Paths ===
 
 This section is not about building Soar, but running the executables that
-you've built. Because the Soar libraries are not installed to standard
-locations such as /usr/lib on Linux or C:\Windows\System32 on Windows,
-the operating system doesn't know where to look for them. This is probably
-the biggest and most frequently encountered problem when getting Soar up
-and running.
-
-The most straightforward way to solve this problem is to tell the OS where
-to look. In Linux, this means setting the LD_LIBRARY_PATH environment
-variable to include the directory libSoar.so is in. Similarly on Mac OSX,
-you should set DYLD_LIBRARY_PATH. On both operating systems, the command
-for setting the environment variable should look like:
-{{{
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/directory/of/your/Soar/library
-}}}
-or
-{{{
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/directory/of/your/Soar/library
-}}}
-Note that you can't put spaces around the =, and you have to use export
-so that the variable will be inherited by child processes.
-
-In Windows, you should set PATH to include the directory containing Soar.dll.
-
-The rest of this section contains explanations of what's going on under
-the hood of every operating system so that you'll have some insight
-should you run into issues.
+you've built. 
 
 ==== Linux ====
 In Linux, the GNU linker provides an -rpath flag that hard codes
@@ -73,6 +48,34 @@ order, see
 
 http://msdn.microsoft.com/en-us/library/windows/desktop/ms682586%28v=vs.85%29.aspx
 
+==== If You have Trouble With The Above ====
+
+Because the Soar libraries are not installed to standard
+locations such as /usr/lib on Linux or C:\Windows\System32 on Windows,
+the operating system may not know where to look for them, depending on
+what you're trying to run.  This is probably the biggest and most frequently 
+encountered problem when getting Soar up and running.
+
+The most straightforward way to solve this problem is to tell the OS where
+to look. In Linux, this means setting the LD_LIBRARY_PATH environment
+variable to include the directory libSoar.so is in. Similarly on Mac OSX,
+you should set DYLD_LIBRARY_PATH. On both operating systems, the command
+for setting the environment variable should look like:
+{{{
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/directory/of/your/Soar/library
+}}}
+or
+{{{
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/directory/of/your/Soar/library
+}}}
+Note that you can't put spaces around the =, and you have to use export
+so that the variable will be inherited by child processes.
+
+In Windows, you should set PATH to include the directory containing Soar.dll.
+
+The rest of this section contains explanations of what's going on under
+the hood of every operating system so that you'll have some insight
+should you run into issues.
 
 === Java Search Paths ===
 The Java virtual machine has two sets of search paths: the class path and
