@@ -1,10 +1,10 @@
 === Download Soar ===
 
-The current stable version of Soar is *9.3.2*.
+The current stable version of Soar is *9.3.3*.
 
 This release of Soar continues the 9.3 line which includes modules for reinforcement learning (RL), episodic memory (EpMem), and semantic memory (SMem), as well as everything from previous versions of Soar. It includes a new "forgetting" mechanism, several bug fixes, a new distribution structure, and a simplification of how libraries are built in Soar.  All learning mechanisms are disabled by default.
 
-[ReleaseNotes#9.3.2 Here are full release notes for the 9.3.2 release].
+[ReleaseNotes#9.3.3 Here are full release notes for the 9.3.3 release].
 
 *Note*: If you are new to Soar, you'll probably want to download the [SoarTutorial Soar Tutorial package], which is a single self-contained package with all the things you'll need to go through the Soar Tutorial, namely Soar, the Java Debugger, !VisualSoar, Eaters, !TankSoar, sample agents, and Soar documentation.  It's also an excellent companion download for those reading [http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784 The Soar Cognitive Architecture].  The downloads below only contain Soar, !VisualSoar and the debugger.
 
@@ -19,17 +19,17 @@ Downloading and installing Java is required since most users will want to use th
 ==== Windows ====
   # Determine if you're running 32- or 64-bit Windows.[http://windows.microsoft.com/en-US/windows-vista/32-bit-and-64-bit-Windows-frequently-asked-questions Click here if you need help figuring out which type of Windows you are running.]
   # Download the appropriate version of Soar
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_32bit.zip 9.3.2 for Windows, 32-bit]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Windows_64bit.zip 9.3.2 for Windows, 64-bit]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Windows_32bit.zip 9.3.3 for Windows, 32-bit]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Windows_64bit.zip 9.3.3 for Windows, 64-bit]
 
 ==== OS X ====
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-OSX.zip 9.3.2 for Mac, 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-OSX.zip 9.3.3 for Mac, 64-bit]
 
 ==== Linux ====
   # Determine if you're running 32- or 64-bit Linux. If the command `uname -m` yields `x86_64`, you have a 64-bit Linux OS.
   # Download the appropriate version of Soar
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Linux_32bit.zip 9.3.2 for Linux, 32-bit]
-    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-Linux_64bit.zip 9.3.2 for Linux, 64-bit]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Linux_32bit.zip 9.3.3 for Linux, 32-bit]
+    * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Linux_64bit.zip 9.3.3 for Linux, 64-bit]
 
 ==== Others ====
   * Follow the [Build instructions] for building Soar from the platform-independent source code.

@@ -14,7 +14,7 @@ Get more details on the mario domain [http://2009.rl-competition.org/mario.php h
   * Continuous, single-agent, episodic, RL, uncertainty, complete information.
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/InfiniteMario-9.3.2.zip Infinite Mario Download (Linux only)]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/InfiniteMario-9.3.3.zip Infinite Mario Download (Linux only)]
 
 === Associated Agents ===
   * [Agent_InfiniteMario_RL Infinite Mario Soar-RL Agent]

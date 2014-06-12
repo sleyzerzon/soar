@@ -6,11 +6,11 @@
   * Deterministic, dynamic with respect to the agent's actions, continuous
 
 === Download Links ===
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Linux_32bit.zip Linux 32-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Linux_64bit.zip Linux 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Windows_32bit.zip Windows 32-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-Windows_64bit.zip Windows 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.2-OSX.zip MacOS X] (tested with Mountain Lion only)
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.3-Linux_32bit.zip Linux 32-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.3-Linux_64bit.zip Linux 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.3-Windows_32bit.zip Windows 32-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.3-Windows_64bit.zip Windows 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/Domains/RoomsWorld_9.3.3-OSX.zip MacOS X] (tested with Mountain Lion only)
 
 === Associated Agents ===
   * The environment download contains agents.  Which agent loads depends on the configuration file you choose.
@@ -25,7 +25,7 @@
   # libgrrc-java 
     * This is a pure Java implementation of the libgrrc library used to communicate with a few of the robots such as Superdroid and the !PackBot (Michigan GRRC interface). This allows the simulator code to interface directly with these robots.
   # Soar
-    * Soar SML 9.3.2 is used to interface the Simulator and Soar.
+    * Soar SML 9.3.3 is used to interface the Simulator and Soar.
   # soarrobot 
     * The soarrobot project contains three Eclipse projects: !SoarRobotServer for the main simulator components, !SoarRobotTablet for a component that runs on the Android Galaxy tablet, and !SoarRobotLibrary for shared code between the two.
 

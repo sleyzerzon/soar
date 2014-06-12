@@ -1,7 +1,7 @@
 = Getting the Source =
 
 There are two ways to get the source code:
-  * Download the the [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.2-source.zip 9.3.2 platform-independent source].  This will contain the last major release of the entire !SoarSuite.
+  * Download the the [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-source.zip 9.3.3 platform-independent source].  This will contain the last major release of the entire !SoarSuite.
 *OR*
   * Checkout the latest code directly from the Soar SVN repository using the directions below.
 
