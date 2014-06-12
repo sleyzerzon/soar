@@ -15,7 +15,8 @@ There are two ways to get the source code:
     ** The URL for the repository is *http://soar.googlecode.com/svn/trunk/SoarSuite/ * (if you are a Soar developer affiliated with the U of M and plan to check in changes, use *https:// *)
       ** *Command-line SVN program*: Use the command `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite`
       ** *TortoiseSVN (Windows)*: Right click in the folder that you want to install the SoarSuite in and select "Checkout". A [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html checkout dialog box] will appear. Enter the URL for the repository as given above.
-    ** *Note*:  Your username is your Google account name without the `@` or domain. [http://code.google.com/hosting/settings Your password is your googlecode.com randomly generated password].
+    ** *Note*:  Your username is your Google account name without the `@` or domain. 
+    ** *NOTE*:  Your password is your googlecode.com randomly generated password that can be found at [http://code.google.com/hosting/settings this link].  It is NOT your standard google pasword.
 
 You can now skip to your operating system build notes:
 
