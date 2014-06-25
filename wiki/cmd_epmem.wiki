@@ -49,7 +49,7 @@ displays a summary of the parameter settings.
 ==== Main Parameters ====
 
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| `append-database` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
+|| `append` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
 || `balance` || Linear weight of match cardinality (1) vs. working memory activation (0) used in calculating match score || `[`0, 1`]` || 1 ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `exclusions` || Toggle the exclusion of an attribute string constant || _any string_ || `epmem, smem` ||
@@ -101,21 +101,23 @@ Instead, it will toggle the membership of `<val>` in the `exclusions`
 list.
 
 The `path` parameter specifies the file system path the database is stored
-in.  When `path` is empty, the database is stored in main memory and
-will be lost when the agent exits.  When `path` is set to a valid file
-system path, the SQLite database is written to that path.  
+in.  When `path` is set to a valid file system path and database mode is set to 
+file, then the SQLite database is written to that path.  
 
-The append-database parameter will determine
+The append parameter will determine
 whether all existing episodes recorded in a database on disk will be erased
 when epmem loads it. Note that this affects episodic memory re-initialization
 also, i.e. if the append setting is off, all episodic memories
-stored to disk will be lost when an init-soar is performed. 
+stored to disk will be lost when an init-soar is performed. Note that
+episodic memory cannot currently append to an in-memory database.  If you perform
+an init-soar while using an in-memory database, all current episodes stored will
+be cleared.
 
-Note that changes to database, path and append-database will not have
+Note that changes to database, path and append will not have
 an effect until the database is used after an initialization.  This
-happens either at launch or when an init-soar or database initialization
-command is issued.  To switch databases or database storage types on the 
-fly, set your new parameters and then either perform an init-soar or `epmem --init`.
+happens either shortly after launch (on first use) or after a database initialization
+command is issued.  To switch databases or database storage types after 
+running, set your new parameters and then perform an `epmem --init`.
 
 The `epmem --backup` command can be used to make 
 a copy of the current state of the database, whether in memory or on
