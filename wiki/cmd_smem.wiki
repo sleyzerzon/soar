@@ -50,7 +50,7 @@ displays a summary of the parameter settings.
 
 ==== Main Parameters ====
 || *Parameter* || *Description* || *Possible values* || *Default* ||
-|| `append-database` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
+|| `append` || Controls whether database is overwritten or appended when opening or re-initializing || `on`, `off` || `off` ||
 || `database` || Database storage method || `file`, `memory` || `memory` ||
 || `learning` || Semantic memory enabled || `on`, `off` || `off` ||
 || `merge` || Controls how retrievals interact with long-term identifiers in working memory || `none`, `add` || `add` ||
@@ -63,21 +63,21 @@ commands put on the epmem link are processed.  This is the same as
 using the enable and disable commands. 
 
 The `path` parameter specifies the file system path the database is stored
-in.  When `path` is empty, the database is stored in main memory and
-will be lost when the agent exits.  When `path` is set to a valid file
-system path, the SQLite database is written to that path.  
+in.  When `path` is set to a valid file system path and database mode is set to 
+file, then the SQLite database is written to that path.  
 
-The append-database parameter will determine
+The append parameter will determine
 whether all existing facts stored in a database on disk will be erased
-when semantic memory loads it. Note that this affects semantic memory re-initialization
+when semantic memory loads. Note that this affects semantic memory re-initialization
 also, i.e. if the append setting is off, all semantic facts
-stored to disk will be lost when an init-soar is performed. 
+stored to disk will be lost when an init-soar is performed. For semantic memory,
+append mode is by default on.
 
-Note that changes to database, path and append-database will not have
+Note that changes to database, path and append will not have
 an effect until the database is used after an initialization.  This
-happens either at launch or when an init-soar or database initialization
-command is issued.  To switch databases or database storage types on the 
-fly, set your new parameters and then either perform an init-soar or `smem --init`.
+happens either shortly after launch (on first use) or after a database initialization
+command is issued.  To switch databases or database storage types while 
+running, set your new parameters and then either perform an `smem --init`.
 
 The `smem --backup` command can be used to make 
 a copy of the current state of the database, whether in memory or on
