@@ -3,9 +3,9 @@
 <wiki:toc max_depth="1" />
 
 ----
-= 9.3.3 =
+= 9.3.4 =
 <pre>
-Soar 9.3.3 Release Notes, June 2014
+Soar 9.3.4 Release Notes, June 2014
 ===================================
 
 This release of Soar continues the 9.3 line. It includes the ability to
@@ -46,11 +46,11 @@ For more technical developer discussion:
 
 Also, please do not hesitate to file bugs on our issue tracker:
 
-        http://code.google.com/p/soar/issues/list
+        https://github.com/SoarGroup/Soar/issues
 
 To avoid redundant entries, please search for duplicate issues first.
 
-Important Changes for 9.3.3
+Important Changes for 9.3.4
 ===========================
 
 -------- 
@@ -85,36 +85,42 @@ convert from the old schema to the new one.
 (4) Users can now specify mathematical constraints to their smem
 retrieval cues.  See the manual for more information.
 
-(5) Both systems now have a new append-database setting that determines
+(5) Both systems now have a new append setting that determines
 whether Soar will erase the database when starting or re-initializing
 via init-soar.
 
-    - Databases are now closed upon init-soar.  With append-mode on,
-    this will have no effect on memories.
+    - By default, APPEND IS ON FOR SEMANTIC MEMORY AND OFF FOR EPISODIC
+    MEMORY.  The reasoning behind this is that the more common use case
+    for episodic memory is to record the experiences within one agent
+    run, while the more common use case for semantic memory is to build
+    up or use a large pre-existing database of semantic knowledge.
+
+    - With append-mode on, init-soar will have no effect on memories.
+
+    - Due to certain technical reasons, episodic memory cannot append to an 
+    in-memory database, only semantic memory can.  If you want to record 
+    episodes across multiple agent runs, you must use an on-disk database.
 
     - Soar will now warn users that initializing Soar can clear their
-    memories.  Only shown when changing epmem/smem settings such that
-    they are storing to a file with append mode off.
+    memories.
 
     - Soar will now notify users that there was no change to epmem/smem
     memories when reinitializing if append mode is on.
 
-(6) Both systems now handle database settings with more flexibility. 
-Users may change path/database/append-database settings arbitrarily
-until they get what they'd like.  It will not effect any changes until
-you step Soar or do something that requires that memory system.
+(6) For both episodic and semantic memory, users may change
+path/database/append settings arbitrarily until they get what
+they'd like.  Soar will now no longer automatically switch to database mode the
+first time that you set the path.  Soar will not effect any changes until the 
+database is used after an initialization. This happens either shortly after 
+launch (on 1st use) or after a database initialization command is issued. To 
+switch databases or storage settings after an agent has been running, set your 
+new parameters and then perform an --init command.
 
-(7) Users can now switch from database to memory mode on the fly without
-losing your data.  (The opposite will not work though.)
-
-(8) Soar will now no longer automatically switch to database mode the
-first time that you set the path.
-
-(9) SMem and epmem now have options for --on, --off, -e, -d, --enable,
+(7) SMem and epmem now have options for --on, --off, -e, -d, --enable,
 --disable parameters to epmem and smem to make interface consistent with
 other systems.
 
-(10) Soar now has an 'epmem --init' command.  This will close and
+(8) Soar now has an 'epmem --init' command.  This will close and
 re-initialize the database like 'smem --init'.
 
 -------------- 
@@ -132,9 +138,10 @@ User Interface
     - This mode is enabled via a new Soar command 'cli'.  For example,
     to load the new Tcl module, users can enter a 'cli tcl on' command,
     and Soar will look for a DLL in the same directory called TclSoarLib
-    
     and load it if found.  Similarly, using an argument of Python will
     try to load PythonSoarLib, if it exists.  (which doesn't)
+
+    - The full release notes for TclSoarLib are at the end of this document.
 
 (2) Soar will now give feedback on many commands and errors that it did
 not before.
@@ -205,10 +212,11 @@ crash.
 
 (7) Fixed bug in epmem retrieval that could result in failed queries.
 
-(8) Fixed bug in smem that caused Soar to crash when attempting to print
-from smem after the settings pointing it to the correct database were
-configured but before it was first used.  It will now connect to the
-database before printing.
+(8) Fixed bug in smem that caused Soar to crash when attempting to print,
+visualize, get stats on the semantic or episodic memory databases after the 
+settings pointing it to the correct database were configured but before it was 
+first used.  It will now connect to the database before attempting any of
+those commands.
 
 (9) Fixed a segfault in smem, triggered when a previously unhashed value
 appeared in a neg-query.
@@ -260,7 +268,7 @@ again.
 (8) Now has LSB support, which can facilitate compilation on certain
 *nix system.
 
-Other Changes in 9.3.3 
+Other Changes in 9.3.4 
 ======================
 
 -------------- 
@@ -329,7 +337,7 @@ Bug Fixes
 ---------
 
 (1) Fixed bug that occurred when epmem is queried with an LTI, which was
-promoted (stored into smem), in the middle of its most recent interval. 
+promoted (stored into smem), in the middle of its most recent interval.
 Soar now sets the priority to its promotion time instead of the interval
 start time.
 

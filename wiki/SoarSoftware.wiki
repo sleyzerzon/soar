@@ -3,17 +3,17 @@
 <wiki:toc max_depth="1" />
 
 ----
-= 9.3.3 =
+= 9.3.4 =
 This release of Soar continues the 9.3 line. It includes the ability to include search control knowledge into chunks, a new form of integrated Tcl support, improved episodic and semantic memory and a large assortment of bug fixes and user interface enhancements.  All learning mechanisms are disabled by default.
 
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Windows_32bit.zip 9.3.3 for Windows, 32-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Windows_64bit.zip 9.3.3 for Windows, 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-OSX.zip 9.3.3 for Mac, 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Linux_32bit.zip 9.3.3 for Linux, 32-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-Linux_64bit.zip 9.3.3 for Linux, 64-bit]
-  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.3-source.zip 9.3.3 platform-independent source]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-Windows_32bit.zip 9.3.4 for Windows, 32-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-Windows_64bit.zip 9.3.4 for Windows, 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-OSX.zip 9.3.4 for Mac, 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-Linux_32bit.zip 9.3.4 for Linux, 32-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-Linux_64bit.zip 9.3.4 for Linux, 64-bit]
+  * [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-source.zip 9.3.4 platform-independent source]
 
-[ReleaseNotes#9.3.3 Here are full release notes for the 9.3.3 release].
+[ReleaseNotes#9.3.4 Here are full release notes for the 9.3.4 release].
 
 ----
 = 9.3.2 =
