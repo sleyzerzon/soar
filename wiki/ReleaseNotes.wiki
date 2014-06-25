@@ -137,9 +137,9 @@ User Interface
 
     - This mode is enabled via a new Soar command 'cli'.  For example,
     to load the new Tcl module, users can enter a 'cli tcl on' command,
-    and Soar will look for a DLL in the same directory called TclSoarLib
-    and load it if found.  Similarly, using an argument of Python will
-    try to load PythonSoarLib, if it exists.  (which doesn't)
+    and Soar will look for a DLL in the same directory called 
+    TclSoarLib and load it if found.  Similarly, using an argument of Python 
+    will try to load PythonSoarLib, if it exists.  (which doesn't)
 
     - The full release notes for TclSoarLib are at the end of this document.
 
@@ -483,6 +483,18 @@ preferences now removed
 (11) TestSoarPerformance now has some #defines to allow you to set a
 different test agent, change the number of trials and control the amount
 of information printed.
+
+</pre>
+
+----
+= 9.3.3 =
+<pre>
+Soar 9.3.3 Release Notes, June 2014
+===================================
+
+This release is identical to Soar 9.3.4, but had a few issues related to
+episodic and semantic memory database initialization that were resolved in 
+9.3.4.
 
 </pre>
 
