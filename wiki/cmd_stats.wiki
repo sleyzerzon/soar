@@ -108,7 +108,7 @@ the single timers should always be greater than than the corresponding derived
 time.  Additionally, as execution time increases, the difference between these
 two values will also increase. For those concerned about the performance cost
 of the timers, all the run time timing calculations can be compiled out of the
-code by defining `NO_TIMING_STUFF` (in `soarkernel.h`) before compilation.
+code by defining `NO_TIMING_STUFF` (in `kernel.h`) before compilation.
 
 == Examples ==
 
