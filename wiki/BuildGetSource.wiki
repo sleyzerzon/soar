@@ -3,22 +3,9 @@
 There are two ways to get the source code:
   * Download the the [http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarSuite_9.3.4-source.zip 9.3.4 platform-independent source].  This will contain the last major release of the entire !SoarSuite.
 *OR*
-  * Checkout the latest code directly from the Soar SVN repository using the directions below.
-
-== How to Check Out Soar from SVN ==
-
-  # Install a subversion client (a revision control program that allows you to download the Soar source code from the SVN repository)
-    ** *Windows*: get [http://tortoisesvn.net/downloads TortoiseSVN] (GUI) and/or [http://www.sliksvn.com/en/download SlikSVN] (command line).
-    ** *Ubuntu Linux*: Install package `subversion`.  You can use the command {{{sudo apt-get install subversion}}}.
-    ** *Mac*: Do nothing! Subversion ships with Leopard and newer.
-  # Check out `SoarSuite`
-    ** The URL for the repository is *http://soar.googlecode.com/svn/trunk/SoarSuite/ * (if you are a Soar developer affiliated with the U of M and plan to check in changes, use *https:// *)
-      ** *Command-line SVN program*: Use the command `svn checkout http://soar.googlecode.com/svn/trunk/SoarSuite`
-      ** *TortoiseSVN (Windows)*: Right click in the folder that you want to install the SoarSuite in and select "Checkout". A [http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-checkout.html checkout dialog box] will appear. Enter the URL for the repository as given above.
-    ** *Note*:  Your username is your Google account name without the `@` or domain. 
-    ** *NOTE*:  Your password is your googlecode.com randomly generated password that can be found at [http://code.google.com/hosting/settings this link].  It is NOT your standard google pasword.
-
-You can now skip to your operating system build notes:
+  * Pull the latest code directly from the [https://github.com/SoarGroup/Soar Soar git repository on github].  Information about using git can be found on github.
+  
+  You can now skip to your operating system build notes:
 
   * [BuildWindows Windows Build Notes]
   * [BuildLinux Linux Build Notes]

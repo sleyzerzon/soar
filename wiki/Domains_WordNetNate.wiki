@@ -19,7 +19,7 @@ From the project page, download the wn-lexical-data for the version of !WordNet 
 
 ==== Conversion ====
 
-The data files in this project contain ACT-R chunks. The conversion to Soar's semantic memory declarative add is basically string replacement. We have a PHP script to perform this conversion in SVN [http://code.google.com/p/soar/source/browse/trunk/Domains/wn/wnlexical.php trunk/Domains/wn/wnlexical.php]. The script takes via standard-in a data file from WN-LEXICAL and outputs a valid semantic memory declarative add statement. For example: 
+The data files in this project contain ACT-R chunks. The conversion to Soar's semantic memory declarative add is basically string replacement. We have a PHP script to perform this conversion on our [https://github.com/SoarGroup/Domains-WordNet git repository]. The script takes via standard-in a data file from WN-LEXICAL and outputs a valid semantic memory declarative add statement. For example: 
 
 cat WNChunks.data | php wnlexical.php smem > wn.soar
 
@@ -34,7 +34,7 @@ This script also can create SQL statements to populate a "sqlite" or "mysql" dat
 
 ==== !SemCor ====
 
-We have done some preliminary work with !SemCor (http://www.cse.unt.edu/~rada/downloads.html), which is a set of texts semantically annotated with !WordNet senses. The scripts described here (available in SVN) parse the !SemCor format (cleaning as necessary), cross-reference the SQL outputs of the WN conversion above, and create !WordNet-independent Word Sense Disambiguation (WSD) test sets.
+We have done some preliminary work with !SemCor (http://www.cse.unt.edu/~rada/downloads.html), which is a set of texts semantically annotated with !WordNet senses. The scripts described here (available on github) parse the !SemCor format (cleaning as necessary), cross-reference the SQL outputs of the WN conversion above, and create !WordNet-independent Word Sense Disambiguation (WSD) test sets.
 
  * semcor.php:
   * input=semcor

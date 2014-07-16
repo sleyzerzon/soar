@@ -42,8 +42,7 @@ Run RebuildQUTApps.cmd to build Maze Simulation
 
 == Soar service ==
 
-Next, check out Soar project from SVN:
-  * http://soar.googlecode.com/svn/trunk/msr
+Next, check out Soar project:
   * Check out to a new folder in Apps/QUT
 
 Copy to bin folder from a running Soar installation or trunk:

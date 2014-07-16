@@ -11,7 +11,7 @@
 
 == Where are the latest Soar releases? ==
 
-Check the [Downloads downloads page] for pointers to downloads and release notes. Alternatively you can check out the development trunk from SVN, see the [Build build document].
+Check the [Downloads downloads page] for pointers to downloads and release notes. Alternatively you can check out the development trunk from git. See the [Build build document] for more information.
 
 = Installing Soar =
 
