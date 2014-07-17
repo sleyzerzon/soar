@@ -26,7 +26,7 @@ It might also run on older versions of Windows and Windows 8, but they have not 
 
 == Build Soar ==
 
-Launch a Visual Studio Command Prompt (not the normal DOS prompt) from the start menu.  Depending on the version of Visual Studio you're using, you should try using either the VS Native Prompt or the VS Cross-Compiler prompt.  
+*Launch a Visual Studio Command Prompt (not the normal DOS prompt) from the start menu.*  Depending on the version of Visual Studio you're using, you should try using either the VS Native Prompt for your architecture or the VS Cross-Compiler prompt.  If the prompt names include the architecture (x86 or x64), you should choose the one that matches the architecture you are building for (32-bit or 64-bit).
 
 Use `cd` to change to the `SoarSuite` directory, and type
 
