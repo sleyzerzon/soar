@@ -18,9 +18,9 @@ It might also run on older versions of Windows and Windows 8, but they have not 
   * *Java Standard Edition Development Kit (JDK)*: Required.
     * Needed for the Soar Debugger and the Java interface. The exact version doesn't matter. You can also use Sun's JDK.
     * The latest JDK is available from [http://www.oracle.com/technetwork/java/javase/downloads/index.html Oracle's web site].  
-  * *ActiveTcl 8.6+*: Optional.
-    * Needed if you want to build the SWIG Tcl interface and TclSoarLib (a module that adds tcl to the Soar command line.) 
-    * Found [http://www.activestate.com/activetcl/downloads here].
+  * *!ActiveTcl 8.6+*: Optional.
+    * Needed if you want to build the SWIG Tcl interface and !TclSoarLib (a module that adds tcl to the Soar command line.) 
+    * ActiveTcl installation packages can be found [http://www.activestate.com/activetcl/downloads here].
 
 *Note*: For all of these packages, make sure to download the 64-bit version if you are on a 64-bit machine.
 
