@@ -1,7 +1,7 @@
 #summary Publications related to the Soar project.
 #labels Featured
 = 2014 =
-J.-Y. Puigbo, A. Pumarola, C. Angulo, and Ricardo Tellez: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Article_SOAR_GPSR-2.pdf Using a Cognitive Architecture for General-purpose Service Robot Control], Connection Science journal, Special Issue in AI and Cognition (2014).
+J.-Y. Puigbo, A. Pumarola, C. Angulo, and Ricardo Tellez: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/Article_SOAR_GPSR-2.pdf Using a Cognitive Architecture for General-purpose Service Robot Control], Connection Science, Special Issue on AI and Cognition (2014).
 
 = 2013 =
 Kirk, J. and Laird J. E.: _[http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/kirklairdACS2013.pdf Learning Task Formulations through Situated Interactive Instruction]_. Proceedings of the 2nd Conference on Advances in Cognitive Systems (2013). Baltimore, Maryland
