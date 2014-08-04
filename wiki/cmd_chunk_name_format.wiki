@@ -6,14 +6,15 @@ Specify format of the name to use for new chunks.
 == Synopsis ==
 
 {{{
-chunk-name-format [-sl] -p [prefix]
-chunk-name-format [-sl] -c [count]
+chunk-name-format [-nrl] -p [prefix]
+chunk-name-format [-nrl] -c [count]
 }}}
 
 == Options ==
 
-|| `-s, --short` || Use the short format for naming chunks ||
-|| `-l, --long` || Use the long format for naming chunks (default) ||
+|| `-n, --numbered` || Name chunks based on the order in which they were created ||
+|| `-r, --rule` || Name chunks based on the rule that created the result (default) ||
+|| `-l, --long` || Name chunks based on the impasse type that created the substate ||
 || `-p, --prefix [p]` || If given, use `p` as the prefix for naming chunks. Otherwise, return the current prefix. (defaults to _chunk_) ||
 || `-c, --count [c]` || If given, set the chunk counter for naming chunks to `c`. Otherwise, return the current value of the chunk counter. ||
 
@@ -25,16 +26,25 @@ The short format for naming newly-created chunks is:
 <prefix><chunknum>
 }}}
 
-The long (default) format for naming chunks is:
+The rule-based (default) format for naming chunks is:
 
 {{{
-<prefix>-<chunknum>*<dc>*<impassetype>*<dcChunknum>
+<prefix>*<original-rule-name>*<short-impassetype>*<dc>-<dcChunknum>
+}}}
+
+The long format for naming chunks is:
+
+{{{
+<prefix>-<chunknum>-<dc>*<impassetype>*<dcChunknum>
 }}}
 
 where:
   * `prefix` is a user-definable prefix string; `prefix` defaults to _chunk_ when unspecified by the user. It many not contain the character `*`,
+  * `original-rule-name` is the name of the production that produced the result that resulted in this chunk,
   * `chunknum` is a counter set by `--count` or starting at 1 for the first chunk created,
   * `dc` is the number of the decision cycle in which the chunk was formed,
   * `impassetype` is one of `tie`, `conflict`, `cfailure`, `snochange`, `opnochange`,
+  * `short-impassetype` is one of `tie`, `con`, `cfi`, `snc`, `onc`,
   * `dcChunknum` is the number of the chunk within that specific decision cycle.
 
+Note that when using the rule-based naming format, a chunk based on another chunk will have a name that beings with `prefix` followed by `-multi`, for example *`chunk-multi*apply-rule*42-2`*. 
