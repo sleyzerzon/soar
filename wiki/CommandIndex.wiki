@@ -71,6 +71,7 @@ listed with each command's synopsis under "Default Aliases".
  * [cmd_srand srand]
  * [cmd_stats stats]
  * [cmd_stop_soar stop-soar]
+ * [cmd_svs]
  * [cmd_time time]
  * [cmd_timers timers]
  * [cmd_unalias unalias]
