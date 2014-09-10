@@ -23,6 +23,7 @@ smem -b|--backup <file name>
 
 == Options ==
 
+|| *Option* || *Description* ||
 || `-e, --enable, --on` || Enable semantic memory. ||
 || `-d, --disable, --off` || Disable semantic memory. ||
 || `-g, --get` || Print current parameter setting ||
@@ -31,7 +32,10 @@ smem -b|--backup <file name>
 || `-S, --stats` || Print statistic summary or specific statistic ||
 || `-t, --timers` || Print timer summary or specific statistic ||
 || `-a, --add` || Add concepts to semantic memory ||
+|| `-r, --remove`|| Remove concepts from semantic memory||
 || `-p, --print` || Print semantic store in user-readable format ||
+|| `-q, --query`|| Print concepts in semantic store matching some cue||
+|| `-h, --history`|| Print activation history for some LTI||
 || `-v, --viz` || Print semantic store in graphviz format ||
 || `-b, --backup` || Creates a backup of the semantic database on disk ||
 
@@ -168,10 +172,12 @@ All timer values are reported in seconds.
 
 Level one
 
+|| *Timer* || *Description* ||
 || `_total` || Total smem operations ||
 
 Level two
 
+|| *Timer* || *Description* ||
 || `smem_api` || Agent command validation ||
 || `smem_hash` || Hashing symbols ||
 || `smem_init` || Semantic store initialization ||
@@ -181,6 +187,7 @@ Level two
 
 Level three
 
+|| *Timer* || *Description* ||
 || three_activation || Recency information maintenance ||
 
 === Manual Storage ===
@@ -205,6 +212,69 @@ storage, manual storage is automatically recursive.  Thus, the above
 example will add a new concept (represented by the temporary
 "arithmetic" variable) with three children.  Each child will be its
 own concept with two constant attribute/value pairs.
+
+=== Manual Removal ===
+
+Part or all of the information in the semantic store of some LTI can be manually removed from the semantic store using the
+
+{{{
+smem --remove <concept>
+}}}
+
+command.  The format for specifying what to remove is similar to that of
+adding WMEs to working memory on the RHS of productions.  For example:
+{{{
+smem --remove {
+   (@W34 ^good-attribute |gibberish value|)
+}
+}}}
+If `good-attribute` is multi-valued, then all values will remain in the store except `|gibberish value|`.  If `|gibberish value|` is the only value, then `good-attribute` will also be removed.  It is not possible to use the common "dot-notation" for this command.  Manual removal is not recursive.  
+
+Another example highlights the ability to remove all of the values for an attribute:
+{{{
+smem --remove {
+   (@W34 ^bad-attribute)
+}
+}}}
+When a value is not given, all of the values for the given attribute are removed from the LTI in the semantic store.
+
+Also, it is possible to remove all augmentations of some LTI from the semantic store:
+{{{
+smem --remove {
+   (@W34)
+}
+}}}
+This would remove all attributes and values of `@W34` from the semantic store. The LTI will remain in the store, but will lack augmentations.
+
+(Use the following at your own risk.)  Optionally, the user can force removal even in the event of an error:
+{{{
+smem -r {(@W34 ^bad-attribute ^bad-attribute-2)} force
+}}}
+Suppose that LTI `@W34` did not contain `bad-attribute`.  The above example would remove `bad-attribute-2` even though it would indicate an error (having not found `bad-attribute`).
+
+=== Manual Query ===
+
+Queries for LTIs in the semantic store that match some cue can be initialized external to an agent using the
+`smem --query <cue> [<num>]`
+command.  The format for specifying the cue is similar to that of adding a new identifier to working memory in the RHS of a rule:
+{{{
+smem --query {
+    (<cue> ^attribute <wildcard> ^attribute-2 |constant|)
+}
+}}}
+Note that the root of the cue structure must be a variable and should be unused in the rest of the cue structure.  This command is for testing and the full range of queries accessible to the agent are not yet available for the command.  For example, math queries are not supported.
+
+The additional option of `<num>` will trigger the display of the top `<num>` most activated LTIs that matched the cue.
+
+The result of a manual query is either to print that no LTIs could be found or to print the information associated with LTIs that were found in the `smem --print <lti>` format.
+
+=== History ===
+
+When the activation-mode of a semantic store is set to base-level, some history of activation events is stored for each LTI.  This history of when some LTI was activated can be displayed:
+{{{
+        smem --history @W34
+}}}
+In the event that semantic memory is not using base-level activation, `history` will mimic `print`.
 
 === Visualization ===
 
