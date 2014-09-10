@@ -11,6 +11,7 @@ epmem
 epmem -e|--enable|--on
 epmem -d|--disable|--off
 epmem -i|--init
+epmem -c|--close
 epmem -g|--get <parameter>
 epmem -s|--set <parameter> <value>
 epmem -S|--stats [<statistic>]
@@ -22,9 +23,11 @@ epmem -b|--backup <file name>
 
 == Options ==
 
+|| *Option* || *Description* ||
 || `-e, --enable, --on` || Enable episodic memory. ||
 || `-d, --disable, --off` || Disable episodic memory. ||
 || `-i, --init` || Re-initialize episodic memory ||
+|| `-c, --close` || Disconnect from episodic memory ||
 || `-g, --get` || Print current parameter setting ||
 || `-s, --set` || Set parameter value ||
 || `-S, --stats` || Print statistic summary or specific statistic ||
@@ -179,10 +182,12 @@ All timer values are reported in seconds.
 
 Level one
 
+|| *Timer* || *Description* ||
 || `_total` || Total epmem operations ||
 
 Level two
 
+|| *Timer* || *Description* ||
 || `epmem_api` || Agent command validation ||
 || `epmem_hash` || Hashing symbols ||
 || `epmem_init` || Episodic store initialization ||
@@ -196,7 +201,8 @@ Level two
 
 Level three
 
-|| `ncb_edge` || Collecting edges during reconstruction ||
+|| *Timer* || *Description* ||
+| `ncb_edge` || Collecting edges during reconstruction ||
 || `ncb_edge_rit` || Collecting edges from relational interval tree ||
 || `ncb_node` || Collecting nodes during reconstruction ||
 || `ncb_node_rit` || Collecting nodes from relational interval tree ||
