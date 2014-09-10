@@ -1,4 +1,4 @@
-svs command documentation
+#summary svs command documentation
 = svs =
 
 Control the behavior of the Spatial Visual System
