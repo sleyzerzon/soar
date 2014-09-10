@@ -17,16 +17,17 @@ indifferent-selection [-a] [setting]
 
 === Default Aliases ===
 
+|| *Alias* || *Equivalent Command* ||
 || `inds` || `indifferent-selection` ||
 
 == Options ==
-
+||*Option*||*Description*||
 || `-s, --stats` || Summary of settings ||
 || `policy` || Set exploration policy ||
-|| `parameter [value]` || Get/Set exploration policy parameters (if value not given, returns the current value) ||
-|| `parameter [reduction_policy]` || Get/Set exploration policy parameter reduction policy (if policy not given, returns the current) ||
-|| `parameter reduction_policy [reduction_rate]` || Get/Set exploration policy parameter reduction rate for a policy (if rate not give, returns the current) ||
-|| `-a, --auto-reduce [on,off]` || Get/Set auto-reduction setting (if setting not provided, returns the current) ||
+|| `parameter [exploration policy parameters]`|| Get/Set exploration policy parameters (if value not given, returns the current value) ||
+|| `parameter [reduction_policy](value]`|| Get/Set exploration policy parameter reduction policy (if policy not given, returns the current) ||
+|| `parameter reduction_policy [exploration policy parameter]`|| Get/Set exploration policy parameter reduction rate for a policy (if rate not give, returns the current)||
+|| `-a, --auto-reduce [on,off](reduction-rate]`|| Get/Set auto-reduction setting (if setting not provided, returns the current) ||
 
 == Description ==
 
@@ -48,6 +49,7 @@ incurs a small performance cost.
 
 == Exploration Policies ==
 
+||*Option*||*Description*||
 || `-b, --boltzmann` || Tempered softmax (uses temperature) ||
 || `-g, --epsilon-greedy` || Tempered greedy (uses epsilon) ||
 || `-x, --softmax` || Random, biased by numeric indifferent values (if a non-positive value is encountered, resorts to a uniform random selection) ||
@@ -62,7 +64,7 @@ incurs a small performance cost.
 
 == Exploration Policy Parameter Auto-Reduction Policies ==
 
-|| *Policy Name* || *Valid Rates* || *Default Rate* ||
+||*Parameter Name*||*Acceptable Values*||*Default Value*||
 || `exponential default` || `[0, 1]` || `1` ||
 || `linear` || `[0, inf]` || `0` ||
 
@@ -71,4 +73,3 @@ incurs a small performance cost.
 
 [cmd_numeric_indifferent_mode numeric-indifferent-mode]
 [cmd_rl rl]
-
