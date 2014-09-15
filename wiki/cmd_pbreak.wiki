@@ -1,0 +1,31 @@
+#summary pbreak command documentation
+
+= pbreak =
+
+Toggles the :interrupt flag on a rule at run-time, which stops the Soar decision cycle when the rule fires.
+
+== Synopsis ==
+
+{{{
+rl -c|--clear <production-name>
+rl -p|--print
+rl -s|--set <production-name>
+rl <production-name>
+}}}
+
+== Options ==
+
+|| *Parameter* || *Argument* || *Description* ||
+|| `-c, --clear` || <production-name> || Clear :interrupt flag from a production. ||
+|| `-p, --print` || (none) || Print which production rules have had their :interrupt flags set. ||
+||  (none) || (none) || Print which production rules have had their :interrupt flags set. ||
+|| `-s, --set` || <production-name> || Set :interrupt flag on a production rule. ||
+|| (none) || <production-name> || Set flag :interrupt on a production rule. ||
+
+== Description ==
+
+The `pbreak` command can be used to toggle the :interrupt flag on production rules which did not have it set in the original source file, which stops the Soar decision cycle when the rule fires. This is intended to be used for debugging purposes.
+
+== See Also ==
+
+[cmd_matches matches] [cmd_pwatch pwatch] [cmd_watch watch]
