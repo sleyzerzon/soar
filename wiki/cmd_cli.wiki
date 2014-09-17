@@ -37,6 +37,17 @@ Similarly, the off message will send the CLI library an `off` message that will
 cause it to unregister all relevant callback handlers and stop processing Soar
 commands.
 
+If you'd like to have a cli mode, like Tcl, turned on automatically when Soar 
+launches, add the enabling command to your settings.soar file in the main 
+Soar directory.  This activates the mode on initial launch, allowing you to 
+immediately source files that require that additional functionality.
+
+If you plan to source files that contain tcl commands, you must turn on tcl through the
+settings file or in a separate command issued prior to your source command.  Due
+to some technical limitation, Soar cannot currently source a file that both turns 
+on Tcl and uses it immediately.
+
+
 == Examples ==
 
 To turn on Tcl mode:
