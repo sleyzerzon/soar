@@ -1,0 +1,74 @@
+# Eaters #
+
+Eaters is a Pac-Man like game implemented using Java and interfaced with Soar via SML.
+
+In Eaters, PACMAN-like eaters compete to consume food in a simple grid world. The Eaters world consists of a rectangular grid, 15 squares wide by 15 squares high. Walls bound all four sides. Interior wall sections are randomly generated for each new game. No two walls will touch, so there are no corners, except for exterior walls, and no dead-ends anywhere on the board. Each eater starts at a random location. Food pellets are in all other squares of the grid. There are two kinds of food: normal food (blue circles and worth 5 points) and bonus food (red squares and worth 10 points). An eater consumes food by moving into a square. When an eater moves out of a square it will be empty (unless another eater moves into it). An eater can sense the contents of cells (eater, normal food, bonus food, and empty) up to 2 squares away in all directions. On each turn, an eater can move one square north, south, east, or west. An eater can also jump two squares north, south, east, or west. An eater can jump over a wall or another eater. An eater does not consume any food in the space it jumps over. A jump costs the eater 5 points. Whenever two eaters try to occupy the same cell at  the same time, they collide. As a result of the collision, their scores are averaged and they are teleported to new, random locations on the board.
+
+### Environment Properties ###
+  * Multi-agent
+
+### Download Links ###
+  * [Eaters for 32-bit Windows](http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.4-Windows_32bit.zip)
+  * [Eaters for 64-bit Windows](http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.4-Windows_64bit.zip)
+  * [Eaters for 32-bit Linux](http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.4-Linux_32bit.zip)
+  * [Eaters for 64-bit Linux](http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.4-Linux_64bit.zip)
+  * [Eaters for MacOS X](http://web.eecs.umich.edu/~soar/downloads/Domains/Eaters_9.3.4-OSX.zip)
+
+### Associated Agents ###
+  * **[Advanced Move Bot](Agent_Eaters_AdvancedMoveBot.md)**
+  * **[Hello World Operator](Agent_HelloWorldOp.md)**
+  * **[Hello World Rule](Agent_HelloWorldRule.md)**
+  * **[Jump Bot](Agent_Eaters_Jump.md)**
+  * **[Jump and Move Bot](Agent_Eaters_JumpMove.md)**
+  * **[Move Bot](Agent_Eaters_Move.md)**
+  * **[Move North Bot](Agent_Eaters_MoveNorth.md)**
+  * **[Move North 2 Bot](Agent_Eaters_MoveNorth2.md)**
+  * **[Move to Food Bot](Agent_Eaters_MoveToFood.md)**
+  * **[Semantic Errors](Agent_Eaters_SemanticErrors.md)**
+  * **[Syntax Errors](Agent_Eaters_SyntaxErrors.md)**
+
+### Documentation ###
+  * [Soar Tutorial](SoarTutorial.md): Chapter 2 of the Soar Tutorial is a great introduction to Eaters.
+
+### IO link Specification ###
+```
+^io
+   ^input-link
+      ^eater
+         ^direction east/north/south/west
+         ^name red/blue/yellow/green/purple/black
+         ^score 0-1000
+         ^x 1-15
+         ^y 1-15
+      ^my-location	
+         ^content bonusfood/normalfood/eater/empty/wall
+         ^east
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^north 
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^south
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+         ^west
+            ^content bonusfood/normalfood/eater/empty/wall
+            ...
+   ^output-link
+      ^move
+         ^direction east/north/south/west
+         ^status complete   - created by Soar as feedback 
+      ^jump
+         ^direction east/north/south/west 
+         ^status complete   - created by Soar as feedback 
+
+```
+
+### Developer ###
+  * Jonathan Voigt, Scott Wallace
+
+### Soar Versions ###
+  * Soar 8, 9
+
+### Language ###
+  * Java

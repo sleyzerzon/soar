@@ -1,0 +1,25 @@
+# QuickLink Input Simulator #
+
+The purpose of this tool is to give complete control of the input-link to the Soar programmer. QuickLink can be thought of as a way to "fake" an external application, such as a game or simulation, in order to test specific circumstances that are rare and/or hard to reproduce. QuickLink currently can only be operated through the use of a command line interface.
+
+### Download Links ###
+  * [QuickLink.zip](http://web.eecs.umich.edu/~soar/downloads/AgentDevelopmentTools/QuickLink.zip)
+
+### Documentation ###
+  * [QuickLink Tutorial](http://soar.googlecode.com/files/QuickLink%20Tutorial.doc)
+
+**Note**: The above document is also included in the download.
+
+### Developer ###
+  * Taylor Lafrinere
+
+### Soar Versions ###
+  * Soar 8, 9
+
+### Language ###
+  * C++
+
+
+
+
+

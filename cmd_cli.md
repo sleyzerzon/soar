@@ -1,0 +1,58 @@
+# cli #
+
+Manipulate external command line interface modules.
+
+## Synopsis ##
+
+```
+cli <module-name> on|off
+```
+
+## Options ##
+
+| `on` | Turn a command-line module on. |
+|:-----|:-------------------------------|
+| `off` | Turn a command-line module on  |
+
+## Description ##
+
+The `cli` command is used to interface to special, external libraries that
+extend the functionality of the Soar command line interface.  For example, a
+module may provide the ability to run Tcl or Python code from any Soar command
+line.
+
+The first time that you turn a module on, Soar will attempt to look for a
+dynamically-linked library based on the module-name passed to the cli command.
+Specifically, it looks for a dll named
+
+`[dllprefix][language]SoarLib.[dllextension]`
+
+(The dll prefix and extension vary depending on the platform.)
+
+When the `on` parameter is given, all future Soar commands will be passed to the
+module for processing.  This allows the module to provide additional
+functionality.
+
+Similarly, the off message will send the CLI library an `off` message that will
+cause it to unregister all relevant callback handlers and stop processing Soar
+commands.
+
+If you'd like to have a cli mode, like Tcl, turned on automatically when Soar
+launches, add the enabling command to your settings.soar file in the main
+Soar directory.  This activates the mode on initial launch, allowing you to
+immediately source files that require that additional functionality, for example,
+files that contain tcl code.
+
+## Examples ##
+
+To turn on Tcl mode:
+
+```
+cli tcl on
+```
+
+To turn off Tcl mode:
+
+```
+cli tcl off
+```

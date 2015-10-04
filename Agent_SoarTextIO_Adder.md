@@ -1,0 +1,26 @@
+# SoarTextIO Adder Example Agent #
+A simple agent that computes the sum of two numbers recieved via SoarTextIO. This agent is used in the SoarTextIO tutorial. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+
+### Soar capabilities ###
+  * Demonstrates how SoarTextIO can be used.
+
+### Download Links ###
+  * The agent is included with the SoarTextIO system under the Agents directory.
+
+### External Environment ###
+  * [SoarTextIO](Domains_SoarTextIO.md)
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * Taylor Lafrinere
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * VisualSoar

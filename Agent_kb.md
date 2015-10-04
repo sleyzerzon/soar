@@ -1,0 +1,28 @@
+# Knowledge Base Agent #
+This agent has a knowledge base of animal species in working memory from the web. For the first few decisions, it "observes" each entry in the kb (i.e. there is a WME that refers to each of the kb entries, once per decision), storing each to episodic memory. The agent also has a set of unit tests in working memory. Each test is composed of "steps," where a step has properties like "type" (e.g. query vs. retrieve), the "expected" outcome, the "command" to run, etc. Each test is loaded sequentially and there is logic to run a test and verify the expected output. These tests cover much of the epmem API (things like query, retrieve, before/after, prohibit, success/failure, match score, etc).
+
+This agent was designed primarily for unit-testing changes to the kernel. However, it may be useful for moderately advanced soar agent programmers as an example of epmem usage.
+
+### Soar capabilities ###
+  * Episodic memory
+
+### Download Links ###
+  * [KB\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/KB_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * Nate Derbinsky
+
+### Soar Versions ###
+  * Soar 9
+
+### Project Type ###
+  * VisualSoar

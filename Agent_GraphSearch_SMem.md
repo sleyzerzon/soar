@@ -1,0 +1,37 @@
+# Graph Search Agent with Semantic Memory #
+This agent demonstrates the use of semantic memory by extending the capabilities of the [Graph Search Agent](Agent_GraphSearch.md).  The description of that agent also applies here.
+
+Has two different uses of semantic memory:
+  * Can hold its mission in wm or smem, which is a list of waypoints to visit. This works fine.
+```
+^parameters.mission-storage [ wm smem ]
+```
+  * Can hold all of its waypoints in semantic memory or working memory.
+```
+^waypoint-storage [ smem wm ]
+```
+
+### Soar capabilities ###
+  * A demonstration of the application for the `A*` (a-star) default knowledge
+  * Semantic memory
+
+### Download Links ###
+  * [Graph\_Search\_SMem\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Graph_Search_SMem_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * selection-astar.soar
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 9.2+
+
+### Project Type ###
+  * VisualSoar

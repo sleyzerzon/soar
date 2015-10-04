@@ -1,0 +1,79 @@
+# indifferent-selection #
+
+Controls indifferent preference arbitration.
+
+## Synopsis ##
+
+```
+indifferent-selection
+indifferent-selection [-s]
+indifferent-selection [-bgfxl]
+indifferent-selection [-et] [value]
+indifferent-selection [-p] parameter [reduction_policy]
+indifferent-selection [-r] parameter reduction_policy [reduction_rate]
+indifferent-selection [-a] [setting]
+```
+
+### Default Aliases ###
+
+| **Alias** | **Equivalent Command** |
+|:----------|:-----------------------|
+| `inds`    | `indifferent-selection` |
+
+## Options ##
+|**Option**|**Description**|
+|:---------|:--------------|
+| `-s, --stats` | Summary of settings |
+| `policy` | Set exploration policy |
+| `parameter [exploration policy parameters]`| Get/Set exploration policy parameters (if value not given, returns the current value) |
+| `parameter [reduction_policy](value]`| Get/Set exploration policy parameter reduction policy (if policy not given, returns the current) |
+| `parameter reduction_policy [exploration policy parameter]`| Get/Set exploration policy parameter reduction rate for a policy (if rate not give, returns the current)|
+| `-a, --auto-reduce [on,off](reduction-rate]`| Get/Set auto-reduction setting (if setting not provided, returns the current) |
+
+## Description ##
+
+The indifferent-selection command allows the user to set options relating to
+selection between operator proposals that are mutually indifferent in
+preference memory.
+
+The primary option is the exploration policy (each is covered below). When Soar
+starts, _softmax_ is the default policy.
+
+**Note**:  As of version 9.3.2, the architecture no longer automatically changes the policy to _epsilon-greedy_ the first time Soar-RL is enabled.
+
+Some policies have parameters to temper behavior. The indifferent-selection
+command provides basic facilities to automatically reduce these parameters
+exponentially and linearly each decision cycle by a fixed rate. In addition to
+setting these policies/rates, the _auto-reduce_ option enables the automatic
+reduction system (disabled by default), for which the Soar decision cycle
+incurs a small performance cost.
+
+## Exploration Policies ##
+
+|**Option**|**Description**|
+|:---------|:--------------|
+| `-b, --boltzmann` | Tempered softmax (uses temperature) |
+| `-g, --epsilon-greedy` | Tempered greedy (uses epsilon) |
+| `-x, --softmax` | Random, biased by numeric indifferent values (if a non-positive value is encountered, resorts to a uniform random selection) |
+| `-f, --first` | Deterministic, first indifferent preference is selected |
+| `-l, --last` | Deterministic, last indifferent preference is selected |
+
+## Exploration Policy Parameters ##
+
+| **Parameter Name** | **Acceptable Values** | **Default Value** |
+|:-------------------|:----------------------|:------------------|
+| `-e, --epsilon`    | `[0, 1]`              | `0.1`             |
+| `-t, --temperature` | `(0, inf)`            | `25`              |
+
+## Exploration Policy Parameter Auto-Reduction Policies ##
+
+|**Parameter Name**|**Acceptable Values**|**Default Value**|
+|:-----------------|:--------------------|:----------------|
+| `exponential default` | `[0, 1]`            | `1`             |
+| `linear`         | `[0, inf]`          | `0`             |
+
+
+## See Also ##
+
+[numeric-indifferent-mode](cmd_numeric_indifferent_mode.md)
+[rl](cmd_rl.md)

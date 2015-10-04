@@ -1,0 +1,110 @@
+# learn #
+
+Set the parameters for chunking.
+
+## Synopsis ##
+
+```
+learn [-l]
+learn [-d|E|o]
+learn [-eabnNpP]
+```
+
+### Default Aliases ###
+
+| `l` | `learn` |
+|:----|:--------|
+
+## Options ##
+
+| `-e, --enable, --on` | Turn chunking on. Can be modified by `-a` or `-b`. |
+|:---------------------|:---------------------------------------------------|
+| `-d, --disable, --off` | Turn all chunking off. (default)                   |
+| `-E, --except`       | Learning is on, except as specified by RHS `dont-learn` actions. |
+| `-o, --only`         | Chunking is on only as specified by RHS `force-learn` actions. |
+| `-l, --list`         | Prints listings of `dont-learn` and `force-learn` states. |
+| `-a, --all-levels`   | Build chunks whenever a subgoal returns a result. Learning must be enabled. |
+| `-b, --bottom-up`    | Build chunks only for subgoals that have not yet had any subgoals with chunks built. Learning must be enabled. |
+| `-n, --local-negations` | Build chunks when local negation encountered in backtraces. (default) |
+| `-N, --no-local-negations` | Do not build chunks when local negation encountered in backtraces. |
+| `-p, --desirability-prefs` | Add relevant desirability preferences to backtraces. |
+| `-P, --no-desirability-prefs` | Do not add any desirability preferences to backtraces. (default)|
+
+## Description ##
+
+The learn command controls the parameters for chunking.
+With no arguments, this command prints out the current learning
+environment status. If arguments are provided, they will alter the learning
+environment as described in the options and arguments table. The
+[watch](cmd_watch.md) command can be used to provide various
+levels of detail when productions are learned. Learning is _disabled_ by
+default.
+
+With the `--on` flag, chunking is on all the time. With the `--except` flag,
+chunking is on, but Soar will not create chunks for states that have had RHS
+`dont-learn` actions executed in them. With the `--only` flag, chunking is off,
+but Soar will create chunks for only those states that have had RHS
+`force-learn` actions executed in them. With the `--off` flag, chunking is off
+all the time.
+
+The `--only` flag and its companion `force-learn` RHS action allow Soar
+developers to turn learning on in a particular problem space, so that they can
+focus on debugging the learning problems in that particular problem space
+without having to address the problems elsewhere in their programs at the same
+time. Similarly, the `--except` flag and its companion `dont-learn` RHS action
+allow developers to temporarily turn learning off for debugging purposes. These
+facilities are provided as debugging tools, and do not correspond to any theory
+of learning in Soar.
+
+The following final six settings are orthogonal to the `--on`,
+`--except`, `--only`, and `--off` flags, and so, may be used in combination
+with them.
+
+The `--all-levels` and `--bottom-up` control when chunks are formed when there
+are multiple levels of subgoals. With bottom-up learning, chunks are learned
+only in states in which no subgoal has yet generated a chunk. In this mode,
+chunks are learned only for the "bottom" of the subgoal hierarchy and not the
+intermediate levels. With experience, the subgoals at the bottom will be
+replaced by the chunks, allowing higher level subgoals to be chunked.
+
+The options `--local-negations` and
+`--no-local-negations` control whether or not chunks can be created that are
+derived from rules that check for negated WMEs on the substate (local
+negations). Chunking through local negations can result in overgeneral chunks,
+but disabling this ability will reduce the number of chunks formed. The default
+is to enable chunking through local negations.
+
+If chunking through local negations is disabled, to see when chunks are
+discarded (and why), set `watch --learning print` (see
+[watch](cmd_watch.md) command).
+
+The options `--desirability-prefs` and
+`--no-desirability-prefs` control whether or not desirability preferences are
+added to the context dependent preference set, which is the set of operator evaluation
+preferences that led to the selection of an operator in a subgoal. All
+preferences in the CDPS are backtraced through when creating justifications and
+chunks.  When this option is disabled, only requirement preferences (requires
+and prohibits) will be added to the CDPS.  When this option is enabled, relevant
+desirability prefs (better, best, worse, worst, indifferent) will also be added,
+producing more specific and possibly correct chunks. The default is to not
+include desirability preferences.
+
+Learning can be turned on or off at any point during a run.
+
+## Examples ##
+
+To enable learning only at the lowest subgoal level:
+
+```
+learn -e b
+```
+
+To see all the `force-learn` and `dont-learn` states registered by RHS actions
+
+```
+learn -l
+```
+
+## See Also ##
+
+[watch](cmd_watch.md) [explain-backtraces](cmd_explain_backtraces.md) [save-backtraces](cmd_save_backtraces.md)

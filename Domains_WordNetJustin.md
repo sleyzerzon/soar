@@ -1,0 +1,49 @@
+# WordNet for Soar with Parse Trees #
+
+This project is a word sense disambiguation task that uses a different approach than [WordNet for Soar](Domains_WordNetNate.md).  While they both use the same corpus, this formulation gives the agent a syntactic parse tree (not a graph) and a word, and the agent is asked to disambiguate the word.  Many structures are repeated within the tree over multiple sentences.
+
+
+### Download Links ###
+  * [WordNet\_With\_Parse\_Trees.zip](http://web.eecs.umich.edu/~soar/downloads/Domains/WordNet_With_Parse_Trees.zip)
+
+**Note**: The domain requires the soar\_exp package above (but will soon be rewritten it so it doesn't). Also necessary are the corpus files, which are included in the download. Each corpus file is a list of triples, which represent the parse tree structure. The script that converts from the SemCor dataset to this format is also included, but it requires other libraries (both publicly available and not).
+
+### Associated Agents ###
+  * Pending:  The agents included in the tarball check for recognition judgments from long-term memory. There is a core set of rules and agents which use/don't use various memories. The rules should also work on Soar kernels without recognition.
+
+### Documentation ###
+  * See the documentation for [WordNet for Soar](Domains_WordNetNate.md) for more information.
+
+### I/O Link Specification ###
+```
+^io
+	^input-link
+		^structure
+			^...            # tree representation of the entire sentence
+		^word               # string representation of the word to be disambiguated
+		^request
+			^path           # recreation of the tree path to the word to be disambiguated
+			^path-direct    # a direct link to the word on the path (NOT to the tree under ^structure)
+		^feedback           # only present if the agent has just disambiguated a word
+			^correct        # yes/no whether the senseid given by the agent is correct
+			^senseid        # the correct senseid of the previous word to be disambiguated
+	^output-link
+		^answer             # the command to use if the agent is disambiguating a word
+			^senseid        # the correct sense of the word ("none" if unknown)
+			^source         # how the agent retrieved the word sense
+			^epmem-recog    # whether the word was recognized by epmem (optional)
+			^smem-recog     # whether the word was recognized by smem (optional)
+		^feedback           # the command to signal that the agent has processed the correct answer
+			^done           # dummy parameter to fit the GSKI output command format
+```
+### Associated Publications ###
+  * Functional Interactions between Memory and Recognition Judgments (submitted AAAI 2012)
+
+### Developer ###
+  * Justin Li
+
+### Soar Versions ###
+  * Any version with SML. If recognition is required, the branch justin-lti-context needs to be used and recognition be turned on ("epmem/smem --set recognition on")
+
+### Language ###
+  * Python

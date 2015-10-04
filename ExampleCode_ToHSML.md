@@ -1,0 +1,29 @@
+# Tower of Hanoi SML #
+This project contains an example of a C++ based environment that interfaces with Soar. It implements a graphical version of the Towers of Hanoi.
+
+The Towers of Hanoi is a puzzle that consists of three rods and a number of disks of different sizes which can slide onto any rod. The puzzle starts with the disks in a neat stack in ascending order of size on one rod, the smallest at the top, thus making a conical shape. The objective of the puzzle is to move the entire stack to another rod, obeying the following rules:
+  * Only one disk may be moved at a time.
+  * Each move consists of taking the upper disk from one of the rods and sliding it onto another rod, on top of the other disks that may already be present on that rod.
+  * No disk may be placed on top of a smaller disk.
+
+`*`_Description of game rules derived from [its Wikipedia page](http://en.wikipedia.org/wiki/Towers_of_Hanoi) and is released under the [Creative Commons license](http://creativecommons.org/licenses/by-sa/3.0/)._
+
+### Download Links ###
+  * [Tower\_Of\_Hanoi\_SML\_Example.zip](http://web.eecs.umich.edu/~soar/downloads/ExampleDomainDevelopmentCode/Tower_Of_Hanoi_SML_Example.zip)
+
+### Documentation ###
+  * None, but the code does have some comments.
+
+### Developer ###
+  * Mitchell Bloch
+
+### Soar Versions ###
+  * Soar 8, 9
+
+### Language ###
+  * C++
+
+
+
+
+

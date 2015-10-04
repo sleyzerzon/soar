@@ -1,0 +1,241 @@
+Note: This help refers to the trunk and future releases, and is not included with the latest round of Soar releases (9.0.1, 9.1.1, 9.2.0).
+
+The Room environment is included in the soar-java/soar-soar2d folder in the Soar suite.
+
+# Configuration #
+
+See configuration help on the [Soar2D help page](Soar2D.md). Here is an example:
+
+```
+general.game = "room";
+general.map = "config/maps/room/default.txt";
+players.active_players = [ "robot" ];
+players.robot.productions = "agents/room/simple-robot.soar";
+```
+
+# I/O #
+Strikeout denotes not implemented.
+
+## Input link specification ##
+Attributes in _italics_ are identifier WMEs, **bold** are leaves or possible leaves.
+
+  * _time_
+    * **seconds** (int) seconds
+    * **microseconds** (int) (0..1000000) microsecond fraction of current second
+
+  * _self_
+    * **name** (string) agent name
+    * **area** (int) unique identifying number for area/room
+    * _carry_ information about carried object, not present if nothing carried
+      * **id** (int) unique identifying number for object
+      * **type** (string) type of object (only block, for now)
+    * _pose_
+      * **x** (float) current x in meters
+      * **y** (float) current y in meters
+      * **z** (float) (0) current z in meters
+      * **yaw** (float or int) (-180..180)
+      * **x-velocity** (float) meters per second
+      * **y-velocity** (float) meters per second
+      * **z-velocity** (float) meters per second
+      * **yaw-velocity** (float) degrees per second
+    * _collision_
+      * **x** (string) (true, false) colliding on x-axis
+      * **y** (string) (true, false) colliding on y-axis
+    * _waypoints_
+      * _waypoint_ one for each registered, enabled waypoint
+        * **id** (int, float, or string) user-defined unique identifier in user-defined type
+        * **x** (float) x position in meters
+        * **y** (float) y position in meters
+        * **z** (float) (0) z position in meters
+        * **distance** (float) (0..) distance to waypoint in meters
+        * **yaw** (float or int) what yaw to turn to to face the waypoint
+        * **relative-bearing** (float or int) if positive then turn left
+        * **abs-relative-bearing** (float or int) (0..) absolute value of relative bearing
+    * _received-messages_
+      * _message_ one for each received message
+        * **id** (int) unique identifying number for message
+        * **from** (string) source of message (agent name)
+        * _first_ (id) starts linked list
+          * **word** (string)
+          * _next_ (identifier **or** string "nil" to end)
+            * **word** (string)
+            * _next_ (identifier **or** string "nil" to end)
+    * **malfunction** (string) (true, false) true indicates systems malfunction
+
+  * _area-description_
+    * **id** (int) unique identifying number for area/room
+    * **type** (string) (door, room) type of room
+    * _gateway_
+      * **id** (int) unique identifying number for gateway
+      * **direction** (string) (north, east, south, west) which wall the gateway is on
+      * **to** (room id on one side of gateway)
+      * **to** (room id on other side of gateway)
+      * **x** (float) x position in meters
+      * **y** (float) y position in meters
+      * **z** (float) (0) z position in meters
+      * **distance** (float) (0..) distance in meters
+      * **yaw** (float or int) what yaw to turn to to face it
+      * **relative-bearing** (float or int) if positive then turn left
+      * **abs-relative-bearing** (float or int) (0..) absolute value of relative bearing
+    * _wall_
+      * **id** (int) unique identifying number for wall
+      * **direction** (string) (north, east, south, west) which wall it is on
+      * **x** (float) x position in meters
+      * **y** (float) y position in meters
+      * **z** (float) (0) z position in meters
+      * **distance** (float) (0..) distance in meters
+      * **yaw** (float or int) what yaw to turn to to face it
+      * **relative-bearing** (float or int) if positive then turn left
+      * **abs-relative-bearing** (float or int) (0..) absolute value of relative bearing
+
+  * _object_
+    * **type** (string) (block, brick, ball, player) type of object
+    * **id** (int) unique identifying number for objects
+    * **name** (string) unique agent name if other player
+    * **visible** (string) (yes, no) object stays on input link briefly after it is not
+    * **x** (float) x position in meters
+    * **y** (float) y position in meters
+    * **z** (float) (0) z position in meters
+    * **distance** (float) (0..) distance in meters
+    * **yaw** (float or int) what yaw to turn to to face it
+    * **relative-bearing** (float or int) if positive then turn left
+    * **abs-relative-bearing** (float or int) (0..) absolute value of relative bearing
+    * **color** (string) (red orange yellow green blue gray violet) object color
+    * **height** (string) object height
+    * **smell** (string) object smell
+    * **shape** (string) object shape
+    * **weight** (float) object weight in kg, only for non-player types
+    * **diffusible** (string) (true, false) object can be diffused
+    * **diffuse-wire** (string) (red, green, blue) which wire diffuses it
+    * **diffused** (string) (true, false) object (diffusible only) is diffused
+
+  * _configuration_
+    * **yaw-format** (string) (float, int)
+    * **offset-x** (float)
+    * **offset-y** (float)
+    * **offset-z** (float)
+
+## Output link specification ##
+
+A note about status error: most commands that return with status error will have an error message attached for debugging. Example, `<m>` below could contain `set-velocity: Unable to parse linear-velocity`
+
+```
+<s> ^io.output-link.set-velocity <sv>
+<sv> ^status error ^message <m>
+```
+
+### Drive Commands ###
+
+Only **one** of the drive commands can be issued at a time. If more than one command is issued, the system arbitrarily picks one unless one of them is _estop_, which overrides all other drive commands.
+
+All parameters for the command must be on the same identifier of the command. For example:
+
+```
+<s> ^io.output-link.set-velocity <sv>
+<sv> ^linear-velocity 1. ^angular velocity 1.
+```
+
+  * ~~_motor_~~
+    * ~~**left** (float) (-1.0..1.0) percent throttle~~
+    * ~~**right** (float) (-1.0..1.0) percent throttle~~
+    * ~~**status** (string) (accepted, executing, complete, error)~~
+
+  * _set-velocity_
+    * **linear-velocity** (float) (-0.5..0.5) meters per second forward or reverse
+    * **angular-velocity** (float) rotation, degrees per second, positive is left turn
+    * **status** (string) (accepted, executing, complete, error)
+
+  * _set-linear-velocity_
+    * **linear-velocity** (float) (-0.5..0.5) meters per second forward or reverse
+    * **status** (string) (accepted, executing, complete, error)
+
+  * _set-angular-velocity_
+    * **angular-velocity** (float) rotation, degrees per second, positive is left turn
+    * **status** (string) (accepted, executing, complete, error)
+
+  * _set-heading_
+    * **yaw** (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * **status** (string) (accepted, executing, interrupted, complete, error)
+
+  * _set-heading-linear_
+    * **yaw** (float or int) (-180..180) target yaw (modded, values outside this bounds OK)
+    * **linear-velocity** (float) (-0.5..0.5) meters per second forward or reverse
+    * **status** (string) (accepted, executing, interrupted, complete, error)
+
+  * _stop_ graceful stop
+    * **status** (string) (accepted, executing, interrupted, complete, error)
+
+  * _estop_ emergency stop
+    * **status** (string) (accepted, complete)
+
+### Effector Commands ###
+
+  * _get-object_ pick up an object
+    * **id** (int) target object id
+    * **status** (string) (accepted, complete, error)
+
+  * _drop-object_ drop a carried object
+    * **id** (int) target object id
+    * **status** (string) (accepted, complete, error)
+
+  * _diffuse-object_ engage in a domain-specific diffuse task
+    * **id** (int) target object id
+    * **status** (string) (accepted, complete, error)
+
+  * _diffuse-object-by-wire_ engage in a domain-specific diffuse task
+    * **id** (int) target object id
+    * **color** (string) (red, green, blue) what wire to cut
+    * **status** (string) (accepted, complete, error)
+
+### Waypoint Commands ###
+
+  * _add-waypoint_ enter a waypoint into the system, enabled
+    * **id** (int, float, string) user-defined identifier string, type will be replicated on input-link
+    * **x** (float) x position in meters
+    * **y** (float) y position in meters
+    * **status** (string) (accepted, complete, error)
+
+  * _remove-waypoint_ remove the waypoint from the system
+    * **id** (int, float, string)
+    * **status** (string) (accepted, complete, error)
+
+  * _enable-waypoint_ enable a previously disabled waypoint
+    * **id** (int, float, string)
+    * **status** (string) (accepted, complete, error)
+
+  * _disable-waypoint_ disable an enabled waypoint
+    * **id** (int, float, string)
+    * **status** (string) (accepted, complete, error)
+
+### Communication Commands ###
+
+Messages sent will appear on the input link after a one-decision-cycle delay.
+
+The `destination` parameter for `send-message` is optional. If omitted, message will be broadcast to all listeners, including the sending agent.
+
+The `say` destination is not currently implemented on windows platforms.
+
+The `remove-message` command uses the message id number, available at `io.input-link.self.received-messages.message.id`
+
+  * _send-message_
+    * **destination** (string) target of message or omit to broadcast to all available listeners
+    * _first_
+      * **word** (string0)
+      * _next_ (identifier **or** string "nil" to end)
+        * **word** (string0)
+        * _next_ (identifier **or** string "nil" to end)
+    * **status** (string) (accepted, complete, error)
+
+  * _remove-message_ remove a specific message from the received-messages list
+    * **id** (string)
+    * **status** (string) (accepted, complete, error)
+
+  * _clear-messages_ remove all messages from received-messages list
+    * **status** (string) (accepted, complete)
+
+### Other Commands ###
+  * _configure_ set environment configuration parameters
+    * **yaw-format** (string) (float, int) use integer data types for yaw
+    * **offset-x** (float) relocate origin
+    * **offset-y** (float) relocate origin
+    * **status** (string) (accepted, complete, error)

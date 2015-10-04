@@ -1,0 +1,30 @@
+# Blocks-World Subgoaling Agent #
+This agent is a modified version of the simple blocks-world agent that uses means-ends analysis and operator subgoaling (first used in General Problem Solver (GPS)).
+
+Means-ends analysis involves proposing operators that can achieve part of the goal. Thus, some operators will be proposed even if they do not apply to the current state. If an operator is selected that can not apply, an operator no-change impasse arises. In that substate, the goal is to achieve a state in which the impassed operator can apply. This leads to a recursive subgoal stack.
+
+Involves removing the original operator evaluation rules, changing the operator proposal rules, and modifying the application rules so they apply only when they should. Also includes the addition of the operator no-change subset under move-block and the inclusion of the desired state.
+
+### Soar capabilities ###
+  * Subgoaling with means-ends analysis
+
+### Download Links ###
+  * [BlocksWorld\_Subgoaling\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Subgoaling_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * [The Soar Cognitive Architecture](http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784): Chapter 4
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * VisualSoar

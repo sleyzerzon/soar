@@ -1,0 +1,28 @@
+# Soar Tutorial #
+
+### What You'll Need ###
+
+  1. If necessary, install Java
+    * If you are running Ubuntu Linux or OSX, you probably already have Java installed.
+    * Otherwise, you can download the [latest version of the Sun JRE or JDK here](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+    * **Important**: the 64-bit version of Soar require the 64-bit version Java!  Make sure to download the correct one.
+  1. Download the Soar Tutorial. It contains Soar, the Java Debugger, VisualSoar, Eaters, TankSoar, sample agents, and Soar documentation.
+    * [Soar Tutorial for 32-bit Windows](http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.4-Windows_32bit.zip)
+    * [Soar Tutorial for 64-bit Windows](http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.4-Windows_64bit.zip)
+    * [Soar Tutorial for 32-bit Linux](http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.4-Linux_32bit.zip)
+    * [Soar Tutorial for 64-bit Linux](http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.4-Linux_64bit.zip)
+    * [Soar Tutorial for MacOS X](http://web.eecs.umich.edu/~soar/downloads/SoarSuite/SoarTutorial_9.3.4-OSX.zip)
+
+### Online Version ###
+Within the SoarSuite download, you will find a complete copy of the Soar Tutorial.  They are also provided here for easier online access.
+
+  1. [Introduction](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%201.pdf)
+  1. [Simple External Interaction](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%202.pdf)
+  1. [Subgoals](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%203.pdf)
+  1. [More Simple Problem Solving](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%204.pdf)
+  1. [Planning and Learning](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%205.pdf)
+  1. [Quakebot](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%206.pdf)
+  1. [Reinforcement Learning Tutorial](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%207%20-%20RL.pdf)
+  1. [Semantic Memory Tutorial](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%208%20-%20SMem.pdf)
+  1. [Episodic Memory Tutorial](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%209%20-%20EpMem.pdf)
+

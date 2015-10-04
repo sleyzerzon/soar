@@ -1,0 +1,60 @@
+# SoarText/IO #
+
+The purpose of this tool is to allow the Soar programmer to interact with a Soar agent while it is running. SoarTextIO allows you to communicates with an agent via plain sentences that it translates into a linked list of words.
+
+Why is this useful? Imagine you have written a Soar agent that solves algebra problems. SoarTextIO provides a way for you to give the agent equations to solve on the fly. Or, say that you have written an exploration bot in a simulation whose goal is to find different locations on a map. SoarTextIO allows you to continually give the agent different locations to find.
+
+### Environment Properties ###
+
+  * Provides a new type of input modality for an agent.
+
+### Download Links ###
+  * [SoarTextIO.zip](http://web.eecs.umich.edu/~soar/downloads/Domains/SoarTextIO.zip)
+
+### Associated Agents ###
+
+  * **[SoarTextIO Adder Demo Agent](Agent_SoarTextIO_Adder.md)**: A simple agent that computes the sum of two numbers recieved via SoarTextIO.  This agent is used in the SoarTextIO tutorial. The files for the agent are included with the SoarTextIO system.
+
+### Documentation ###
+  * [SoarTextIO Command Summary](http://soar.googlecode.com/files/CommandSummary.doc)
+  * [SoarTextIO Tutorial](http://soar.googlecode.com/files/SoarTextIO%20Tutorial.doc)
+
+**Note**: The above documents are also included in the download.
+
+### IO link Specification ###
+```
+^input-link
+	^text
+		^text-input-number <num>
+		^length <num-words>
+		^next
+			^value <word-one>
+			^next
+				^value <word-two>
+				^next 
+					^value <word-three>
+					^next
+						^value nil
+
+^output-link
+	^text
+		^text-input-number 1 # Optional
+		^length 5		   # Optional
+		^get next-line	   # Optional - used for loading from files
+		^next
+			^value <word-one>
+			^next
+				^value <word-two>
+				^next 
+					^value <word-three>
+					^next
+						^value nil
+```
+### Developer ###
+  * Taylor Lafrinere
+
+### Soar Versions ###
+  * Soar 8, 9
+
+### Language ###
+  * C++

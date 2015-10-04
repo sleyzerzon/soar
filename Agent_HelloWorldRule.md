@@ -1,0 +1,28 @@
+# Eaters Hello World Rule Example Agent #
+A very simple agent (1 production) that prints out "Hello World" and halts.
+
+### Soar capabilities ###
+  * Basic production syntax
+  * Printing a debug statement
+  * Halting agent run from a production
+
+### Download Links ###
+  * [Hello\_World\_Rule\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Hello_World_Rule_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * The Soar Tutorial: Chapter 2
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * Simple text

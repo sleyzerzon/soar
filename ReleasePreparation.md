@@ -1,0 +1,41 @@
+# University of Michigan Soar Release Procedure #
+(Updated 4/10/12 by Mazin Assanie)
+  1. Prioritize bugs and decide which to do.  Fix them, test, then declare a code freeze.
+  1. Update each platform�s build instructions on wiki.
+    * It contains version numbers of prerequisites that may change from release to release (at least with the the items that say download the latest version of�)
+    * May need to test with the latest versions of prerequisites if they change
+  1. Update all version numbers on web site
+    * Can just grep 9.3.1 over the wiki directory.
+  1. Bump version number in code files
+    * `Core/shared/soarversion.h`
+    * `Java/SMLJava/ edu.umich.soar.SoarProperties.VERSION`
+    * Inside the root SConstruct file
+  1. Prepare release notes
+    * See a previous version's release notes for a template.: http://code.google.com/p/soar/wiki/ReleaseNotes
+    * A great (and tedious) way to prepare for this is to find out the date of the previous release and to go through the Subversion repository from that date to the current release, and summarize as many changes as you can. Break major changes out and include those near the top of the file. List the smaller changes (and the big ones, again, with shorter text) later in the file in a bulleted list.
+    * I usually email the people involved with changes that are complex, obscure, or insufficiently documented and have them write summaries for those.
+  1. Turn off timing switches before final build compile
+    * High-performance timers should be disabled but are often checked in enabled. They carry an unacceptable performance penalty on many platforms, but we need them when doing research. This should be a runtime switch in the timers command. Make sure this line is commented out in shared/misc.h:
+```
+    //#define USE_PERFORMANCE_FOR_BOTH 1
+```
+> > Timing stats should be on but not detailed. Same reasons as above. Make sure these are commented out in SoarKernel/src/kernel.h:
+```
+    //#define NO_TIMING_STUFF
+    //#define DETAILED_TIMING_STATS
+```
+  1. Convert all docx and doc files in the Documentation folder to pdf
+    * First update release date and latest Soar version number in the first chapter of the tutorial.
+    * The tutorial also specifically cites directories where users can find agents and so forth.  If there are any changes in the distribution�s directory structure, you�ll need to go through the tutorial and update all of those references accordingly.
+    * After conversion with Adobe Acrobat, move into the Documentation/pdf directory and check in.
+  1. Generate Manual
+    * Update the version number in trunk/Documentation/ManualSource/manual.tex
+    * Follow the instructions in the readme.txt to generate the pdf.  This must be done on a linux machine.  If you have the right packages installed, you basically just run make.
+    * Copy the pdf to the Documentation/pdf directory and check in.
+  1. Build on each platform and copy to repository
+    * Update the source code on each platform and run scons all to build Soar
+    * Copy the 'out' directory from each platform�s build to the appropriate directory in trunk/Compiled/(platform)
+  1. Build VisualSoar and copy to trunk/Compiled/VisualSoar/
+    * To build, open a command line in the VisualSoar directory and type �ant�
+  1. Build Eaters/TankSoar and copy to to trunk/Compiled/Soar2D
+    * To build, open a command line in the Eaters

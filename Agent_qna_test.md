@@ -1,0 +1,28 @@
+# Soar QnA Test Agent #
+An example agent that runs and validates a non-comprehensive set of unit tests based upon available sample data source instances/queries.
+
+SoarQnA facilitates agent access to external knowledge stores via the io system. It is an efficient, unified agent interface that allows your system to access arbitrary external data sources. Examples include Google Maps, GIS, GPS/WiFi, weather data, rhyming databases, diet databases, and language translation engines.
+
+### Soar capabilities ###
+  * Demonstrates how an agent can use Soar QnA
+
+### Download Links ###
+  * [Algebra\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Algebra_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * Nate Derbinsky
+
+### Soar Versions ###
+  * Soar 9
+
+### Project Type ###
+  * VisualSoar

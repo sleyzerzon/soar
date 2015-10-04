@@ -1,0 +1,38 @@
+# Arithmetic Agent with Semantic Memory #
+This agent demonstrates the use of semantic memory by extending the capabilities of the [Arithmetic Agent](Agent_Arithmetic.md).  The description of that agent also applies here.
+
+This agent supports using semantic memory through in three different ways controlled by parameters set in initialize-arithmetic.
+  1. If the semantic or working memory is pre-loaded with problems, it will use those problems. If not it will generate problems at random.
+    * problems-5000.soar and problems-10000.soar contain the rules to generate the working memory problems.
+    * problems-5000-smem.soar contains the structure to initialize semantic memory.
+    * Controlled by loading one of those files at run time and setting `^parameters.problems-source [wm smem]`
+  1. Control whether arithmetic facts are computed/stored in working memory or semantic memory. If in semantic memory, will dynamically generated using counting (process-column/compute-result/add-via-counting
+    * Controlled by parameters.fact-source `[wm smem]`
+    * To experiment with impact of semantic memory, can control whether facts are stored in semantic memory (or will always be counted) via parameters.store `[yes no]` and whether they are attempted to be retrieved parameters.retrieve `[yes no]`
+    * Number of problems attempted is set by count, which is usually 5000 or 10000.
+
+### Soar capabilities ###
+  * Semantic Memory
+  * Hierarchical task decomposition
+  * Chunking
+
+### Download Links ###
+  * [Arithmetic-SMem\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Arithmetic-SMem_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 9.2+
+
+### Project Type ###
+  * VisualSoar

@@ -1,0 +1,5 @@
+# Domain Development Example Code #
+
+This category contains example code and wrapper functions to help you build your own environments in a variety of language, namely C++, PhP, Python, Java and C.  There are two actual external environments among these examples.
+
+**Note**: For meatier examples, you can also study the source code of many of the domains in the _Domains_ section of the downloads by downloading the source for them from our [git repository](https://github.com/SoarGroup).

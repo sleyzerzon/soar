@@ -1,0 +1,15 @@
+# version #
+
+Returns the version number of the Soar kernel.
+
+## Synopsis ##
+
+```
+version
+```
+
+## Description ##
+
+This command gives version information about the current Soar kernel. It
+returns the version number and build date which can then be stored by the agent
+or the application.

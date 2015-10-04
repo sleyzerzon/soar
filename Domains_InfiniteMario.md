@@ -1,0 +1,53 @@
+# Infinite Mario #
+
+This environment is derived from the Infinite Mario domain from RLCompetition2009 (based on RL-Glue) and uses SML to connect to Soar.
+
+Agents play a variant of Super Mario, a complete side-scrolling video game with destructible blocks, enemies, fireballs, coins, chasms, platforms, etc. The state space is complicated, but factored in an object-oriented way, which captures many aspects of the real world. Challenges include:
+
+  * Path planning: How can Mario navigate around simple obstacles, or through complicated sets of blocks?
+  * Option learning and execution: Are there reusable sensory-motor primitives which simplify planning? Can these be learned?
+  * Explore / exploit: Do enemies always behave the same way? Are there stochastic effects of blocks that can be learned?
+
+Get more details on the mario domain [here](http://2009.rl-competition.org/mario.php).
+
+### Environment Properties ###
+  * Continuous, single-agent, episodic, RL, uncertainty, complete information.
+
+### Download Links ###
+  * [Infinite Mario Download (Linux only)](http://web.eecs.umich.edu/~soar/downloads/Domains/InfiniteMario-9.3.4.zip)
+
+### Associated Agents ###
+  * [Infinite Mario Soar-RL Agent](Agent_InfiniteMario_RL.md)
+
+### Documentation ###
+  * Running Instructions
+    * Download and install [Soar](http://code.google.com/p/soar/wiki/Downloads?tm%3D2).
+    * Configure environment variables for Soar ($SOAR\_HOME)
+    * Perform the install instructions found at [RL-Competition 2009 software](http://2009.rl-competition.org/software.php#download).  Use the software that is already in the above Infinite Mario download, within the 15-rl-competition-2009 directory
+    * Configure $COMP\_HOME to point to the topmost directory of your local install of the competition software
+    * Configure $AGENT\_HOME to point to the topmost directory of your local install of MarioSoar
+    * cd $AGENT\_HOME
+    * make clean;make
+    * Run the agent ./run.bash config/combined.config
+    * cd to trainer $COMP\_HOME/trainers/guiTrainerJava/ for GUI trainer and ./run.bash or $COMP\_HOME/trainers/consoleTrainerJava/ for headless trainer
+
+### IO link Specification ###
+```
+pending
+```
+
+### Developer ###
+  * Shiwali Mohan
+
+### Soar Versions ###
+  * Soar 9.3
+
+### Language ###
+  * Java
+
+### Associated Publications ###
+  * Mohan, S. and Laird, J. E. (2011). An Object-Oriented Approach to Reinforcement Learning in an Action Game. In Proceedings of the Seventh Artificial Intelligence and Interactive Digital Entertainment.
+
+  * Mohan, S. and Laird, J. E. (2010). Relational Reinforcement Learning in Infinite Mario (Extended Abstract). In Proceedings of the Twenty-Fourth AAAI Conference on Artificial Intelligence.
+
+  * Mohan, S. and Laird, J. (2009). Learning to play Mario (Unrefereed). Center for Cognitive Architecture, University of Michigan, Tech. Rep. CCA-TR-2009-03

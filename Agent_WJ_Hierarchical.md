@@ -1,0 +1,30 @@
+# Water Jug Hierarchical Task Decomposition Agent #
+This project contains a version of the water jug problem that is formulated for hierarchical task decomposition.  It involves two levels of problem spaces.
+
+The top level has three operators: fill, empty or pour.  The next level consists of three operators: pick-up, fill-jug and put-down and they arise in an operator no-change for the super state.
+
+**Note**:  This agent works with chunking, which compiles the actions in the substates into rules that apply at the top-state.  Use the command "learn -e" to turn on chunking, run the agent once, init-soar  then run the agent again to see how the learned productions eliminate the need to subgoal in the second run.
+
+### Soar capabilities ###
+  * Hierarchical task composition via subgoaling
+
+### Download Links ###
+  * [Water\_Jug\_Hierarchical\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Water_Jug_Hierarchical_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * None.
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * VisualSoar

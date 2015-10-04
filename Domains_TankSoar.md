@@ -1,0 +1,56 @@
+# TankSoar #
+
+TankSoar is a multi-agent tank battle game implemented using Java and interfaced with Soar via SML.
+
+The TankSoar world consists of a rectangular grid, 14 squares wide by 14 squares high. All four sides are bounded by walls made of rock. Interior walls are made of trees. There are a variety of maps that can be used, with different layouts of walls.   Each TankSoar agent controls one tank. The tank takes up one square in the playing field. A tank has actions it can take, resources it carries, and sensors with which it observes its environment.  In TankSoar, your tank has many sensors and actions and can interact with other tanks by shooting missiles.
+
+### Environment Properties ###
+  * Multi-agent, incomplete information
+
+### Download Links ###
+  * [TankSoar for 32-bit Windows](http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.3.4-Windows_32bit.zip)
+  * [TankSoar for 64-bit Windows](http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.3.4-Windows_64bit.zip)
+  * [TankSoar for 32-bit Linux](http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.3.4-Linux_32bit.zip)
+  * [TankSoar for 64-bit Linux](http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.3.4-Linux_64bit.zip)
+  * [TankSoar for MacOS X](http://web.eecs.umich.edu/~soar/downloads/Domains/TankSoar_9.3.4-OSX.zip)
+
+### Associated Agents ###
+  * **[Simple Bot](Agent_TankSoar_Simple.md)**
+  * **[Simple Sound Bot](Agent_TankSoar_SimpleSound.md)**
+  * **[Obscure Bot](Agent_TankSoar_Obscure.md)**
+  * **[Wander Bot](Agent_TankSoar_Wander.md)**
+  * **[Mapping Bot](Agent_TankSoar_Mapping.md)**
+
+### Documentation ###
+  * [Soar Tutorial](SoarTutorial.md): Chapter 3 of the Soar Tutorial is a great introduction to TankSoar.
+
+### IO link Specification ###
+```
+^input-link
+  (^blocked B1 ^clock 0 ^current-score C3 ^direction north ^energy 1000
+       ^energyrecharger no ^health 1000 ^healthrecharger no ^incoming I4
+       ^missiles 15 ^my-color blue ^radar-distance 0 ^radar-setting 0
+       ^radar-status off ^random 0.07299846410751343 ^resurrect yes ^rwaves R4
+       ^shield-status off ^smell S3 ^sound silent ^x 6 ^y 3)
+  (B1 ^backward no ^forward yes ^left no ^right no)
+  (C3 ^blue 0)
+  (I4 ^backward no ^forward no ^left no ^right no)
+  (R4 ^backward no ^forward no ^left no ^right no)
+  (S3 ^color none ^distance none)
+^output-link
+  ^move.direction left/right/forward/backward/none
+  ^rotate.direction left/right
+  ^fire.weapon missile
+  ^radar.switch on/off
+  ^radar-power.setting 1-14
+  ^shields.switch on/off
+```
+
+### Developer ###
+  * Jonathan Voigt, Mazin Assanie
+
+### Soar Versions ###
+  * Soar 8, 9
+
+### Language ###
+  * Java

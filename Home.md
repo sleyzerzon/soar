@@ -1,0 +1,4 @@
+This is the Wiki for the **Soar** cognitive architecture.  It serves as living documentation on
+**Soar** as it evolves with ongoing research. See the sidebar for a table of interesting links.
+
+For more general information about the **Soar** project, please visit the [Soar home page](http://sitemaker.umich.edu/soar).

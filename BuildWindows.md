@@ -1,0 +1,49 @@
+# Building Soar on Windows #
+
+Soar has been tested on 32-bit and 64-bit Windows 7.
+It might also run on older versions of Windows and Windows 8, but they have not been tested and are not officially supported.
+
+## Install the Prerequisities ##
+
+  * **Microsoft Visual C++ compiler**: Required.
+    * Soar has been tested on [Visual Studio or Visual Studio Express 2010](http://www.visualstudio.com/downloads/download-visual-studio-vs) and better.
+    * Note that because Soar is built by [SCons](http://scons.org), you don't need the Visual Studio IDE or project configurations to build it. You only need the command-line compiler, linker, and runtime libraries.
+  * **Python**: Required.
+    * Version 2.7 is recommended, but anything from 2.5 onward should work. **Note**: The Python 3.x series WILL NOT WORK.
+    * You can download it at [python.org](http://www.python.org/download/releases/2.7.3/).
+    * **Note**: Please install Python to a path without spaces. If you use the installer from python.org, the default `C:\Python2X` is a good choice. We recommend using the installer.
+  * **SWIG**: Optional.
+    * Acts as a bridge between the Soar C++ libraries and the various other languages.  Since nearly everyone uses the Soar Debugger, which is written in Java, you probably need this.  It is also needed if you plan to interface with Soar using Tcl, C# or Python.
+    * You can download a precompiled zip from [swig.org](http://www.swig.org/download.html) and extract it anywhere. We recommend `C:\swig` or a similar path without spaces, because the build script may have trouble with those.
+  * **Java Standard Edition Development Kit (JDK)**: Required.
+    * Needed for the Soar Debugger and the Java interface. The exact version doesn't matter. You can also use Sun's JDK.
+    * The latest JDK is available from [Oracle's web site](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+  * **ActiveTcl 8.6+**: Optional.
+    * Needed if you want to build the SWIG Tcl interface and TclSoarLib (a module that adds tcl to the Soar command line.)
+    * ActiveTcl installation packages can be found [here](http://www.activestate.com/activetcl/downloads).
+
+**Note**: For all of these packages, make sure to download the 64-bit version if you are on a 64-bit machine.
+
+## Build Soar ##
+
+**Launch a Visual Studio Command Prompt (not the normal DOS prompt) from the start menu.**  Depending on the version of Visual Studio you're using, you should try using either the VS Native Prompt for your architecture or the VS Cross-Compiler prompt.  If the prompt names include the architecture (x86 or x64), you should choose the one that matches the architecture you are building for (32-bit or 64-bit).
+
+Use `cd` to change to the `SoarSuite` directory, and type
+
+```
+  build all
+```
+
+The batch file may ask you for the paths to Java, SWIG, or Python, if it can't find them automatically. After you enter them the first time, you no longer have to manually specify those paths in environment variables.
+
+All of your resulting binaries will be in the /out folder.  You can build specific components by specifying a different target than 'all'.  There are also several settings to control how Soar is built.  For example, the '--opt' setting will create a faster, optimized build instead of the default debug build.  For more detailed information about the Scons script, see the [SCons Script Documentation page](BuildSconsScript.md). See the [FAQ](FAQ.md) for common solutions to errors.
+
+### Visual Studio Solution Generation ###
+
+SCons can generate Visual Studio project and solution files that allow users to more easily modify and debug the kernel source code.  When performing 'build all', these files will also be generated.  You can also manually generate these files by typing
+```
+  build msvs
+```
+Note that the generated projects are not stand-alone, they still call SCons under the hood to build targets.
+
+Also note that you can debug a running instance of Soar without a project. To do this, start the Soar program, such as the Java Debugger, then in Visual Studio choose "Debug->Attach to Process", and select the Soar process. As long as you compiled Soar.dll in debug mode (**without** the --opt flag), the debug symbols and locations of source files will be embedded in the library itself, and you will get most of the debugging functionality this way.

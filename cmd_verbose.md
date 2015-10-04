@@ -1,0 +1,26 @@
+# verbose #
+
+Control detailed information printed as Soar runs.
+
+## Synopsis ##
+
+```
+verbose [-ed]
+```
+
+## Options ##
+
+| `-d, --disable, --off` | Turn verbosity off. (default) |
+|:-----------------------|:------------------------------|
+| `-e, --enable, --on`   | Turn verbosity on.            |
+
+## Description ##
+
+The verbose command enables tracing of a number of low-level Soar execution
+details during a run. The details printed by verbose are usually only valuable
+to developers debugging Soar implementation details.  Invoke with no arguments
+to query the current setting.
+
+## See Also ##
+
+[watch](cmd_watch.md)

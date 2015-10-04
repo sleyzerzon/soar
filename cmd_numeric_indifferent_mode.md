@@ -1,0 +1,30 @@
+# numeric-indifferent-mode #
+
+Select method for combining numeric preferences.
+
+## Synopsis ##
+
+```
+numeric-indifferent-mode [-as]
+```
+
+## Options ##
+
+| `-a, --avg, --average` | Use average mode |
+|:-----------------------|:-----------------|
+| `-s, --sum`            | Use sum mode (default) |
+
+## Description ##
+
+The numeric-indifferent-mode command sets how multiple numeric
+indifferent preference values given to an operator are combined into a
+single value for use in random selection.
+
+The default procedure is `--sum` which sums all numeric indifferent
+preference values given to the operator, defaulting to 0 if none
+exist.  The alternative `--avg` mode will average the values, also
+defaulting to 0 if none exist.
+
+## See Also ##
+
+[rl](cmd_rl.md) [indifferent-selection](cmd_indifferent_selection.md)

@@ -1,0 +1,79 @@
+# Taxi #
+The taxicab problem domain is well known in the area of reinforcement learning.  Simply put, a taxicab driver is tasked with the problem of picking up a passenger and delivering him to his destination in as few steps as possible.  Typically, the taxi is constrained by a limit on the amount of fuel that can be carried.
+
+The canonical taxicab problem is a 5x5 gridworld.  There are four cells which serve as possible starting locations
+and possible destinations for the passenger.  There is a refueling station near the middle of the map.
+Additionally, there are six impassable walls (or 26 counting the walls surrounding the map).
+The seven actions available to the taxi are moving North, South, East and West, picking up the passenger,
+putting down the passenger, and refueling. An attempt to move North, South, East, or West automatically results in the taxi moving one cell in that direction unless there is a wall in the way, in which case the move action is ignored and the taxi remains in place.  Fuel decreases by 1 unless the move action is ignored.  Pickup always results in the passenger being picked up if the taxi does not have the passenger and is at the passenger's starting location.  Putdown always results in the passenger being put down if the taxi has the passenger and is at the destination.  Refuel always sets the amount of fuel to 14 if the taxi is at the refueling station.
+
+### Environment Properties ###
+  * Single-agent
+
+### Download Links ###
+  * [Taxi (all platforms)](http://web.eecs.umich.edu/~soar/downloads/Domains/zeni_taxicab.zip)
+
+### Associated Agents ###
+  * [Reinforcement Learning Taxi Driver Agent](Agent_Taxi_RL.md)
+  * [Hierarchical Reinforcement Learning Taxi Driver Agent](Agent_Taxi_HRL.md)
+
+### Documentation ###
+  * There are a variety of launch scripts you can use to start Taxi with the two included agents, depending on your platform.  Open them up to see how you can create a script to launch your own agents.
+
+### Associated Publications ###
+  * Bloch, M.K. _[Hierarchical Reinforcement Learning in the Taxicab Domain.](http://www.eecs.umich.edu/~soar/sitemaker/docs/pubs/bazald_-_tr1.pdf)_ (Report No. CCA-TR-2009-02). Ann Arbor, MI: Center for Cognitive Architecture, University of Michigan. (2009)
+
+### IO link Specification ###
+```
+^input-link
+    ^self
+        ^position
+            ^x <int> current grid column
+            ^y <int> current grid row, flipped
+        ^reward <int> result of last action
+        ^random <float> a random number, just like eaters and tanksoar, [0..1)
+        ^passenger [true false] true if a passenger is carried
+        ?^destination [red blue green yellow]
+        ^fuel <int> fuel remaining
+    ^view
+        ^north
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^south
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^east
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+        ^west
+            ^type [none normal red blue green yellow fuel]
+            ^wall [true false]
+            ^passenger [true false]
+    ^cell current cell agent is at
+        ^type [normal red blue green yellow fuel]
+        ^passenger [true false] passenger is hailing cab        
+                
+# Error status only happens when there's an architectural error.
+# Do not use "status" to determine if your command was successful or not.               
+^output-link
+        ^move
+                ^direction [north south east west]
+                ^status [complete error]
+        ^pickup
+                ^status [complete error]
+        ^putdown
+                ^status [complete error]
+        ^fillup
+                ^status [complete error]
+```
+### Developer ###
+  * Mitchell Bloch
+
+### Soar Versions ###
+  * Soar 9
+
+### Language ###
+  * C++

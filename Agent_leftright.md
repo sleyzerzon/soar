@@ -1,0 +1,26 @@
+# Left-Right Reinforcement Learning Agent #
+A very simple agent that demonstrates reinforcement learning.  Agent chooses between left and right and must learn that left is preferred.
+
+### Soar capabilities ###
+  * Reinforcement learning
+
+### Download Links ###
+  * [Left\_Right\_RL\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/Left_Right_RL_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * Soar Reinforcement Learning Tutorial
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 9
+
+### Project Type ###
+  * VisualSoar

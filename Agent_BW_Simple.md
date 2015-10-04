@@ -1,0 +1,26 @@
+# Blocks-World Simple Agent #
+A very simple instance of an internally-simulated blocks world with three blocks. Uses two operator evaluation rules to eliminate all search.
+
+### Soar capabilities ###
+  * Basic PSCM functions: State Elaboration, Operator Proposal, Operator Evaluation, Internal Operator Application
+
+### Download Links ###
+  * [BlocksWorld\_Simple\_Agent.zip](http://web.eecs.umich.edu/~soar/downloads/Agents/BlocksWorld_Simple_Agent.zip)
+
+### External Environment ###
+  * None.
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * [The Soar Cognitive Architecture](http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=12784): Chapter 4
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * VisualSoar

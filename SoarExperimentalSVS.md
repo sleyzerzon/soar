@@ -1,0 +1,24 @@
+# Soar Visual System #
+SVS augments the Soar cognitive architecture with specialized processing for spatial and visual information.  It combines the functionality of both Soar Visual Imagery (SVI, developed by Scott Lathrop) and the Spatial Reasoning for Soar system (SRS, developed by Sam Wintermute), with an increased emphasis on increasing agent functionality. The architecture includes short-term and long-term
+memories for both spatial and visual information, along with mechanisms to access and modify those
+memories.
+
+### Download Links ###
+  * This project is not yet ready for public distribution.  It will be posted here when it is.
+
+### Documentation ###
+  * None.
+
+### Developer ###
+  * Joseph Xu
+
+### Soar Versions ###
+  * Soar 9.32
+
+### Language ###
+  * C++
+
+
+
+
+

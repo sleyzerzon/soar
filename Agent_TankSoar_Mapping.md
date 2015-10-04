@@ -1,0 +1,27 @@
+# TankSoar Mapping Agent #
+This agent extends the capabilities of both the TankSoar simple agent (described [here](Agent_TankSoar_Simple.md)) and the TankSoar simple sound agent (described [here](Agent_TankSoar_SimpleSound.md)) with the ability to create an internal representation of the environment map.  It uses this map to better control its radar and find chargers.
+
+### Soar capabilities ###
+  * Hierarchical task composition
+  * Creating persistent working memory structures to remember past state
+
+### Download Links ###
+  * This agent is packaged with the TankSoar environment.
+
+### External Environment ###
+  * [TankSoar](Domains_TankSoar.md)
+
+### Default Rules ###
+  * None.
+
+### Associated Publications ###
+  * [The Soar Tutorial: Chapter 3](http://web.eecs.umich.edu/~soar/downloads/Documentation/SoarTutorial/Soar%20Tutorial%20Part%203.pdf)
+
+### Developer ###
+  * John Laird
+
+### Soar Versions ###
+  * Soar 8,9
+
+### Project Type ###
+  * VisualSoar
